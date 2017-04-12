@@ -9,9 +9,7 @@ public class BuildManager
 	boolean[] ProdStatus = new boolean[20];
 	boolean[] StreStatus = new boolean[20];
 
-	UIsetup u = GridManager.u;
-	TurnManager t = GridManager.t;
-	GridManager g = UIsetup.g;
+	TurnManager t = new TurnManager();
 	int credits;
 	String news;
 	int[] playercredits = new int[2];
@@ -38,13 +36,13 @@ public class BuildManager
 			this.playercredits = this.t.GetPlayerCredits();
 			int[] production = this.t.GetPlanetProd();
 
-			if (this.ProdStatus[planet] == 0)
+			if (this.ProdStatus[planet])
 			{
 				if (this.credits >= 12500)
 				{
 					production[planet] += 3;
 					this.t.SetPlanetProd(production);
-					this.ProdStatus[planet] = (this.ProdStatus[planet] != 0 ? 0 : true);
+					this.ProdStatus[planet] = !this.ProdStatus[planet];
 
 					if (!this.t.PlayerTurn)
 					{
@@ -79,13 +77,13 @@ public class BuildManager
 			this.playercredits = this.t.GetPlayerCredits();
 			double[] strength = this.t.GetPlanetStrength();
 
-			if (this.StreStatus[planet] == 0)
+			if (this.StreStatus[planet])
 			{
 				if (this.credits >= 9500)
 				{
 					strength[planet] += 3.0D;
 					this.t.SetPlanetStrength(strength);
-					this.StreStatus[planet] = (this.StreStatus[planet] != 0 ? 0 : true);
+					this.StreStatus[planet] = !this.StreStatus[planet];
 
 					if (!this.t.PlayerTurn)
 					{

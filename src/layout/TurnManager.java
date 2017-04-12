@@ -4,9 +4,8 @@ import java.util.Random;
 
 public class TurnManager
 {
-	static GridManager g = UIsetup.g;
-	static UIsetup u = new UIsetup();
-	static BuildManager b = UIsetup.b;
+	static GridManager g = null;
+	static BuildManager b = new BuildManager();
 
 	public boolean FirstTurn = true;
 	boolean PlayerTurn = false;
