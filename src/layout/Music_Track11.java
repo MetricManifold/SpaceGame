@@ -1,42 +1,22 @@
- package layout;
- 
- import java.io.File;
- import javax.sound.sampled.AudioFormat;
- import javax.sound.sampled.AudioFormat.Encoding;
- import javax.sound.sampled.AudioInputStream;
- import javax.sound.sampled.AudioSystem;
- import javax.sound.sampled.BooleanControl;
- import javax.sound.sampled.BooleanControl.Type;
- import javax.sound.sampled.DataLine.Info;
- import javax.sound.sampled.FloatControl;
- import javax.sound.sampled.FloatControl.Type;
- import javax.sound.sampled.SourceDataLine;
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- class Music_Track1$1
-   implements Runnable
- {
-   public void run()
+package layout;
+
+
+import java.io.File;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.BooleanControl;
+import javax.sound.sampled.BooleanControl.Type;
+import javax.sound.sampled.DataLine.Info;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.FloatControl.Type;
+import javax.sound.sampled.SourceDataLine;
+
+class Music_Track11
+		implements Runnable
+{
+	public void run()
    {
      try
      {
@@ -123,10 +103,10 @@
        ex.printStackTrace();
      }
    }
- }
+}
 
-
-/* Location:              C:\Users\Zirconix\Desktop\Computer Science\Java Projects\Java Game\bin\!\layout\Music_Track1$1.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       0.7.1
+/*
+ * Location: C:\Users\Zirconix\Desktop\Computer Science\Java Projects\Java
+ * Game\bin\!\layout\Music_Track1$1.class Java compiler version: 6 (50.0)
+ * JD-Core Version: 0.7.1
  */

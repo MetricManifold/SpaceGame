@@ -1,33 +1,32 @@
- package layout;
- 
- import javax.sound.sampled.AudioFormat;
- import javax.sound.sampled.AudioInputStream;
- import javax.sound.sampled.FloatControl;
- import javax.sound.sampled.SourceDataLine;
- 
- public class Music_Track2
- {
-   static java.io.File sound;
-   
-   public static void play()
-   {
-     sound = new java.io.File("Greatest Battle Music Of All Times_ Dragon Rider.wav");
-     new Thread(play).start();
-   }
-   
- 
-   static boolean muted = false;
-   static float volume = 20.0F;
-   static float pan = 0.0F;
-   
-   static double seconds = 0.0D;
-   
-   static boolean looped_forever = true;
-   
-   static int loop_times = 0;
-   static int loops_done = 0;
-   
-   static final Runnable play = new Runnable()
+package layout;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.SourceDataLine;
+
+public class Music_Track2
+{
+	static java.io.File sound;
+
+	public static void play()
+	{
+		sound = new java.io.File("Greatest Battle Music Of All Times_ Dragon Rider.wav");
+		new Thread(play).start();
+	}
+
+	static boolean muted = false;
+	static float volume = 20.0F;
+	static float pan = 0.0F;
+
+	static double seconds = 0.0D;
+
+	static boolean looped_forever = true;
+
+	static int loop_times = 0;
+	static int loops_done = 0;
+
+	static final Runnable play = new Runnable()
    {
  
      public void run()
@@ -120,10 +119,10 @@
        }
      }
    };
- }
+}
 
-
-/* Location:              C:\Users\Zirconix\Desktop\Computer Science\Java Projects\Java Game\bin\!\layout\Music_Track2.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       0.7.1
+/*
+ * Location: C:\Users\Zirconix\Desktop\Computer Science\Java Projects\Java
+ * Game\bin\!\layout\Music_Track2.class Java compiler version: 6 (50.0) JD-Core
+ * Version: 0.7.1
  */
