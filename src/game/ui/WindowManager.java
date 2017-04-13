@@ -1,10 +1,8 @@
 package game.ui;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -14,40 +12,33 @@ public class WindowManager extends Application
 	HBox topBox = new HBox();
 	PlanetGrid planets;
 
-	public static final int PX = 10, PY = 10;
+	public static final int PADX = 5, PADY = 5, 
+			PX = 10, PY = 10,
+			SIZEX = 300, SIZEY = 250;
 	public static final double D = 0.10;
+	public static final String TITLE = "Konquest II";
 
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
-		Button btn = new Button();
-		btn.setText("Say 'Hello World'");
-
-		btn.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event)
-			{
-				System.out.println("Hello World!");
-			}
-		});
-
-		BorderPane root = new BorderPane();
-		root.setCenter(btn);
-
-		Scene gameScene = new Scene(root, 300, 250);
-
-		primaryStage.setTitle("Hello World!");
-		primaryStage.setScene(gameScene);
-		primaryStage.show();
-		
 		planets = new PlanetGrid(PX, PY, D);
+
+		BorderPane border = new BorderPane();
+		border.setCenter(planets.tilePane);
+		border.setPadding(new Insets(PADY, PADX, PADY, PADX));
+		
+		Scene scene = new Scene(border, SIZEX, SIZEY);
+
+		primaryStage.setTitle(TITLE);
+		primaryStage.setScene(scene);
+		primaryStage.show();
+
 	}
 
 	public void makeEntryHead()
 	{
 
 	}
-
 
 	/**
 	 * Program entry point
