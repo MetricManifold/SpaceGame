@@ -1,4 +1,4 @@
-package layout;
+package game.managers;
 
 public class BuildManager
 {

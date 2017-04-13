@@ -1,10 +1,9 @@
-package layout;
+package game.managers;
 
 import java.util.Random;
 
 public class TurnManager
 {
-	static GridManager g = null;
 	static BuildManager b = new BuildManager();
 
 	public boolean FirstTurn = true;
