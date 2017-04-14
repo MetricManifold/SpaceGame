@@ -10,7 +10,7 @@ public class Planet extends Space
 
 	// production per turn and ships
 	private int production;
-	private ShipInventory ships = new ShipInventory();
+	private ShipInventory ships = new ShipInventory(this);
 
 	public Planet(Displacement pos)
 	{
@@ -57,6 +57,12 @@ public class Planet extends Space
 	public ShipInventory getShipInventory()
 	{
 		return ships;
+	}
+	
+	
+	public void updateShipInventory()
+	{
+		ships.add(production);
 	}
 
 }

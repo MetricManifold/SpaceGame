@@ -1,5 +1,7 @@
 package game.ui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import game.objects.Planet;
 import game.objects.Space;
@@ -22,8 +24,8 @@ public class PlanetGrid
 	private int x, y, len;
 	private double density;
 
-	// ui tiles
 	public TilePane tilePane = new TilePane(Orientation.HORIZONTAL);
+	public List<Planet> planets = new ArrayList<Planet>();
 
 	PlanetGrid(int x, int y, double density)
 	{
@@ -65,7 +67,7 @@ public class PlanetGrid
 				String bgSelect = "planet-button" + String.valueOf(ThreadLocalRandom.current().nextInt(NUM_P_BG) + 1);
 				b.getStyleClass().add(bgSelect);
 				b.getStyleClass().add("space-button");
-				
+								
 				// set the planet click event
 				b.setOnMouseClicked(new EventHandler<MouseEvent>()
 				{
@@ -75,8 +77,10 @@ public class PlanetGrid
 						System.out.println("Hello World!");
 					}
 				});
-
-				tiles[i] = new Planet(s);
+				
+				Planet p = new Planet(s);
+				tiles[i] = p;
+				planets.add(p);
 				buttons[i] = b;
 			}
 			else
