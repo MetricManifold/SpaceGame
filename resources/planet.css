@@ -1,0 +1,50 @@
+/* PLANET GRID */
+
+.planet-grid {
+	-fx-background-size: 100% 100%;
+}
+
+.planet-grid1 {
+	.planet-grid;
+	-fx-background-image: url("background1.jpg");
+}
+
+.planet-grid2 {
+	.planet-grid;
+	-fx-background-image: url("background2.png");
+}
+
+.planet-grid3 {
+	.planet-grid;
+	-fx-background-image: url("background3.jpg");
+}
+
+.planet-grid4 {
+	.planet-grid;
+	-fx-background-image: url("background4.jpg");
+}
+
+
+/* PLANET BUTTONS */
+
+.space-button {
+	-fx-background-color: transparent;
+}
+
+.planet-button1 {
+	-fx-background-image: url("planet1.png");
+}
+
+.planet-button2 {
+	-fx-background-image: url("planet2.png");
+}
+
+.planet-button3 {
+	-fx-background-image: url("planet3.png");
+}
+
+.planet-button4 {
+	-fx-background-image: url("planet4.png");
+}
+
+

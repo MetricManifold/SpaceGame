@@ -3,22 +3,18 @@ package game.objects;
 import java.util.concurrent.ThreadLocalRandom;
 import game.helpers.Displacement;
 
-public class Planet
+public class Planet extends Space
 {
+	// production range of the planet
 	private static final int PRODMAX = 30, PRODMIN = 5;
 
+	// production per turn and ships
 	private int production;
 	private ShipInventory ships = new ShipInventory();
-	private Displacement pos;
-
-	public Planet(int x, int y)
-	{
-		this(new Displacement(x, y));
-	}
 
 	public Planet(Displacement pos)
 	{
-		this.pos = pos;
+		super(pos);
 		production = ThreadLocalRandom.current().nextInt(PRODMIN, PRODMAX + 1);
 	}
 
@@ -29,23 +25,38 @@ public class Planet
 
 	public Planet(Displacement pos, int production)
 	{
-		this.pos = pos;
+		super(pos);
 		this.production = production;
 	}
 
+	public Planet(Planet p)
+	{
+		super(p);
+		this.production = p.production;
+		this.ships = p.ships;
+	}
+	
+	public Planet(Space s)
+	{
+		this(s.pos);
+	}
+
+	/**
+	 * Return the production capacity for this planet
+	 * @return
+	 */
 	public int getProduction()
 	{
 		return production;
 	}
 
+	/**
+	 * Return the ship inventory for this planet
+	 * @return
+	 */
 	public ShipInventory getShipInventory()
 	{
 		return ships;
-	}
-
-	public double distanceTo(Planet p)
-	{
-		return p.pos.subtract(pos).length();
 	}
 
 }

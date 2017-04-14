@@ -13,21 +13,22 @@ public class WindowManager extends Application
 	PlanetGrid planets;
 
 	public static final int PADX = 5, PADY = 5, 
-			PX = 10, PY = 10,
+			PX = 20, PY = 20,
 			SIZEX = 300, SIZEY = 250;
-	public static final double D = 0.10;
+	public static final double D = 0.07;
 	public static final String TITLE = "Konquest II";
 
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
-		planets = new PlanetGrid(PX, PY, D);
-
 		BorderPane border = new BorderPane();
+		Scene scene = new Scene(border);
+		
+		scene.getStylesheets().add("planet.css");
+		planets = new PlanetGrid(PX, PY, D);
+		
 		border.setCenter(planets.tilePane);
 		border.setPadding(new Insets(PADY, PADX, PADY, PADX));
-		
-		Scene scene = new Scene(border, SIZEX, SIZEY);
 
 		primaryStage.setTitle(TITLE);
 		primaryStage.setScene(scene);

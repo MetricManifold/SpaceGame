@@ -1,107 +1,113 @@
 package game.ui;
 
 import java.util.concurrent.ThreadLocalRandom;
-
 import game.objects.Planet;
-import javafx.event.ActionEvent;
+import game.objects.Space;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.TilePane;
 
 public class PlanetGrid
 {
 	// static values for ui
-	private static final int PADH = 1, PADV = 1, TILEH = 30, TILEV = 30, NUM_P_BG = 4;
-	private static final String[] pf = new String[] { "planet1.png", "planet2.png", "planet3.png", "planet4.png" };
-	private static final String bf = "background3.jpg";
-
-	private Background[] pbg = new Background[NUM_P_BG];
-	private Background bg;
+	private static final int PADH = 8, PADV = 8, TILEH = 30, TILEV = 30, NUM_P_BG = 4, NUM_B_BG = 4, MARGIN = 5;
 
 	// planets and corresponding buttons
-	private Planet[] planets;
+	private Space[] tiles;
 	private Button[] buttons;
-	private int len;
+	private int x, y, len;
+	private double density;
 
 	// ui tiles
 	public TilePane tilePane = new TilePane(Orientation.HORIZONTAL);
 
 	PlanetGrid(int x, int y, double density)
 	{
-		makeBackgrounds();
+		// initialize local variables
+		this.x = x;
+		this.y = y;
+		this.density = density;
 
 		len = x * y;
-		planets = new Planet[len];
+		tiles = new Space[len];
 		buttons = new Button[len];
 
-		// set up planet grid ui
-		tilePane.setHgap(PADH);
-		tilePane.setVgap(PADV);
-		tilePane.setPrefColumns(x);
-		tilePane.setPrefTileWidth(TILEH);
-		tilePane.setPrefTileHeight(TILEV);
-		tilePane.setBackground(bg);
+		makeTilePaneUI();
+		makePlanets();
 
-		// Create planets
+	}
+
+	/**
+	 * puts planets in the grid and associates them with buttons
+	 */
+	void makePlanets()
+	{
 		for (int i = 0; i < len; i++)
 		{
-			if (ThreadLocalRandom.current().nextDouble() <= density)
-			{
-				// create the necessary elements
-				Button b = new Button();
-				Planet p = new Planet(i % x, i / y);
+			// create the necessary elements
+			Button b = new Button();
+			Space s = new Space(i % x, i / y);
+			tilePane.getChildren().add(b);
 
-				// modify button to correct size and action
-				b.setMinSize(TILEH, TILEV);
-				b.setMaxSize(TILEH, TILEV);
-				b.setBackground(pbg[ThreadLocalRandom.current().nextInt(NUM_P_BG)]);
-				b.setOnAction(new EventHandler<ActionEvent>()
+			// modify button to correct size and action
+			b.setMinSize(TILEH, TILEV);
+			b.setMaxSize(TILEH, TILEV);
+
+			// choose whether to create a planet or empty space
+			double prob = ThreadLocalRandom.current().nextDouble();
+			if (prob < density)
+			{
+				// set the button background
+				String bgSelect = "planet-button" + String.valueOf(ThreadLocalRandom.current().nextInt(NUM_P_BG) + 1);
+				b.getStyleClass().add(bgSelect);
+				b.getStyleClass().add("space-button");
+				
+				// set the planet click event
+				b.setOnMouseClicked(new EventHandler<MouseEvent>()
 				{
 					@Override
-					public void handle(ActionEvent event)
+					public void handle(MouseEvent event)
 					{
 						System.out.println("Hello World!");
 					}
 				});
 
-				planets[i] = p;
+				tiles[i] = new Planet(s);
 				buttons[i] = b;
-
-				// add the button to the tilepane
-				tilePane.getChildren().add(b);
 			}
-
+			else
+			{
+				b.getStyleClass().add("space-button");
+				tiles[i] = s;
+			}
 		}
 	}
 
 	/**
-	 * Create the list of backgrounds used to fill the planets
+	 * Sets the properties related to tilepane UI
 	 */
-	void makeBackgrounds()
+	void makeTilePaneUI()
 	{
-		// creation of backgrounds for planets
-		for (int i = 0; i < NUM_P_BG; i++)
-		{
-			Image im = new Image(pf[i], TILEH, TILEV, true, true);
-			pbg[i] = new Background(
-					new BackgroundImage(
-							im, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
-							BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT));
-		}
+		tilePane.setHgap(PADH);
+		tilePane.setVgap(PADV);
+		
+		tilePane.setPrefTileWidth(TILEH);
+		tilePane.setPrefTileHeight(TILEV);
+		
+		tilePane.setPrefColumns(x);
+		tilePane.setPrefRows(y);
+		
+		tilePane.setMaxSize((TILEH + PADH) * x + MARGIN * 2, (TILEV + PADV) * y + MARGIN * 2);
+		tilePane.setPadding(new Insets(MARGIN, MARGIN, MARGIN, MARGIN));
+		tilePane.setAlignment(Pos.CENTER);
 
-		// main tilepane background creation
-		Image im = new Image(bf, TILEH, TILEV, true, true);
-		bg = new Background(
-				new BackgroundImage(
-						im, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
-						BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT));
+		String bgSelect = "planet-grid" + String.valueOf(ThreadLocalRandom.current().nextInt(NUM_B_BG) + 1);
+		tilePane.getStyleClass().add(bgSelect);
+		
 	}
 
 }
