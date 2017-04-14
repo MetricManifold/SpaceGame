@@ -18,7 +18,7 @@ public class TurnManager
 
 	private void updateInventories()
 	{
-		for (Planet p : pg.planets)
+		for (Planet p : pg.planets.values())
 		{
 			p.updateShipInventory();
 		}
@@ -26,11 +26,16 @@ public class TurnManager
 
 	private void moveShips()
 	{
-
+		for (Ship s : movingShips)
+		{
+			s.update();
+		}
 	}
 
 	public void nextTurn()
 	{
 		updateInventories();
+		moveShips();
 	}
+	
 }

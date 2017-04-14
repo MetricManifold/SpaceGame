@@ -8,14 +8,25 @@ import javafx.scene.layout.HBox;
 public class TurnBar
 {
 	public HBox turnBar = new HBox();
-	public Button btnNextTurn = new Button();
-	public TextField entShipNum = new TextField();
+	private Button btnNextTurn = new Button();
+	private Button btnSendShips = new Button();
+	private TextField entShipNum = new TextField();
 	
 	public TurnBar()
 	{
 		turnBar.setAlignment(Pos.CENTER_LEFT);
-		btnNextTurn.setText("Next Turn");
+		turnBar.setSpacing(10.0);
 		
+		btnNextTurn.setText("Next Turn");
+		btnSendShips.setText("Send");
+		
+		turnBar.getChildren().addAll(entShipNum, btnSendShips, btnNextTurn);
+		
+		System.out.println("finished toolbar");
+	}
+	
+	public void sendShips()
+	{
 		
 	}
 }

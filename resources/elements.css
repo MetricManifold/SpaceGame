@@ -1,34 +1,39 @@
 /* PLANET GRID */
 
 .planet-grid {
-	-fx-background-size: 100% 100%;
+	-fx-background-repeat: no-repeat;
+	-fx-background-size: contain;
+	-fx-background-position: center;
 }
 
 .planet-grid1 {
-	.planet-grid;
 	-fx-background-image: url("background1.jpg");
 }
 
 .planet-grid2 {
-	.planet-grid;
 	-fx-background-image: url("background2.png");
 }
 
 .planet-grid3 {
-	.planet-grid;
 	-fx-background-image: url("background3.jpg");
 }
 
 .planet-grid4 {
-	.planet-grid;
 	-fx-background-image: url("background4.jpg");
 }
 
 
 /* PLANET BUTTONS */
 
+.space-button:hover {
+	-fx-background-color: rgb(255, 255, 255, 0.4);
+
+}
+
 .space-button {
-	-fx-background-color: transparent;
+	-fx-background-repeat: no-repeat;
+	-fx-background-size: contain;
+	-fx-background-radius: 25%;
 }
 
 .planet-button1 {
@@ -45,6 +50,11 @@
 
 .planet-button4 {
 	-fx-background-image: url("planet4.png");
+}
+
+/* TURN BAR */
+
+.turn-bar {
 }
 
 

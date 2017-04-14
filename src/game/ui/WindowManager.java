@@ -11,9 +11,10 @@ public class WindowManager extends Application
 {
 	HBox topBox = new HBox();
 	PlanetGrid planets;
+	TurnBar turn;
 
 	public static final int PADX = 5, PADY = 5, 
-			PX = 20, PY = 20,
+			PX = 30, PY = 30,
 			SIZEX = 300, SIZEY = 250;
 	public static final double D = 0.07;
 	public static final String TITLE = "Konquest II";
@@ -24,21 +25,17 @@ public class WindowManager extends Application
 		BorderPane border = new BorderPane();
 		Scene scene = new Scene(border);
 		
-		scene.getStylesheets().add("planet.css");
+		scene.getStylesheets().add("elements.css");
 		planets = new PlanetGrid(PX, PY, D);
+		turn = new TurnBar();
 		
 		border.setCenter(planets.tilePane);
+		border.setTop(turn.turnBar);
 		border.setPadding(new Insets(PADY, PADX, PADY, PADX));
-
+		
 		primaryStage.setTitle(TITLE);
 		primaryStage.setScene(scene);
 		primaryStage.show();
-
-	}
-
-	public void makeEntryHead()
-	{
-
 	}
 
 	/**
