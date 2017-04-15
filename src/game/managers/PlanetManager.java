@@ -19,16 +19,16 @@ public class PlanetManager
 {
 	// static values for ui
 	public static final int PADH = 8, PADV = 8,
-			TILEH = 20, TILEV = 20, 
+			TILEH = 20, TILEV = 20,
 			NUM_P_BG = 4, NUM_B_BG = 4,
-			MARGIN = 5, TOPMARGIN = 10;
+			MARGIN = 5, TOPMARGIN = 2;
 
 	// planets and corresponding buttons
-	private Space[] tiles;
+	private Map<Space, Label> tiles = new HashMap<Space, Label>();
 	private int x, y, len;
 	private double density;
-	//private BuildManager bm = new BuildManager();
-	
+	private BuildManager bm = new BuildManager();
+
 	public int maxh, maxv;
 	public TilePane tilePane = new TilePane(Orientation.HORIZONTAL);
 	public Map<Integer, Planet> planets = new HashMap<Integer, Planet>();
@@ -43,7 +43,6 @@ public class PlanetManager
 		this.maxv = (TILEV + PADV) * y + MARGIN * 2;
 
 		len = x * y;
-		tiles = new Space[len];
 
 		makeTilePaneUI(); // 		setup tilepane UI
 		makePlanets(); // 			create the planets on this grid
@@ -54,7 +53,7 @@ public class PlanetManager
 	/**
 	 * Sets the mouse event associated with the tilepane to find all the grid locations
 	 */
-	public void setMouseEvent(PlayerManager pm)
+	public void setEvents(PlayerManager pm, TurnManager tm)
 	{
 		tilePane.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
@@ -63,23 +62,68 @@ public class PlanetManager
 			{
 				double sx = (event.getX() - MARGIN) / (TILEH + PADH); // 	normalized selected x
 				double sy = (event.getY() - MARGIN) / (TILEV + PADV); // 	normalized selected y
-				double dx = sx - (int) sx; //							fractional distance x
-				double dy = sy - (int) sy; // 							fractional distance y
+				int ix = (int) sx; //										integer distance x
+				int iy = (int) sy; //										integer distance y
+				double dx = sx - ix; //										fractional distance x
+				double dy = sy - iy; // 									fractional distance y
 
 				// check if selection is before padding
 				if (dx < PADH / (TILEH / PADH) && dy < PADV / (TILEV / PADV))
 				{
-					Planet p = planets.get(hashLocation((int) sx, (int) sy));
+					Planet p = planets.get(hashLocation(ix, iy));
+					Planet o = pm.getCurrentPlayer().getOrigin();
+					Planet d = pm.getCurrentPlayer().getDestination();
+
 					pm.getCurrentPlayer().clickTile(p);
-				}
-				else
-				{
-					pm.getCurrentPlayer().clearSelection();
+					
+					if (p != null)
+					{
+						if (o == null)
+						{
+							tiles.get(p).getStyleClass().add("space-button-origin");
+						}
+						else if (d == null)
+						{
+							if (p != o)
+							{
+								tiles.get(p).getStyleClass().add("space-button-destination");
+								tm.enableSend(true);
+							}
+						}
+						else
+						{
+							tiles.get(p).getStyleClass().add("space-button-origin");
+							clearSelection(o, d);
+							tm.enableSend(false);
+						}
+					}
+					else
+					{
+						clearSelection(o, d);
+						tm.enableSend(false);
+					}
 				}
 			}
 		});
 
 		System.out.println("set mouse event");
+	}
+	
+	public void clearSelection(Planet origin, Planet destination)
+	{
+		if (origin != null)
+		{
+			tiles.get(origin).getStyleClass().remove("space-button-origin");
+		}
+		if (destination != null)
+		{
+			tiles.get(destination).getStyleClass().remove("space-button-destination");
+		}
+	}
+	
+	public void ownerTIles()
+	{
+		
 	}
 
 	/**
@@ -107,13 +151,13 @@ public class PlanetManager
 				l.getStyleClass().addAll(bgSelect, "space-button");
 
 				Planet p = new Planet(s);
-				tiles[i] = p;
+				tiles.put(p, l);
 				planets.put(hashLocation(i % x, i / y), p);
 			}
 			else
 			{
 				l.getStyleClass().add("space-button");
-				tiles[i] = s;
+				tiles.put(s, l);
 			}
 		}
 

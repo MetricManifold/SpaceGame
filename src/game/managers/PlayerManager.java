@@ -17,7 +17,7 @@ public class PlayerManager
 	private int playerIndex = 0;
 	private Player[] players = new Player[NUM_PLAYERS];
 
-	public Class<?> defaultShip = Destroyer.class;
+	public static Class<?> defaultShip = Destroyer.class;
 
 	public PlayerManager()
 	{
@@ -51,15 +51,9 @@ public class PlayerManager
 	 * @param num
 	 * @return
 	 */
-	public boolean canSend(int num)
+	public boolean canSend(Player p, int num)
 	{
-		if (player.getOrigin() == null)
-		{
-			return false;
-		}
-		else
-		{
-			return num >= player.getOrigin().getShipInventory().getCount(defaultShip);
-		}
+		if (p.getOrigin() == null) return false;
+		else return num <= p.getOrigin().getShipInventory().getCount(defaultShip);
 	}
 }

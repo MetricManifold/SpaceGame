@@ -25,13 +25,21 @@
 
 /* PLANET BUTTONS */
 
+.space-button-origin {
+	-fx-border-color: blue;
+}
+
+.space-button-destination {
+	-fx-border-color: red;
+}
+
 .space-button:hover {
-	-fx-background-color: rgb(255, 255, 255, 0.4);
+	-fx-border-color: rgb(255, 255, 255, 0.4);
 }
 
 .space-button {
 	-fx-border-radius: 25%;
-	-fx-border-width: 2px;
+	-fx-border-width: 1px;
 
 	-fx-background-repeat: no-repeat;
 	-fx-background-size: contain;
@@ -57,6 +65,8 @@
 /* TURN BAR */
 
 .turn-bar {
+	-fx-background-color: gray;
+	-fx-padding: 5;
 }
 
 

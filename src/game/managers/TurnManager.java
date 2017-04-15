@@ -5,6 +5,7 @@ import java.util.List;
 
 import game.objects.Fleet;
 import game.objects.Planet;
+import game.players.Player;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -30,24 +31,33 @@ public class TurnManager
 	private Button btnSendShips = new Button();
 	private TextField tfShipNum = new TextField();
 
-	private PlayerManager pm;
-	private PlanetManager pg;
 	private List<Fleet> fleets = new ArrayList<Fleet>();
 
-	public TurnManager(PlayerManager pm, PlanetManager pg)
+	public TurnManager()
 	{
-		this.pm = pm;
-
-		
 		btnNextTurn.setText("Next Turn");
 		btnSendShips.setText("Send");
+		enableSend(false);
 
+		// set the turnbar UI
+		turnBar.getStyleClass().add("turn-bar");
+		turnBar.setAlignment(Pos.CENTER_LEFT);
+		turnBar.setSpacing((float) SPACING);
+		turnBar.getChildren().addAll(tfShipNum, btnSendShips, btnNextTurn);
+
+		System.out.println("finished toolbar");
+	}
+	
+	public void setEvents(PlayerManager pm, PlanetManager pg)
+	{
+		turnBar.setMaxWidth(pg.maxh);
+		
 		btnNextTurn.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
 			@Override
 			public void handle(MouseEvent event)
 			{
-				nextTurn();
+				nextTurn(pm, pg);
 			}
 
 		});
@@ -58,11 +68,15 @@ public class TurnManager
 			public void handle(MouseEvent event)
 			{
 				int num = Integer.valueOf(tfShipNum.getText());
-				if (pm.canSend(num))
+				Player p = pm.getCurrentPlayer();
+				
+				if (pm.canSend(p, num))
 				{
 					try
 					{
-						sendShips(num);
+						sendShips(p, num);
+						enableSend(false);
+						tfShipNum.setText("");
 					}
 					catch (NumberFormatException e)
 					{
@@ -83,51 +97,43 @@ public class TurnManager
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue)
 			{
+				// check if the value does not exceed ships to send
+				if (!newValue.isEmpty())
+				{
+					int num = Integer.valueOf(newValue);
+					if (!pm.canSend(pm.getCurrentPlayer(), num)) btnSendShips.setDisable(true);
+					else btnSendShips.setDisable(false);
+				}
+				else
+				{
+					btnSendShips.setDisable(false);
+				}
+				
+				// ensure only numbers are added to the text field
 				if (!newValue.matches("\\d*"))
 				{
 					tfShipNum.setText(newValue.replaceAll("[^\\d]", ""));
 				}
 			}
 		});
-
-		// set the turnbar UI
-		turnBar.setMaxWidth(pg.maxh);
-		turnBar.setAlignment(Pos.CENTER);
-		turnBar.setSpacing((float) SPACING);
-		turnBar.getChildren().addAll(tfShipNum, btnSendShips, btnNextTurn);
-
-		System.out.println("finished toolbar");
-	}
-
-	/**
-	 * for each planet in the planet grid, update the ship inventory
-	 */
-	private void updateInventories()
-	{
-		for (Planet p : pg.planets.values())
-		{
-			p.produceShips();
-		}
-	}
-
-	/**
-	 * update each of the fleets on the map
-	 */
-	private void moveShips()
-	{
-		for (Fleet f : fleets)
-		{
-			f.update();
-		}
 	}
 
 	/**
 	 * activate the next turn
 	 */
-	public void nextTurn()
+	public void nextTurn(PlayerManager pm, PlanetManager pg)
 	{
-		updateInventories();
-		moveShips();
+		for (Planet p : pg.planets.values())
+		{
+			p.produceShips();
+		}
+		
+
+		for (Fleet f : fleets)
+		{
+			f.update();
+		}
+		
 		pm.nextPlayer();
 	}
 
@@ -140,6 +146,12 @@ public class TurnManager
 	{
 		return fleets;
 	}
+	
+	public void enableSend(boolean b)
+	{
+		tfShipNum.setDisable(!b);
+		btnSendShips.setDisable(!b);
+	}
 
 	/**
 	 * send the given number of ships
@@ -147,11 +159,11 @@ public class TurnManager
 	 * @param num
 	 * @throws Exception
 	 */
-	public void sendShips(int num) throws Exception
+	public void sendShips(Player p, int num) throws Exception
 	{
-		Planet o = pm.getCurrentPlayer().getOrigin();
-		Planet d = pm.getCurrentPlayer().getDestination();
-		Fleet f = (Fleet) o.getShipInventory().take(pm.defaultShip, num);
+		Planet o = p.getOrigin();
+		Planet d = p.getDestination();
+		Fleet f = (Fleet) o.getShipInventory().take(PlayerManager.defaultShip, num);
 
 		f.send(o, d);
 		fleets.add(f);

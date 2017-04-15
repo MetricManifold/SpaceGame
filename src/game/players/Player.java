@@ -35,26 +35,30 @@ public class Player
 
 	public void clickTile(Space s)
 	{
-		if (s instanceof Planet)
+		if (s != null && s instanceof Planet)
 		{
+			Planet p = (Planet) s;
+
 			if (origin == null)
 			{
-				origin = (Planet) s;
+				origin = p;
 			}
 			else if (destination == null)
 			{
-				destination = (Planet) s;
+				if (p != origin)
+				{
+					destination = p;
+				}
 			}
 			else
 			{
-				origin = (Planet) s;
+				origin = p;
 				destination = null;
 			}
 		}
 		else
 		{
-			origin = null;
-			destination = null;
+			clearSelection();
 		}
 	}
 

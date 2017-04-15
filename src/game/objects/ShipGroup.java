@@ -26,7 +26,10 @@ public abstract class ShipGroup
 	
 	public int getCount(Class<?> type)
 	{
-		return count.get(type);
+		Integer c = count.get(type);
+		
+		if (c == null) return 0;
+		else return c;
 	}
 
 	public void add(Class<?> type, int num)
