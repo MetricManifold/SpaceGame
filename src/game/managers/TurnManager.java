@@ -1,41 +1,32 @@
-package game.managers;
+package game.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-import game.objects.Planet;
-import game.objects.Ship;
-import game.ui.PlanetGrid;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 
-public class TurnManager
+public class TurnBar
 {
-	private final PlanetGrid pg;
-	private List<Ship> movingShips = new ArrayList<Ship>();
-
-	public TurnManager(PlanetGrid pg)
+	public HBox turnBar = new HBox();
+	private Button btnNextTurn = new Button();
+	private Button btnSendShips = new Button();
+	private TextField entShipNum = new TextField();
+	
+	public TurnBar()
 	{
-		this.pg = pg;
-	}
-
-	private void updateInventories()
-	{
-		for (Planet p : pg.planets.values())
-		{
-			p.updateShipInventory();
-		}
-	}
-
-	private void moveShips()
-	{
-		for (Ship s : movingShips)
-		{
-			s.update();
-		}
-	}
-
-	public void nextTurn()
-	{
-		updateInventories();
-		moveShips();
+		turnBar.setAlignment(Pos.CENTER_LEFT);
+		turnBar.setSpacing(10.0);
+		
+		btnNextTurn.setText("Next Turn");
+		btnSendShips.setText("Send");
+		
+		turnBar.getChildren().addAll(entShipNum, btnSendShips, btnNextTurn);
+		
+		System.out.println("finished toolbar");
 	}
 	
+	public void sendShips()
+	{
+		
+	}
 }
