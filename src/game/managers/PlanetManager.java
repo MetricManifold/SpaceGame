@@ -1,8 +1,9 @@
-package game.ui;
+package game.managers;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+
 import game.objects.Planet;
 import game.objects.Space;
 import javafx.event.EventHandler;
@@ -11,37 +12,41 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 
-public class PlanetGrid
+public class PlanetManager
 {
 	// static values for ui
-	private static final int PADH = 8, PADV = 8,
-			TILEH = 20, TILEV = 20, NUM_P_BG = 4, NUM_B_BG = 4,
+	public static final int PADH = 8, PADV = 8,
+			TILEH = 20, TILEV = 20, 
+			NUM_P_BG = 4, NUM_B_BG = 4,
 			MARGIN = 5, TOPMARGIN = 10;
 
 	// planets and corresponding buttons
 	private Space[] tiles;
 	private int x, y, len;
 	private double density;
-
+	//private BuildManager bm = new BuildManager();
+	
+	public int maxh, maxv;
 	public TilePane tilePane = new TilePane(Orientation.HORIZONTAL);
 	public Map<Integer, Planet> planets = new HashMap<Integer, Planet>();
 
-	PlanetGrid(int x, int y, double density)
+	public PlanetManager(int x, int y, double density)
 	{
 		// initialize local variables
 		this.x = x;
 		this.y = y;
 		this.density = density;
+		this.maxh = (TILEH + PADH) * x + MARGIN * 2;
+		this.maxv = (TILEV + PADV) * y + MARGIN * 2;
 
 		len = x * y;
 		tiles = new Space[len];
 
 		makeTilePaneUI(); // 		setup tilepane UI
 		makePlanets(); // 			create the planets on this grid
-		setMouseEvent(); //			attach mouse event when clicking on grid
 
 		System.out.println("finished grid");
 	}
@@ -49,7 +54,7 @@ public class PlanetGrid
 	/**
 	 * Sets the mouse event associated with the tilepane to find all the grid locations
 	 */
-	void setMouseEvent()
+	public void setMouseEvent(PlayerManager pm)
 	{
 		tilePane.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
@@ -64,7 +69,12 @@ public class PlanetGrid
 				// check if selection is before padding
 				if (dx < PADH / (TILEH / PADH) && dy < PADV / (TILEV / PADV))
 				{
-					Planet selected = planets.get(hashLocation((int) sx, (int) sy));
+					Planet p = planets.get(hashLocation((int) sx, (int) sy));
+					pm.getCurrentPlayer().clickTile(p);
+				}
+				else
+				{
+					pm.getCurrentPlayer().clearSelection();
 				}
 			}
 		});
@@ -115,8 +125,8 @@ public class PlanetGrid
 	 */
 	void makeTilePaneUI()
 	{
-		BorderPane.setMargin(tilePane, new Insets(TOPMARGIN, 0, 0, 0));
-		
+		VBox.setMargin(tilePane, new Insets(TOPMARGIN, 0, 0, 0));
+
 		tilePane.setHgap(PADH);
 		tilePane.setVgap(PADV);
 
@@ -126,7 +136,7 @@ public class PlanetGrid
 		tilePane.setPrefColumns(x);
 		tilePane.setPrefRows(y);
 
-		tilePane.setMaxSize((TILEH + PADH) * x + MARGIN * 2, (TILEV + PADV) * y + MARGIN * 2);
+		tilePane.setMaxSize(maxh, maxv);
 		tilePane.setPadding(new Insets(MARGIN, MARGIN, MARGIN, MARGIN));
 		tilePane.setAlignment(Pos.CENTER);
 

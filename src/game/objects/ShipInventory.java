@@ -1,24 +1,23 @@
 package game.objects;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class ShipInventory
+public class ShipInventory extends ShipGroup
 {
 	private Planet owner;
-	private List<Ship> ships = new ArrayList<Ship>();
-	
+
 	public ShipInventory(Planet owner)
 	{
+		super();
 		this.owner = owner;
 	}
-	
+
 	public void add(int production)
 	{
-		for (int i = 0; i < production; i++)
-		{
-			ships.add(new Destroyer(owner.pos));
-		}
+		add(Destroyer.class, production);
 	}
-
+	
+	public Planet getOwner()
+	{
+		return owner;
+	}
+	
 }

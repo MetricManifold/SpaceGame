@@ -60,7 +60,7 @@ public class Planet extends Space
 	}
 	
 	
-	public void updateShipInventory()
+	public void produceShips()
 	{
 		ships.add(production);
 	}

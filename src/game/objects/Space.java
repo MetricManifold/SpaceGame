@@ -21,6 +21,11 @@ public class Space
 		this.pos = p.pos;
 	}
 
+	/**
+	 * Compute the distance to another space tile
+	 * @param p
+	 * @return
+	 */
 	public double distanceTo(Space p)
 	{
 		return p.pos.subtract(pos).length();

@@ -1,12 +1,11 @@
 package game.objects;
 
-import game.helpers.Displacement;
 
 public class Destroyer extends Ship
 {
-	public Destroyer(Displacement pos)
+	public Destroyer()
 	{
-		super(pos);
+		super();
 		power = 10;
 		armor = 1;
 	}

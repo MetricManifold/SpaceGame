@@ -27,10 +27,12 @@
 
 .space-button:hover {
 	-fx-background-color: rgb(255, 255, 255, 0.4);
-
 }
 
 .space-button {
+	-fx-border-radius: 25%;
+	-fx-border-width: 2px;
+
 	-fx-background-repeat: no-repeat;
 	-fx-background-size: contain;
 	-fx-background-radius: 25%;

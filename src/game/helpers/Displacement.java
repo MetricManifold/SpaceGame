@@ -2,7 +2,7 @@ package game.helpers;
 
 public class Displacement
 {
-	public float x, y;
+	private float x, y;
 
 	public Displacement(float x, float y)
 	{
@@ -25,7 +25,7 @@ public class Displacement
 		return (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 	}
 
-	public void move(float length)
+	public Displacement add(float length)
 	{
 		double angle = Math.toDegrees(Math.atan2(y, x));
 
@@ -33,8 +33,25 @@ public class Displacement
 		{
 			angle += 360;
 		}
-		
+
 		x += length * Math.cos(angle);
 		y -= length * Math.sin(angle);
+		
+		return new Displacement(x, y);
+	}
+	
+	public Displacement subtract(float length)
+	{
+		return add(-length);
+	}
+
+	public float getX()
+	{
+		return x;
+	}
+
+	public float getY()
+	{
+		return y;
 	}
 }
