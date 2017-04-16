@@ -1,15 +1,21 @@
 package game.ui;
 
+import java.lang.reflect.Field;
+
 import game.managers.PlanetManager;
 import game.managers.PlayerManager;
 import game.managers.TurnManager;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class WindowManager extends Application
 {

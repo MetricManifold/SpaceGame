@@ -12,6 +12,7 @@ public class Player
 	private List<Planet> planets = new ArrayList<Planet>();
 	private int num;
 	private String color;
+	private boolean status = true;
 	
 	public Player(int num, String color)
 	{
@@ -105,5 +106,10 @@ public class Player
 	public String getName()
 	{
 		return "Player " + Integer.valueOf(num);
+	}
+	
+	public boolean isAlive()
+	{
+		return status;
 	}
 }

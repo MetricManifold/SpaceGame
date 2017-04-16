@@ -2,6 +2,8 @@ package game.objects;
 
 import java.util.concurrent.ThreadLocalRandom;
 import game.helpers.Displacement;
+import game.managers.ConfigurationManager;
+import game.players.Player;
 
 public class Planet extends Space
 {
@@ -11,6 +13,8 @@ public class Planet extends Space
 	// production per turn and ships
 	private int production;
 	private ShipInventory ships = new ShipInventory(this);
+	private String name = ConfigurationManager.PlanetName.getName();
+	private Player owner = null;
 
 	public Planet(Displacement pos)
 	{
@@ -18,7 +22,7 @@ public class Planet extends Space
 		production = ThreadLocalRandom.current().nextInt(PRODMIN, PRODMAX + 1);
 	}
 
-	public Planet(int x, int y, int production)
+	public Planet(int x, int y, int production, String name)
 	{
 		this(new Displacement(x, y), production);
 	}
@@ -32,6 +36,7 @@ public class Planet extends Space
 	public Planet(Planet p)
 	{
 		super(p);
+
 		this.production = p.production;
 		this.ships = p.ships;
 	}
@@ -62,16 +67,45 @@ public class Planet extends Space
 	public void addShips(Fleet f)
 	{
 		ships.add(f);
+		updateToolTip();
 	}
 	
 	public void addShips(Class<?> type, int num)
 	{
 		ships.add(type, num);
+		updateToolTip();
 	}
 	
 	public void produceShips()
 	{
 		ships.add(production);
+		updateToolTip();
+	}
+
+	@Override
+	public void updateToolTip()
+	{
+		String txt = "Name:\t" + getName() + "\n" +
+				"Ships:\t" + ships.getCount(ConfigurationManager.defaultShip) + "\n" +
+				"Industry:\t" + getProduction() + "\n" + 
+				"Owner:\t" + owner.getName() + "\n";
+		tooltip.setText(txt);
+	}
+	
+	public String getName()
+	{
+		return name;
+	}
+	
+	public void setOwner(Player owner)
+	{
+		this.owner = owner;
+		updateToolTip();
+	}
+	
+	public Player getOwner()
+	{
+		return owner;
 	}
 
 }

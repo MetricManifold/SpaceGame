@@ -9,7 +9,6 @@ import game.players.Player;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -142,21 +141,26 @@ public class TurnManager
 	{
 		lblPlayer.getStyleClass().remove(pm.getCurrentPlayer().getColor());
 		
-		for (Planet p : pg.getPlanetArray())
-		{
-			p.produceShips();
-		}
-		
-
-		for (Fleet f : fleets)
-		{
-			f.update();
-		}
-		
 		pm.nextPlayer();
 		
 		lblPlayer.setText(pm.getCurrentPlayer().getName());
 		lblPlayer.getStyleClass().add(pm.getCurrentPlayer().getColor());
+		
+		if (pm.getPlayer(1) == pm.getCurrentPlayer())
+		{
+
+			for (Planet p : pg.getPlanetArray())
+			{
+				p.produceShips();
+			}
+			
+
+			for (Fleet f : fleets)
+			{
+				f.update();
+			}
+		}
+		
 	}
 
 	/**

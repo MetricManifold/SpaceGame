@@ -1,10 +1,12 @@
 package game.objects;
 
 import game.helpers.Displacement;
+import javafx.scene.control.Tooltip;
 
 public class Space
 {
 	protected Displacement pos;
+	protected final Tooltip tooltip;
 
 	public Space(int x, int y)
 	{
@@ -14,11 +16,13 @@ public class Space
 	public Space(Displacement pos)
 	{
 		this.pos = pos;
+		this.tooltip = new Tooltip();
 	}
 
 	public Space(Space p)
 	{
 		this.pos = p.pos;
+		this.tooltip = p.tooltip;
 	}
 
 	/**
@@ -30,5 +34,19 @@ public class Space
 	{
 		return p.pos.subtract(pos).length();
 	}
+	
+	/**
+	 * Return the tooltip for this space tile
+	 * @return
+	 */
+	public Tooltip getTooltip()
+	{
+		return tooltip;
+	}
+	
+	/**
+	 * Updates the tooltip with the information from the object.
+	 */
+	public void updateToolTip() {}
 
 }
