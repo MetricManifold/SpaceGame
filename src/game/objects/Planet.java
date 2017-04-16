@@ -59,6 +59,15 @@ public class Planet extends Space
 		return ships;
 	}
 	
+	public void addShips(Fleet f)
+	{
+		ships.add(f);
+	}
+	
+	public void addShips(Class<?> type, int num)
+	{
+		ships.add(type, num);
+	}
 	
 	public void produceShips()
 	{

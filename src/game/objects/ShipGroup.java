@@ -65,6 +65,14 @@ public abstract class ShipGroup
 			add(s);
 		}
 	}
+	
+	public void add(ShipGroup g)
+	{
+		for (Ship s : g.ships)
+		{
+			ships.add(s);
+		}
+	}
 
 	public void remove(Ship ship)
 	{

@@ -9,8 +9,10 @@ import game.players.Player;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -24,33 +26,48 @@ import javafx.scene.layout.HBox;
  */
 public class TurnManager
 {
-	public static final int SPACING = 10;
+	public static final int SPACING = 10, LBL_WIDTH = 80;
 	
 	public HBox turnBar = new HBox();
 	private Button btnNextTurn = new Button();
 	private Button btnSendShips = new Button();
 	private TextField tfShipNum = new TextField();
+	private Label lblPlayer = new Label();
 
 	private List<Fleet> fleets = new ArrayList<Fleet>();
 
 	public TurnManager()
 	{
-		btnNextTurn.setText("Next Turn");
-		btnSendShips.setText("Send");
 		enableSend(false);
-
-		// set the turnbar UI
-		turnBar.getStyleClass().add("turn-bar");
-		turnBar.setAlignment(Pos.CENTER_LEFT);
-		turnBar.setSpacing((float) SPACING);
-		turnBar.getChildren().addAll(tfShipNum, btnSendShips, btnNextTurn);
+		makeHBoxUI();
+		
+		turnBar.getChildren().addAll(tfShipNum, btnSendShips, btnNextTurn, lblPlayer);
 
 		System.out.println("finished toolbar");
 	}
 	
+	/**
+	 * Create the UI for the turn bar
+	 */
+	public void makeHBoxUI()
+	{
+		// set text and disable sending
+		btnNextTurn.setText("Next Turn");
+		btnSendShips.setText("Send");
+		
+		turnBar.getStyleClass().add("turn-bar");
+		turnBar.setAlignment(Pos.CENTER_LEFT);
+		turnBar.setSpacing((float) SPACING);
+		
+		lblPlayer.getStyleClass().add("player-label");
+		lblPlayer.setMinWidth(LBL_WIDTH);
+	}
+	
 	public void setEvents(PlayerManager pm, PlanetManager pg)
 	{
-		turnBar.setMaxWidth(pg.maxh);
+		turnBar.setMaxWidth(pg.getSizeX());
+		lblPlayer.setText(pm.getCurrentPlayer().getName());
+		lblPlayer.getStyleClass().add(pm.getCurrentPlayer().getColor());
 		
 		btnNextTurn.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
@@ -123,7 +140,9 @@ public class TurnManager
 	 */
 	public void nextTurn(PlayerManager pm, PlanetManager pg)
 	{
-		for (Planet p : pg.planets.values())
+		lblPlayer.getStyleClass().remove(pm.getCurrentPlayer().getColor());
+		
+		for (Planet p : pg.getPlanetArray())
 		{
 			p.produceShips();
 		}
@@ -135,6 +154,9 @@ public class TurnManager
 		}
 		
 		pm.nextPlayer();
+		
+		lblPlayer.setText(pm.getCurrentPlayer().getName());
+		lblPlayer.getStyleClass().add(pm.getCurrentPlayer().getColor());
 	}
 
 	/**
@@ -150,6 +172,7 @@ public class TurnManager
 	public void enableSend(boolean b)
 	{
 		tfShipNum.setDisable(!b);
+		tfShipNum.clear();
 		btnSendShips.setDisable(!b);
 	}
 
@@ -163,7 +186,7 @@ public class TurnManager
 	{
 		Planet o = p.getOrigin();
 		Planet d = p.getDestination();
-		Fleet f = (Fleet) o.getShipInventory().take(PlayerManager.defaultShip, num);
+		Fleet f = (Fleet) o.getShipInventory().take(ConfigurationManager.defaultShip, num);
 
 		f.send(o, d);
 		fleets.add(f);

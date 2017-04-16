@@ -2,7 +2,7 @@
 
 .planet-grid {
 	-fx-background-repeat: no-repeat;
-	-fx-background-size: contain;
+	-fx-background-size: cover;
 	-fx-background-position: center;
 }
 
@@ -26,24 +26,29 @@
 /* PLANET BUTTONS */
 
 .space-button-origin {
-	-fx-border-color: blue;
+	-fx-border-color: lightblue;
 }
 
 .space-button-destination {
-	-fx-border-color: red;
+	-fx-border-color: lightblue;
 }
 
 .space-button:hover {
-	-fx-border-color: rgb(255, 255, 255, 0.4);
+	-fx-background-size: 100% 100%;
 }
 
 .space-button {
-	-fx-border-radius: 25%;
-	-fx-border-width: 1px;
+	-fx-border-width: 2px;
+	-fx-border-radius: 50%;
+
+	-fx-background-radius: 50%;
+	-fx-padding: 5px;
 
 	-fx-background-repeat: no-repeat;
-	-fx-background-size: contain;
-	-fx-background-radius: 25%;
+	-fx-background-size: cover;
+	-fx-background-size: 80% 80%;
+	-fx-background-position: center;
+
 }
 
 .planet-button1 {
@@ -69,4 +74,71 @@
 	-fx-padding: 5;
 }
 
+.player-label {
+	-fx-padding: 3px;
+	-fx-background-radius: 3px;
 
+	-fx-text-fill: white;
+	-fx-font-weight: bold;
+	-fx-stroke: black;
+	-fx-stroke-width: 2px;
+	-fx-alignment: center;
+}
+
+/* PLAYER COLORS */
+
+.blue {
+	-fx-background-color: rgba(0, 0, 255, 0.75);
+}
+
+.red {
+	-fx-background-color: rgba(255, 0, 0, 0.75);
+}
+
+.orange {
+	-fx-background-color: rgba(255, 153, 0, 0.75);
+}
+
+.teal {
+	-fx-background-color: rgba(0, 153, 153, 0.75);
+}
+
+.purple {
+	-fx-background-color: rgba(153, 102, 255, 0.75);
+}
+
+.pink {
+	-fx-background-color: rgba(255, 153, 204, 0.75);
+}
+
+.gray {
+	-fx-background-color: rgba(102, 153, 153, 0.75);
+}
+
+.white {
+	-fx-background-color: rgba(255, 255, 255, 0.75);
+}
+
+.yellow {
+	-fx-background-color: rgba(255, 255, 0, 0.75);
+}
+
+.dark-blue {
+	-fx-background-color: rgba(0, 51, 204, 0.75);
+}
+
+.green {
+	-fx-background-color: rgba(51, 204, 51, 0.75);
+}
+
+.light-green {
+	-fx-background-color: rgba(0, 255, 0, 0.75);
+}
+
+.light-blue {
+	-fx-background-color: rgba(0, 255, 255, 0.75);
+}
+
+.brown {
+	-fx-background-color: rgba(153, 102, 51, 0.75);
+}

@@ -1,11 +1,15 @@
 package game.managers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
 
 import game.objects.Planet;
 import game.objects.Space;
+import game.players.Player;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -25,29 +29,55 @@ public class PlanetManager
 
 	// planets and corresponding buttons
 	private Map<Space, Label> tiles = new HashMap<Space, Label>();
-	private int x, y, len;
+	private Map<Integer, Planet> planets = new HashMap<Integer, Planet>();
+	
+	private int maxh, maxv, x, y, len;
 	private double density;
-	private BuildManager bm = new BuildManager();
-
-	public int maxh, maxv;
+	
 	public TilePane tilePane = new TilePane(Orientation.HORIZONTAL);
-	public Map<Integer, Planet> planets = new HashMap<Integer, Planet>();
 
-	public PlanetManager(int x, int y, double density)
+	public PlanetManager()
 	{
 		// initialize local variables
-		this.x = x;
-		this.y = y;
-		this.density = density;
+		this.x = ConfigurationManager.gridX;
+		this.y = ConfigurationManager.gridY;
+		this.density = ConfigurationManager.planetDensity;
+		
 		this.maxh = (TILEH + PADH) * x + MARGIN * 2;
 		this.maxv = (TILEV + PADV) * y + MARGIN * 2;
 
-		len = x * y;
+		this.len = x * y;
 
 		makeTilePaneUI(); // 		setup tilepane UI
 		makePlanets(); // 			create the planets on this grid
 
 		System.out.println("finished grid");
+	}
+	
+	/**
+	 * Sets the properties related to tilepane UI
+	 */
+	void makeTilePaneUI()
+	{
+		VBox.setMargin(tilePane, new Insets(TOPMARGIN, 0, 0, 0));
+
+		tilePane.setHgap(PADH);
+		tilePane.setVgap(PADV);
+
+		tilePane.setPrefTileWidth(TILEH);
+		tilePane.setPrefTileHeight(TILEV);
+
+		tilePane.setPrefColumns(x);
+		tilePane.setPrefRows(y);
+
+		tilePane.setMaxSize(maxh, maxv);
+		tilePane.setPadding(new Insets(MARGIN, MARGIN, MARGIN, MARGIN));
+		tilePane.setAlignment(Pos.BASELINE_CENTER);
+
+		String bgSelect = "planet-grid" + String.valueOf(ThreadLocalRandom.current().nextInt(NUM_B_BG) + 1);
+		tilePane.getStyleClass().addAll(bgSelect, "planet-grid");
+
+		System.out.println("created grid ui");
 	}
 
 	/**
@@ -106,9 +136,16 @@ public class PlanetManager
 			}
 		});
 
-		System.out.println("set mouse event");
+		makeStartPlanets(pm);
+		
+		System.out.println("set events");
 	}
 	
+	/**
+	 * Clears the current selection from the grid
+	 * @param origin
+	 * @param destination
+	 */
 	public void clearSelection(Planet origin, Planet destination)
 	{
 		if (origin != null)
@@ -121,11 +158,12 @@ public class PlanetManager
 		}
 	}
 	
-	public void ownerTIles()
+	public void givePlanet(Player player, Planet p)
 	{
-		
+		player.givePlanet(p);
+		tiles.get(p).getStyleClass().add(player.getColor());
 	}
-
+	
 	/**
 	 * puts planets in the grid and associates them with buttons
 	 */
@@ -151,6 +189,7 @@ public class PlanetManager
 				l.getStyleClass().addAll(bgSelect, "space-button");
 
 				Planet p = new Planet(s);
+				
 				tiles.put(p, l);
 				planets.put(hashLocation(i % x, i / y), p);
 			}
@@ -163,32 +202,33 @@ public class PlanetManager
 
 		System.out.println("placed planets in grid");
 	}
-
-	/**
-	 * Sets the properties related to tilepane UI
-	 */
-	void makeTilePaneUI()
+	
+	void makeStartPlanets(PlayerManager pm)
 	{
-		VBox.setMargin(tilePane, new Insets(TOPMARGIN, 0, 0, 0));
-
-		tilePane.setHgap(PADH);
-		tilePane.setVgap(PADV);
-
-		tilePane.setPrefTileWidth(TILEH);
-		tilePane.setPrefTileHeight(TILEV);
-
-		tilePane.setPrefColumns(x);
-		tilePane.setPrefRows(y);
-
-		tilePane.setMaxSize(maxh, maxv);
-		tilePane.setPadding(new Insets(MARGIN, MARGIN, MARGIN, MARGIN));
-		tilePane.setAlignment(Pos.CENTER);
-
-		String bgSelect = "planet-grid" + String.valueOf(ThreadLocalRandom.current().nextInt(NUM_B_BG) + 1);
-		tilePane.getStyleClass().addAll(bgSelect, "planet-grid");
-
-		System.out.println("created grid ui");
+		// make a list of planets to choose from
+		int numPlayers = ConfigurationManager.numPlayers;
+		Planet[] planetArray = getPlanetArray();
+		
+		// make a list denoting each of the planets
+		List<Integer> nums = new ArrayList<Integer>();
+		for (Integer i : IntStream.range(0, planets.size()).toArray()) nums.add(i);
+		
+		while (numPlayers-- > 0)
+		{
+			// pick a random value from the planet array
+			int r = ThreadLocalRandom.current().nextInt(nums.size());
+			int pick = nums.get(r);
+			
+			givePlanet(pm.getPlayer(numPlayers), planetArray[pick]);
+			nums.remove(r);
+		}
+		
+		for (int n : nums)
+		{
+			givePlanet(pm.neutral, planetArray[n]);
+		}
 	}
+
 
 	/**
 	 * Creates a unique integer associated with the provided 2d location.
@@ -201,5 +241,20 @@ public class PlanetManager
 	{
 		return x + this.x * y;
 	}
-
+	
+	public Planet[] getPlanetArray()
+	{
+		return planets.values().toArray(new Planet[planets.size()]);
+	}
+	
+	public int getSizeX()
+	{
+		return maxh;
+	}
+	
+	public int getSizeY()
+	{
+		return maxv;
+	}
+	
 }

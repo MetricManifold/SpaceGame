@@ -34,7 +34,7 @@ public class WindowManager extends Application
 		scene.getStylesheets().add("elements.css"); //			set the style sheet for the scene
 
 		playerMan = new PlayerManager(); //						creates the object managing players
-		planets = new PlanetManager(PX, PY, D); //				create the planet grid with the selected x, y and density
+		planets = new PlanetManager(); //						create the planet grid with the selected x, y and density
 		turnMan = new TurnManager(); // 						create the turn bar to take input
 
 		planets.setEvents(playerMan, turnMan); //				set the mouse events for the grid and toolbar
