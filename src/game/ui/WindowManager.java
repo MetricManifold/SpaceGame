@@ -62,8 +62,6 @@ public class WindowManager extends Application
 	 */
 	public static void main(String[] args)
 	{
-		// new Music_Track1();
-		// Music_Track1.play();
 		launch(args);
 	}
 

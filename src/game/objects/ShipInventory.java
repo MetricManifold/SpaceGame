@@ -1,23 +1,22 @@
 package game.objects;
 
+import game.managers.ConfigurationManager;
+
 public class ShipInventory extends ShipGroup
 {
-	private Planet owner;
-
 	public ShipInventory(Planet owner)
 	{
 		super();
-		this.owner = owner;
 	}
 
 	public void add(int production)
 	{
 		add(Destroyer.class, production);
 	}
-	
-	public Planet getOwner()
+
+	public void getCount()
 	{
-		return owner;
+		getCount(ConfigurationManager.defaultShip);
 	}
-	
+
 }

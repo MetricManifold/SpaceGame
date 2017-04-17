@@ -43,7 +43,7 @@ public class Planet extends Space
 		this.production = p.production;
 		this.ships = p.ships;
 	}
-	
+
 	public Planet(Space s)
 	{
 		this(s.pos);
@@ -51,6 +51,7 @@ public class Planet extends Space
 
 	/**
 	 * Return the production capacity for this planet
+	 * 
 	 * @return
 	 */
 	public int getProduction()
@@ -60,25 +61,39 @@ public class Planet extends Space
 
 	/**
 	 * Return the ship inventory for this planet
+	 * 
 	 * @return
 	 */
 	public ShipInventory getShipInventory()
 	{
 		return ships;
 	}
-	
+
+	/**
+	 * add a fleet of ships to this planet
+	 * 
+	 * @param f
+	 */
 	public void addShips(Fleet f)
 	{
 		ships.add(f);
 		updateToolTip();
 	}
-	
+
+	/**
+	 * give ships to this planet
+	 * 
+	 * @param type
+	 *            type of ship to add
+	 * @param num
+	 *            number of ships
+	 */
 	public void addShips(Class<?> type, int num)
 	{
 		ships.add(type, num);
 		updateToolTip();
 	}
-	
+
 	public void produceShips()
 	{
 		ships.add(production);
@@ -89,39 +104,59 @@ public class Planet extends Space
 	public void updateToolTip()
 	{
 		String strNumShips = (owner.getNum() != 0) ? "Ships:\t" + ships.getCount(ConfigurationManager.defaultShip) + "\n" : "";
-		
+
 		// create text
 		Text stats = new Text("Name:\t" + getName() + "\n" +
 				strNumShips +
 				"Industry:\t" + getProduction() + "\n" +
 				"Owner:\t");
 		Text name = new Text(owner.getName());
-		
+
 		// format text
 		stats.setFill(Color.WHITE);
-		name.setFill(Color.valueOf(owner.getColor()));
+		name.getStyleClass().add(owner.getColor());
 		TextFlow txt = new TextFlow(stats, name);
 		txt.setPrefHeight(0);
-		
+
 		tooltip.setGraphic(txt);
 	}
-	
+
+	/**
+	 * get the name of this planet
+	 * 
+	 * @return
+	 */
 	public String getName()
 	{
 		return name;
 	}
-	
+
+	/**
+	 * set the owner of this planet to the specified player
+	 * 
+	 * @param owner
+	 */
 	public void setOwner(Player owner)
 	{
 		this.owner = owner;
 		updateToolTip();
 	}
-	
+
+	/**
+	 * return the player who owns the planet
+	 * 
+	 * @return
+	 */
 	public Player getOwner()
 	{
 		return owner;
 	}
-	
+
+	/**
+	 * change the production of the planet
+	 * 
+	 * @param production
+	 */
 	public void setProduction(int production)
 	{
 		this.production = production;

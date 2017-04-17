@@ -104,10 +104,10 @@ public class PlanetManager
 					Planet p = planets.get(hashLocation(ix, iy));
 					Planet o = pm.getCurrentPlayer().getOrigin();
 					Planet d = pm.getCurrentPlayer().getDestination();
+					pm.getCurrentPlayer().clickTile(p);
 
 					if (p != null)
 					{
-						pm.getCurrentPlayer().clickTile(p);
 
 						if (o == null)
 						{
@@ -126,8 +126,8 @@ public class PlanetManager
 						}
 						else
 						{
-							tiles.get(p).getStyleClass().add("space-button-origin");
 							clearSelection(o, d);
+							tiles.get(p).getStyleClass().add("space-button-origin");
 							tm.enableSend(false);
 						}
 					}

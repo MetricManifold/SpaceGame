@@ -6,7 +6,8 @@ public class Destroyer extends Ship
 	public Destroyer()
 	{
 		super();
-		power = 10;
+		attack = 10;
 		armor = 1;
+		health = 200;
 	}
 }

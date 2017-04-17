@@ -17,8 +17,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
 /**
- * Responsible for managing turns including updating planet production, fleets
- * sent to other planets Also contains the graphical element that
+ * Responsible for managing turns including updating planet production, fleets sent to other planets Also contains the graphical element that
  * 
  * @author MR SMITH
  *
@@ -112,18 +111,19 @@ public class TurnManager
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue)
 			{
-				
+
 				// ensure only numbers are added to the text field
 				if (!newValue.matches("\\d*"))
 				{
 					tfShipNum.setText(newValue.replaceAll("[^\\d]", ""));
 				}
-				
+
 				// check if the value does not exceed ships to send
 				if (!tfShipNum.getText().isEmpty())
 				{
 					int num = Integer.valueOf(newValue);
-					if (!pm.canSend(pm.getCurrentPlayer(), num)) btnSendShips.setDisable(true);
+					if (!pm.canSend(pm.getCurrentPlayer(), num))
+						btnSendShips.setDisable(true);
 					else btnSendShips.setDisable(false);
 				}
 				else
@@ -151,7 +151,16 @@ public class TurnManager
 
 			for (Planet p : pg.getPlanetArray())
 			{
-				p.produceShips();
+				// if owner is neutral, produce 75% total ships
+
+				if (p.getOwner() == pm.neutral)
+				{
+					p.addShips(ConfigurationManager.defaultShip, (int) (p.getProduction() * ConfigurationManager.neutralProdModifier));
+				}
+				else
+				{
+					p.produceShips();
+				}
 			}
 
 			for (Fleet f : fleets)
@@ -172,6 +181,11 @@ public class TurnManager
 		return fleets;
 	}
 
+	/**
+	 * turn the send button on or off
+	 * 
+	 * @param b
+	 */
 	public void enableSend(boolean b)
 	{
 		tfShipNum.setDisable(!b);
