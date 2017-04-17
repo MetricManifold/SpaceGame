@@ -24,9 +24,9 @@ public class PlanetManager
 {
 	// static values for ui
 	public static final int PADH = 8, PADV = 8,
-			TILEH = 20, TILEV = 20,
-			NUM_P_BG = 4, NUM_B_BG = 4,
-			MARGIN = 5, TOPMARGIN = 2;
+		TILEH = 20, TILEV = 20,
+		NUM_P_BG = 4, NUM_B_BG = 4,
+		MARGIN = 5, TOPMARGIN = 2;
 
 	// planets and corresponding buttons
 	private Map<Space, Label> tiles = new HashMap<Space, Label>();
@@ -105,13 +105,16 @@ public class PlanetManager
 					Planet o = pm.getCurrentPlayer().getOrigin();
 					Planet d = pm.getCurrentPlayer().getDestination();
 
-					pm.getCurrentPlayer().clickTile(p);
-
 					if (p != null)
 					{
+						pm.getCurrentPlayer().clickTile(p);
+
 						if (o == null)
 						{
-							tiles.get(p).getStyleClass().add("space-button-origin");
+							if (p.getOwner() == pm.getCurrentPlayer())
+							{
+								tiles.get(p).getStyleClass().add("space-button-origin");
+							}
 						}
 						else if (d == null)
 						{
@@ -133,6 +136,7 @@ public class PlanetManager
 						clearSelection(o, d);
 						tm.enableSend(false);
 					}
+
 				}
 			}
 		});
@@ -160,11 +164,46 @@ public class PlanetManager
 		}
 	}
 
+	/**
+	 * transfer ownership of a planet to a given player
+	 * 
+	 * @param player
+	 * @param p
+	 */
 	public void givePlanet(Player player, Planet p)
 	{
 		player.givePlanet(p);
 		p.setOwner(player);
 		tiles.get(p).getStyleClass().add(player.getColor());
+	}
+
+	/**
+	 * add the tooltip for the given planet
+	 * 
+	 * @param p
+	 */
+	public void setPlanetTooltip(Planet p)
+	{
+		Label l = tiles.get(p);
+
+		l.setOnMouseEntered(new EventHandler<MouseEvent>()
+		{
+			@Override
+			public void handle(MouseEvent event)
+			{
+				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX(), l.getLayoutBounds().getMaxY());
+				p.getTooltip().show(l, pnt.getX(), pnt.getY());
+			}
+		});
+		l.setOnMouseExited(new EventHandler<MouseEvent>()
+		{
+
+			@Override
+			public void handle(MouseEvent event)
+			{
+				p.getTooltip().hide();
+			}
+		});
 	}
 
 	/**
@@ -189,34 +228,23 @@ public class PlanetManager
 			if (prob < density)
 			{
 				Planet p = new Planet(s);
+
+				// set styles
 				String bgSelect = "planet-button" + String.valueOf(ThreadLocalRandom.current().nextInt(NUM_P_BG) + 1);
 				l.getStyleClass().addAll(bgSelect, "space-button");
-				
-				l.setOnMouseEntered(new EventHandler<MouseEvent>()
-				{
-					@Override
-					public void handle(MouseEvent event)
-					{
-						Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX(), l.getLayoutBounds().getMaxY());
-						p.getTooltip().show(l, pnt.getX(), pnt.getY());
-					}
-				});
-				l.setOnMouseExited(new EventHandler<MouseEvent>()
-				{
 
-					@Override
-					public void handle(MouseEvent event)
-					{
-						p.getTooltip().hide();
-					}
-				});
-
+				// add the planet to the grid and planets list
 				tiles.put(p, l);
 				planets.put(hashLocation(i % x, i / y), p);
+
+				setPlanetTooltip(p);
 			}
 			else
 			{
+				// set styles
 				l.getStyleClass().add("space-button");
+
+				// add the planet to the planet grid
 				tiles.put(s, l);
 			}
 		}
@@ -224,6 +252,11 @@ public class PlanetManager
 		System.out.println("placed planets in grid");
 	}
 
+	/**
+	 * give players one starting planet
+	 * 
+	 * @param pm
+	 */
 	void makeStartPlanets(PlayerManager pm)
 	{
 		// make a list of planets to choose from
@@ -240,8 +273,11 @@ public class PlanetManager
 			// pick a random value from the planet array
 			int r = ThreadLocalRandom.current().nextInt(nums.size());
 			int pick = nums.get(r);
+			Planet p = planetArray[pick];
 
-			givePlanet(pm.getPlayer(numPlayers), planetArray[pick]);
+			givePlanet(pm.getPlayer(numPlayers), p);
+			p.setProduction(10);
+			p.produceShips();
 			nums.remove(r);
 		}
 
@@ -252,7 +288,7 @@ public class PlanetManager
 	}
 
 	/**
-	 * Creates a unique integer associated with the provided 2d location.
+	 * creates a unique integer associated with the provided 2d location
 	 * 
 	 * @param x
 	 * @param y
@@ -263,16 +299,31 @@ public class PlanetManager
 		return x + this.x * y;
 	}
 
+	/**
+	 * get the array of planets
+	 * 
+	 * @return
+	 */
 	public Planet[] getPlanetArray()
 	{
 		return planets.values().toArray(new Planet[planets.size()]);
 	}
 
+	/**
+	 * return the width in tiles of the grid
+	 * 
+	 * @return
+	 */
 	public int getSizeX()
 	{
 		return maxh;
 	}
 
+	/**
+	 * return the height in tiles of the grid.
+	 * 
+	 * @return
+	 */
 	public int getSizeY()
 	{
 		return maxv;

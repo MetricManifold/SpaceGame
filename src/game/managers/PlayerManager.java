@@ -32,7 +32,7 @@ public class PlayerManager
 		do
 		{
 			playerIndex = playerIndex % (ConfigurationManager.numPlayers - 1) + 1;
-		} while (players[playerIndex].isAlive());
+		} while (!players[playerIndex].isAlive());
 	}
 
 	/**

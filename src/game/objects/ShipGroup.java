@@ -99,10 +99,10 @@ public abstract class ShipGroup
 	}
 	
 
-	public ShipGroup take(Class<?> type, int num) throws Exception
+	public Fleet take(Class<?> type, int num) throws Exception
 	{
 		List<Ship> sendShips = new ArrayList<Ship>();
-		ShipGroup f = this.getClass().newInstance();
+		Fleet f = new Fleet();
 		int track = 0;
 		
 		// handle no ships to return

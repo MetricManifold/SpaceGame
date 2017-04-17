@@ -12,13 +12,13 @@ public class Player
 	private List<Planet> planets = new ArrayList<Planet>();
 	private int num;
 	private String color;
-	private boolean status = true;
-	
+	private boolean alive = true;
+
 	public Player(int num, String color)
 	{
 		this.num = num;
 		this.color = color;
-		
+
 		origin = null;
 		destination = null;
 	}
@@ -51,7 +51,10 @@ public class Player
 
 			if (origin == null)
 			{
-				origin = p;
+				if (p.getOwner() == this)
+				{
+					origin = p;
+				}
 			}
 			else if (destination == null)
 			{
@@ -72,44 +75,83 @@ public class Player
 		}
 	}
 
+	/**
+	 * clear the planets selected by this player
+	 */
 	public void clearSelection()
 	{
 		origin = null;
 		destination = null;
 	}
-	
+
+	/**
+	 * give a planet to this player's control
+	 * 
+	 * @param p
+	 */
 	public void givePlanet(Planet p)
 	{
 		planets.add(p);
 	}
-	
+
+	/**
+	 * removes a planet from this player's control
+	 * 
+	 * @param p
+	 */
 	public void removePlanet(Planet p)
 	{
 		planets.remove(p);
+		if (planets.isEmpty()) alive = false;
 	}
-	
-	public int getNum()	
+
+	/**
+	 * get the player's player index
+	 * 
+	 * @return
+	 */
+	public int getNum()
 	{
 		return num;
 	}
-	
+
+	/**
+	 * return the css style associated with this player color
+	 * 
+	 * @return
+	 */
 	public String getColor()
 	{
 		return color;
 	}
-	
+
+	/**
+	 * set the name of the css style associated with this player color
+	 * 
+	 * @param color
+	 */
 	public void setColor(String color)
 	{
 		this.color = color;
 	}
-	
+
+	/**
+	 * return the name of this player
+	 * 
+	 * @return
+	 */
 	public String getName()
 	{
 		return "Player " + Integer.valueOf(num);
 	}
-	
+
+	/**
+	 * return whether the player is still in the game.
+	 * 
+	 * @return
+	 */
 	public boolean isAlive()
 	{
-		return status;
+		return alive;
 	}
 }

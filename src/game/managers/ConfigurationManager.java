@@ -9,7 +9,7 @@ import game.objects.Destroyer;
 public class ConfigurationManager
 {
 	public static int shipStartCount = 10,
-			numPlayers = 3, playerMax = 14,
+			numPlayers = 14, playerMax = 14,
 			gridX = 30, gridY = 30;
 
 	public static double planetDensity = 0.15;
@@ -17,8 +17,8 @@ public class ConfigurationManager
 
 	public static final String[] COLORS = {
 			"white", "red", "blue", "orange", "teal", "purple",
-			"pink", "gray", "yellow", "dark-blue", "green",
-			"light-green", "light-blue", "brown" };
+			"pink", "gray", "yellow", "darkblue", "green",
+			"lightgreen", "lightblue", "brown" };
 
 
 	public static class PlanetName

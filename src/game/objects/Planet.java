@@ -4,6 +4,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import game.helpers.Displacement;
 import game.managers.ConfigurationManager;
 import game.players.Player;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 public class Planet extends Space
 {
@@ -85,11 +88,22 @@ public class Planet extends Space
 	@Override
 	public void updateToolTip()
 	{
-		String txt = "Name:\t" + getName() + "\n" +
-				"Ships:\t" + ships.getCount(ConfigurationManager.defaultShip) + "\n" +
-				"Industry:\t" + getProduction() + "\n" + 
-				"Owner:\t" + owner.getName() + "\n";
-		tooltip.setText(txt);
+		String strNumShips = (owner.getNum() != 0) ? "Ships:\t" + ships.getCount(ConfigurationManager.defaultShip) + "\n" : "";
+		
+		// create text
+		Text stats = new Text("Name:\t" + getName() + "\n" +
+				strNumShips +
+				"Industry:\t" + getProduction() + "\n" +
+				"Owner:\t");
+		Text name = new Text(owner.getName());
+		
+		// format text
+		stats.setFill(Color.WHITE);
+		name.setFill(Color.valueOf(owner.getColor()));
+		TextFlow txt = new TextFlow(stats, name);
+		txt.setPrefHeight(0);
+		
+		tooltip.setGraphic(txt);
 	}
 	
 	public String getName()
@@ -106,6 +120,12 @@ public class Planet extends Space
 	public Player getOwner()
 	{
 		return owner;
+	}
+	
+	public void setProduction(int production)
+	{
+		this.production = production;
+		updateToolTip();
 	}
 
 }

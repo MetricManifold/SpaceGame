@@ -17,8 +17,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
 /**
- * Responsible for managing turns including updating planet production, fleets sent to other planets
- * Also contains the graphical element that 
+ * Responsible for managing turns including updating planet production, fleets
+ * sent to other planets Also contains the graphical element that
  * 
  * @author MR SMITH
  *
@@ -26,7 +26,7 @@ import javafx.scene.layout.HBox;
 public class TurnManager
 {
 	public static final int SPACING = 10, LBL_WIDTH = 80;
-	
+
 	public HBox turnBar = new HBox();
 	private Button btnNextTurn = new Button();
 	private Button btnSendShips = new Button();
@@ -39,12 +39,12 @@ public class TurnManager
 	{
 		enableSend(false);
 		makeHBoxUI();
-		
+
 		turnBar.getChildren().addAll(tfShipNum, btnSendShips, btnNextTurn, lblPlayer);
 
 		System.out.println("finished toolbar");
 	}
-	
+
 	/**
 	 * Create the UI for the turn bar
 	 */
@@ -53,21 +53,21 @@ public class TurnManager
 		// set text and disable sending
 		btnNextTurn.setText("Next Turn");
 		btnSendShips.setText("Send");
-		
+
 		turnBar.getStyleClass().add("turn-bar");
 		turnBar.setAlignment(Pos.CENTER_LEFT);
 		turnBar.setSpacing((float) SPACING);
-		
+
 		lblPlayer.getStyleClass().add("player-label");
 		lblPlayer.setMinWidth(LBL_WIDTH);
 	}
-	
+
 	public void setEvents(PlayerManager pm, PlanetManager pg)
 	{
 		turnBar.setMaxWidth(pg.getSizeX());
 		lblPlayer.setText(pm.getCurrentPlayer().getName());
 		lblPlayer.getStyleClass().add(pm.getCurrentPlayer().getColor());
-		
+
 		btnNextTurn.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
 			@Override
@@ -85,13 +85,12 @@ public class TurnManager
 			{
 				int num = Integer.valueOf(tfShipNum.getText());
 				Player p = pm.getCurrentPlayer();
-				
+
 				if (pm.canSend(p, num))
 				{
 					try
 					{
 						sendShips(p, num);
-						enableSend(false);
 						tfShipNum.setText("");
 					}
 					catch (NumberFormatException e)
@@ -113,8 +112,15 @@ public class TurnManager
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue)
 			{
+				
+				// ensure only numbers are added to the text field
+				if (!newValue.matches("\\d*"))
+				{
+					tfShipNum.setText(newValue.replaceAll("[^\\d]", ""));
+				}
+				
 				// check if the value does not exceed ships to send
-				if (!newValue.isEmpty())
+				if (!tfShipNum.getText().isEmpty())
 				{
 					int num = Integer.valueOf(newValue);
 					if (!pm.canSend(pm.getCurrentPlayer(), num)) btnSendShips.setDisable(true);
@@ -123,12 +129,6 @@ public class TurnManager
 				else
 				{
 					btnSendShips.setDisable(false);
-				}
-				
-				// ensure only numbers are added to the text field
-				if (!newValue.matches("\\d*"))
-				{
-					tfShipNum.setText(newValue.replaceAll("[^\\d]", ""));
 				}
 			}
 		});
@@ -139,13 +139,13 @@ public class TurnManager
 	 */
 	public void nextTurn(PlayerManager pm, PlanetManager pg)
 	{
+		// switch player label
 		lblPlayer.getStyleClass().remove(pm.getCurrentPlayer().getColor());
-		
 		pm.nextPlayer();
-		
 		lblPlayer.setText(pm.getCurrentPlayer().getName());
 		lblPlayer.getStyleClass().add(pm.getCurrentPlayer().getColor());
-		
+
+		// produce ships if all players have made their turn
 		if (pm.getPlayer(1) == pm.getCurrentPlayer())
 		{
 
@@ -153,14 +153,13 @@ public class TurnManager
 			{
 				p.produceShips();
 			}
-			
 
 			for (Fleet f : fleets)
 			{
 				f.update();
 			}
 		}
-		
+
 	}
 
 	/**
@@ -172,7 +171,7 @@ public class TurnManager
 	{
 		return fleets;
 	}
-	
+
 	public void enableSend(boolean b)
 	{
 		tfShipNum.setDisable(!b);
@@ -192,6 +191,7 @@ public class TurnManager
 		Planet d = p.getDestination();
 		Fleet f = (Fleet) o.getShipInventory().take(ConfigurationManager.defaultShip, num);
 
+		o.updateToolTip();
 		f.send(o, d);
 		fleets.add(f);
 	}
