@@ -49,6 +49,13 @@ public class Fleet extends ShipGroup
 		this.owner = owner;
 	}
 
+	/**
+	 * update the status of this fleet, including position if moving
+	 * 
+	 * @param pm
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
 	public void update(PlanetManager pm) throws InstantiationException, IllegalAccessException
 	{
 		if (path != null)
@@ -58,11 +65,13 @@ public class Fleet extends ShipGroup
 				if (owner != destination.getOwner())
 				{
 					attack(destination);
-					System.out.println("attack completed");
-					
+
 					if (getCount() > 0)
 					{
-						System.out.println("sender won");
+						for (Ship f : getAll())
+						{
+							f.maxHealth();
+						}
 						pm.givePlanet(owner, destination);
 						destination.addShips(this);
 					}
@@ -71,21 +80,31 @@ public class Fleet extends ShipGroup
 				{
 					destination.addShips(this);
 				}
-				
+
 				path = null;
 				destination = null;
 			}
 			else
 			{
-				path.add(speed);
+				path = path.subtract(speed);
 			}
 		}
 	}
 
+	/**
+	 * direct this fleet to move to a destination from the origin
+	 * 
+	 * @param origin
+	 * @param dest
+	 */
 	public void send(Planet origin, Planet dest)
 	{
+		// set the path and destination
 		this.path = dest.getPosition().subtract(origin.getPosition());
 		this.destination = dest;
+
+		// log message
+		System.out.format("x%.1f, y%.1f\n", path.getX(), path.getY());
 
 		for (List<Ship> l : ships.values())
 		{
@@ -126,7 +145,6 @@ public class Fleet extends ShipGroup
 
 					// get the list of attackers
 					List<Ship> attackers = getAll();
-					int index = 0;
 
 					// for each of the defenders ships of the current type, damage an attacker
 					for (Ship s : defender.ships.get(type))
@@ -134,24 +152,31 @@ public class Fleet extends ShipGroup
 						// check whether to apply strength
 						if (strSet.isEmpty() || !ships.containsKey(strAll[0]))
 						{
-							Ship atk = attackers.get(index);
-							Class<?> atp = atk.getClass();
-							index = (index + 1) % attackers.size();
+							Ship atk = attackers.get(0);
+							atk.subtractHealth((int) (s.getAttack() * defenderBonus));
 
-							// if the attacker is dead, remove it from the shipos
-							boolean dead = atk.subtractHealth((int) (s.getAttack() * defenderBonus));
-							if (dead) ships.get(atp).remove(ships.get(atp).size() - 1);
+							// if the attacker is dead, remove it from the ships
+							if (atk.isDead())
+							{
+								ships.get(atk.getClass()).remove(atk);
+							}
 						}
 						else
 						{
-							Class<?> str = strAll[0];
-							boolean dead = ships.get(str).get(0).subtractHealth((int) (s.getAttack() * defenderBonus));
-							if (dead) ships.get(str).remove(ships.get(str).size() - 1);
+							// get list of weak ships and last one in that list.
+							List<Ship> atl = ships.get(strAll[0]);
+							Ship atk = atl.get(atl.size() - 1);
+
+							atk.subtractHealth((int) ((s.getAttack() + s.getStrengths().get(strAll[0])) * defenderBonus));
+							if (atk.isDead())
+							{
+								atl.remove(atl.size() - 1);
+							}
 						}
 					}
 				}
 
-				// evaulate attackers
+				// evaluate attackers
 				if (ships.containsKey(type))
 				{
 					// filter strengths based on defender makeup
@@ -161,7 +186,6 @@ public class Fleet extends ShipGroup
 
 					// get the list of defenders
 					List<Ship> defenders = defender.getAll();
-					int index = 0;
 
 					// for each of the defenders ships of the current type, damage an attacker
 					for (Ship s : ships.get(type))
@@ -169,18 +193,25 @@ public class Fleet extends ShipGroup
 						// check whether to apply strength
 						if (strSet.isEmpty() || !defender.ships.containsKey(strAll[0]))
 						{
-							Ship dfn = defenders.get(index);
-							Class<?> dfp = dfn.getClass();
-							index = (index + 1) % defenders.size();
+							Ship dfn = defenders.get(0);
+							dfn.subtractHealth((int) (s.getAttack()));
 
-							boolean dead = dfn.subtractHealth((int) (s.getAttack()));
-							if (dead) defender.ships.get(dfp).remove(defender.ships.get(dfp).size() - 1);
+							if (dfn.isDead())
+							{
+								defender.ships.get(dfn.getClass()).remove(dfn);
+							}
 						}
 						else
 						{
-							Class<?> str = strAll[0];
-							boolean dead = defender.ships.get(str).get(0).subtractHealth((int) (s.getAttack()));
-							if (dead) defender.ships.get(str).remove(defender.ships.get(str).size() - 1);
+							// get list of weak ships and last one in that list
+							List<Ship> dfl = defender.ships.get(strAll[0]);
+							Ship dfn = dfl.get(dfl.size() - 1);
+
+							dfn.subtractHealth((int) (s.getAttack()));
+							if (dfn.isDead())
+							{
+								dfl.remove(dfl.size() - 1);
+							}
 						}
 					}
 				}

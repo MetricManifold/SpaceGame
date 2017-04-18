@@ -2,8 +2,8 @@ package game.managers;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import game.groups.Fleet;
+import game.groups.ShipGroup;
 import game.players.Player;
 import game.tiles.Planet;
 import javafx.animation.KeyFrame;
@@ -86,6 +86,12 @@ public class TurnManager
 		HBox.setHgrow(rightAlignBox, Priority.ALWAYS);
 	}
 
+	/**
+	 * set the events when interacting with the turnbar
+	 * 
+	 * @param pm
+	 * @param pg
+	 */
 	public void setEvents(PlayerManager pm, PlanetManager pg)
 	{
 		turnBar.setMaxWidth(pg.getSizeX());
@@ -97,13 +103,7 @@ public class TurnManager
 			@Override
 			public void handle(ActionEvent event)
 			{
-				totalSeconds++;
-				int hours = totalSeconds / 3600;
-				int minutes = (totalSeconds % 3600) / 60;
-				int seconds = totalSeconds % 60;
-
-				String time = String.format("%02d:%02d:%02d", hours, minutes, seconds);
-				gameTimeText.setText(time);
+				updateTime();
 			}
 		}));
 		oneSecond.setCycleCount(Timeline.INDEFINITE);
@@ -118,11 +118,7 @@ public class TurnManager
 				{
 					nextTurn(pm, pg);
 				}
-				catch (InstantiationException e)
-				{
-					e.printStackTrace();
-				}
-				catch (IllegalAccessException e)
+				catch (Exception e)
 				{
 					e.printStackTrace();
 				}
@@ -135,32 +131,32 @@ public class TurnManager
 			@Override
 			public void handle(MouseEvent event)
 			{
-				if (tfShipNum.getText().isEmpty()) return;
-
-				int num = Integer.valueOf(tfShipNum.getText());
-				Player p = pm.getCurrentPlayer();
-
-				if (pm.canSend(p, num))
+				if (!tfShipNum.getText().isEmpty())
 				{
-					try
+					int num = Integer.valueOf(tfShipNum.getText());
+					ShipGroup f = new ShipGroup(ConfigurationManager.defaultShip, num);
+					Player p = pm.getCurrentPlayer();
+
+					if (pm.canSend(p, f))
 					{
-						sendShips(p, num);
-						enableSend(false);
-						pg.clearSelection(pm.getCurrentPlayer().getOrigin(), pm.getCurrentPlayer().getDestination());
-						pm.getCurrentPlayer().clearSelection();
-					}
-					catch (NumberFormatException e)
-					{
-						e.printStackTrace();
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
+						try
+						{
+							sendShips(p, f);
+							enableSend(false);
+							pg.clearSelection(pm.getCurrentPlayer().getOrigin(), pm.getCurrentPlayer().getDestination());
+							pm.getCurrentPlayer().clearSelection();
+						}
+						catch (NumberFormatException e)
+						{
+							e.printStackTrace();
+						}
+						catch (Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
 				}
-
 			}
-
 		});
 
 		tfShipNum.textProperty().addListener(new ChangeListener<String>()
@@ -178,10 +174,18 @@ public class TurnManager
 				// check if the value does not exceed ships to send
 				if (!tfShipNum.getText().isEmpty())
 				{
+					// create a new fleet to send
 					int num = Integer.valueOf(newValue);
-					if (!pm.canSend(pm.getCurrentPlayer(), num))
+					ShipGroup f = new ShipGroup(ConfigurationManager.defaultShip, num);
+
+					if (!pm.canSend(pm.getCurrentPlayer(), f))
+					{
 						btnSendShips.setDisable(true);
-					else btnSendShips.setDisable(false);
+					}
+					else
+					{
+						btnSendShips.setDisable(false);
+					}
 				}
 				else
 				{
@@ -193,11 +197,14 @@ public class TurnManager
 
 	/**
 	 * activate the next turn
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
+	 * 
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
 	public void nextTurn(PlayerManager pm, PlanetManager pg) throws InstantiationException, IllegalAccessException
 	{
+		pg.clearSelection(pm.getCurrentPlayer().getOrigin(), pm.getCurrentPlayer().getDestination());
+		
 		// switch player label
 		lblPlayer.getStyleClass().remove(pm.getCurrentPlayer().getColor());
 		pm.nextPlayer();
@@ -221,13 +228,26 @@ public class TurnManager
 				}
 			}
 
+			// update all the fleets
 			for (Fleet f : fleets)
 			{
 				f.update(pg);
-				if (f.getCount() <= 0) fleets.remove(f);
+				System.out.println(f.getCount());
 			}
+			fleets.removeIf(f -> f.getCount() == 0);
 		}
 
+	}
+
+	private void updateTime()
+	{
+		totalSeconds++;
+		int hours = totalSeconds / 3600;
+		int minutes = (totalSeconds % 3600) / 60;
+		int seconds = totalSeconds % 60;
+
+		String time = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+		gameTimeText.setText(time);
 	}
 
 	/**
@@ -249,6 +269,7 @@ public class TurnManager
 	{
 		tfShipNum.setDisable(!b);
 		tfShipNum.clear();
+		tfShipNum.requestFocus();
 		btnSendShips.setDisable(!b);
 	}
 
@@ -258,11 +279,11 @@ public class TurnManager
 	 * @param num
 	 * @throws Exception
 	 */
-	public void sendShips(Player p, int num) throws Exception
+	public void sendShips(Player p, ShipGroup g) throws Exception
 	{
 		Planet o = p.getOrigin();
 		Planet d = p.getDestination();
-		Fleet f = new Fleet(o.getShipInventory().take(ConfigurationManager.defaultShip, num), p);
+		Fleet f = new Fleet(o.getShipInventory().take(g), p);
 
 		o.updateToolTip();
 		f.send(o, d);

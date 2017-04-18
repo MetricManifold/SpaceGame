@@ -1,9 +1,10 @@
 package game.managers;
 
+import game.groups.ShipGroup;
 import game.players.Player;
 
 /**
- * Reponsible for managing player actions and updating the current player per turn
+ * Responsible for managing player actions and updating the current player per turn
  * 
  * @author MR SMITH
  *
@@ -46,15 +47,15 @@ public class PlayerManager
 	}
 
 	/**
-	 * returns whether or not the origin planet
+	 * compares given fleet to available inventory at planet
 	 * 
 	 * @param num
 	 * @return
 	 */
-	public boolean canSend(Player p, int num)
+	public boolean canSend(Player p, ShipGroup f)
 	{
 		if (p.getOrigin() == null) return false;
-		else return num <= p.getOrigin().getShipInventory().getCount(ConfigurationManager.defaultShip);
+		return p.getOrigin().getShipInventory().contains(f);
 	}
 
 	/**

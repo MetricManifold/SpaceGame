@@ -6,9 +6,7 @@ import java.util.Map;
 public abstract class Ship
 {
 	protected float speed = (float) 1.0;
-	protected int attack = 1;
-	protected int armor = 0;
-	protected int health = 100;
+	protected int attack = 1, armor = 0, health = 100, maxHealth = 100;
 
 	protected Map<Class<?>, Integer> strengths = new HashMap<Class<?>, Integer>();
 
@@ -52,6 +50,11 @@ public abstract class Ship
 		this.health = health;
 	}
 
+	public void maxHealth()
+	{
+		health = maxHealth;
+	}
+
 	public Map<Class<?>, Integer> getStrengths()
 	{
 		return strengths;
@@ -61,17 +64,26 @@ public abstract class Ship
 	{
 		this.strengths = strengths;
 	}
-	
+
 	/**
 	 * subtracts the given value from health and returns true if dead
+	 * 
 	 * @param sub
 	 * @return
 	 */
-	public boolean subtractHealth(int sub)
+	public void subtractHealth(int sub)
 	{
 		health -= sub;
+	}
+
+	/**
+	 * get whether or not health has been depleted
+	 * 
+	 * @return
+	 */
+	public boolean isDead()
+	{
 		return health <= 0;
 	}
-	
-	
+
 }

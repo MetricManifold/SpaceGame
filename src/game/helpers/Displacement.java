@@ -27,16 +27,9 @@ public class Displacement
 
 	public Displacement add(float length)
 	{
-		double angle = Math.toDegrees(Math.atan2(y, x));
-		System.out.println(String.valueOf(angle) + " " + String.valueOf(length) + " " + String.valueOf(x) + " " + String.valueOf(y));
-
-		if (angle < 0)
-		{
-			angle += 360;
-		}
-
-		x += length * Math.cos(angle);
-		y -= length * Math.sin(angle);
+		double angle = Math.atan2(y, x);
+		float x = (float) (this.x + length * Math.cos(angle));
+		float y = (float) (this.y + length * Math.sin(angle));
 		
 		return new Displacement(x, y);
 	}

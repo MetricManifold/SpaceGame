@@ -24,9 +24,9 @@ public class PlanetManager
 {
 	// static values for ui
 	public static final int PADH = 8, PADV = 8,
-		TILEH = 20, TILEV = 20,
-		NUM_P_BG = 4, NUM_B_BG = 4,
-		MARGIN = 5, TOPMARGIN = 2;
+			TILEH = 20, TILEV = 20,
+			NUM_P_BG = 4, NUM_B_BG = 4,
+			MARGIN = 5, TOPMARGIN = 2;
 
 	// planets and corresponding buttons
 	private Map<Space, Label> tiles = new HashMap<Space, Label>();
@@ -127,7 +127,6 @@ public class PlanetManager
 						else
 						{
 							clearSelection(o, d);
-							tiles.get(p).getStyleClass().add("space-button-origin");
 							tm.enableSend(false);
 						}
 					}
@@ -172,6 +171,12 @@ public class PlanetManager
 	 */
 	public void givePlanet(Player player, Planet p)
 	{
+		// if owner is not null 
+		if (p.getOwner() != null)
+		{
+			tiles.get(p).getStyleClass().remove(p.getOwner().getColor());
+		}
+		
 		player.givePlanet(p);
 		p.setOwner(player);
 		tiles.get(p).getStyleClass().add(player.getColor());
@@ -266,7 +271,9 @@ public class PlanetManager
 		// make a list denoting each of the planets
 		List<Integer> nums = new ArrayList<Integer>();
 		for (Integer i : IntStream.range(0, planets.size()).toArray())
+		{
 			nums.add(i);
+		}
 
 		while (numPlayers-- > 0)
 		{

@@ -46,7 +46,12 @@ public class ShipGroup
 		else
 			return c.size();
 	}
-	
+
+	/**
+	 * returns the total number of ships owned by the group
+	 * 
+	 * @return
+	 */
 	public int getCount()
 	{
 		int total = 0;
@@ -54,7 +59,7 @@ public class ShipGroup
 		{
 			total += getCount(type);
 		}
-		
+
 		return total;
 	}
 
@@ -209,16 +214,23 @@ public class ShipGroup
 	{
 		return new ShipGroup(ships.get(type));
 	}
-	
+
 	/**
 	 * get the whole list of ships
+	 * 
 	 * @return
 	 */
 	public List<Ship> getAll()
 	{
-		return Arrays.asList(ships.values().toArray(new Ship[]{}));
+		List<Ship> r = new ArrayList<Ship>();
+		for (Class<?> type : ships.keySet())
+		{
+			r.addAll(ships.get(type));
+		}
+		
+		return r;
 	}
-	
+
 	/**
 	 * return a new fleet formed by removing ships from this group and adding it to the new one
 	 * 
@@ -229,6 +241,10 @@ public class ShipGroup
 	 */
 	public ShipGroup take(Class<?> type, int num) throws Exception
 	{
+		// log message
+		System.out.println("taking " + String.valueOf(num) + " ships of type " + type.getName());
+		System.out.println("there are " + String.valueOf(getCount(type)) + " ships of that type");
+		
 		List<Ship> sendShips = new ArrayList<Ship>();
 		int track = 0;
 
@@ -243,16 +259,47 @@ public class ShipGroup
 		}
 
 		// if too few ships were found, throw an error
-		if (track != num) throw new Exception("not enough ships");
+		if (track < num) throw new Exception("not enough ships");
 
 		// remove the ships and add them to the new fleet
 		for (Ship s : sendShips)
 		{
 			remove(s);
 		}
-		
+
 		// return the assembled fleet
 		return new ShipGroup(sendShips);
+	}
+
+	/**
+	 * remove from this group the specified subgroup and return a new subgroup
+	 * @param g
+	 * @return
+	 * @throws Exception
+	 */
+	public ShipGroup take(ShipGroup g) throws Exception
+	{
+		for (Class<?> type : g.ships.keySet())
+		{
+			take(type, g.ships.get(type).size());
+		}
+
+		return new ShipGroup(g);
+	}
+
+	/**
+	 * check if this group contains the complete subgroup
+	 * @param g
+	 * @return
+	 */
+	public boolean contains(ShipGroup g)
+	{
+		for (Class<?> type : g.ships.keySet())
+		{
+			if (getCount(type) < g.getCount(type)) return false;
+		}
+
+		return true;
 	}
 
 }

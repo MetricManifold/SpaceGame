@@ -26,11 +26,11 @@
 /* PLANET BUTTONS */
 
 .space-button-origin {
-	-fx-border-color: black;
+	-fx-effect: dropshadow(gaussian, lightblue, 6, 0.2, 0, 0);
 }
 
 .space-button-destination {
-	-fx-border-color: darkred;
+	-fx-effect: dropshadow(gaussian, pink, 6, 0.2, 0, 0);
 }
 
 .space-button:hover {
@@ -42,29 +42,29 @@
 	-fx-border-radius: 50%;
 
 	-fx-background-radius: 50%;
-	-fx-padding: 5px;
-
-	-fx-background-repeat: no-repeat;
-	-fx-background-size: cover;
 	-fx-background-size: 80% 80%;
 	-fx-background-position: center;
-
+	-fx-background-repeat: no-repeat;
 }
 
 .planet-button1 {
 	-fx-background-image: url("planet1.png");
+	-fx-cursor: hand;
 }
 
 .planet-button2 {
 	-fx-background-image: url("planet2.png");
+	-fx-cursor: hand;
 }
 
 .planet-button3 {
 	-fx-background-image: url("planet3.png");
+	-fx-cursor: hand;
 }
 
 .planet-button4 {
 	-fx-background-image: url("planet4.png");
+	-fx-cursor: hand;
 }
 
 /* TURN BAR */

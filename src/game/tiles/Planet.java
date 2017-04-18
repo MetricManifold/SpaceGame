@@ -24,11 +24,10 @@ public class Planet extends Space
 
 	public Planet(Displacement pos)
 	{
-		super(pos);
-		production = ThreadLocalRandom.current().nextInt(PRODMIN, PRODMAX + 1);
+		this(pos, ThreadLocalRandom.current().nextInt(PRODMIN, PRODMAX + 1));
 	}
 
-	public Planet(int x, int y, int production, String name)
+	public Planet(int x, int y, int production, String name, Player owner)
 	{
 		this(new Displacement(x, y), production);
 	}

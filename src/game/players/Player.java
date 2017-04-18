@@ -65,7 +65,7 @@ public class Player
 			}
 			else
 			{
-				origin = p;
+				origin = null;
 				destination = null;
 			}
 		}
