@@ -1,9 +1,12 @@
-package game.objects;
+package game.groups;
 
 import java.util.Collection;
 import java.util.List;
+
+import game.entities.Ship;
 import game.helpers.Displacement;
 import game.managers.ConfigurationManager;
+import game.tiles.Planet;
 
 public class Fleet extends ShipGroup
 {
@@ -55,14 +58,14 @@ public class Fleet extends ShipGroup
 
 	public void send(Planet origin, Planet dest)
 	{
-		this.path = dest.pos.subtract(origin.pos);
+		this.path = dest.getPosition().subtract(origin.getPosition());
 		this.destination = dest;
 
 		for (List<Ship> l : ships.values())
 		{
 			for (Ship s : l)
 			{
-				if (s.speed < speed) speed = s.speed;
+				if (s.getSpeed() < speed) speed = s.getSpeed();
 			}
 		}
 	}

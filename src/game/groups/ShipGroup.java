@@ -1,4 +1,4 @@
-package game.objects;
+package game.groups;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import game.entities.Ship;
 
 public class ShipGroup
 {
@@ -214,7 +216,7 @@ public class ShipGroup
 		// iterate through the list to mark all the ships to move
 		for (Ship s : ships.get(type))
 		{
-			if (track++ < num) break;
+			if (track++ > num) break;
 
 			sendShips.add(s);
 		}

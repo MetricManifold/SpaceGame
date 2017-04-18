@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
-import game.objects.Planet;
-import game.objects.Space;
 import game.players.Player;
+import game.tiles.Planet;
+import game.tiles.Space;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;

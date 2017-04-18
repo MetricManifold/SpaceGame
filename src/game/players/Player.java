@@ -3,8 +3,8 @@ package game.players;
 import java.util.ArrayList;
 import java.util.List;
 
-import game.objects.Planet;
-import game.objects.Space;
+import game.tiles.Planet;
+import game.tiles.Space;
 
 public class Player
 {

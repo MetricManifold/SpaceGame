@@ -1,5 +1,4 @@
-package game.objects;
-
+package game.entities;
 
 public class Destroyer extends Ship
 {

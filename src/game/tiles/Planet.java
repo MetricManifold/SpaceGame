@@ -1,6 +1,9 @@
-package game.objects;
+package game.tiles;
 
 import java.util.concurrent.ThreadLocalRandom;
+
+import game.groups.Fleet;
+import game.groups.ShipInventory;
 import game.helpers.Displacement;
 import game.managers.ConfigurationManager;
 import game.players.Player;
@@ -100,7 +103,9 @@ public class Planet extends Space
 		updateToolTip();
 	}
 
-	@Override
+	/**
+	 * updates the tooltip for this planet
+	 */
 	public void updateToolTip()
 	{
 		String strNumShips = (owner.getNum() != 0) ? "Ships:\t" + ships.getCount(ConfigurationManager.defaultShip) + "\n" : "";

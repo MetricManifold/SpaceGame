@@ -1,4 +1,4 @@
-package game.objects;
+package game.tiles;
 
 import game.helpers.Displacement;
 import javafx.scene.control.Tooltip;
@@ -44,9 +44,8 @@ public class Space
 		return tooltip;
 	}
 	
-	/**
-	 * Updates the tooltip with the information from the object.
-	 */
-	public void updateToolTip() {}
-
+	public Displacement getPosition()
+	{
+		return pos;
+	}
 }

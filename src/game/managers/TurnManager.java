@@ -3,9 +3,9 @@ package game.managers;
 import java.util.ArrayList;
 import java.util.List;
 
-import game.objects.Fleet;
-import game.objects.Planet;
+import game.groups.Fleet;
 import game.players.Player;
+import game.tiles.Planet;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -152,7 +152,6 @@ public class TurnManager
 			for (Planet p : pg.getPlanetArray())
 			{
 				// if owner is neutral, produce 75% total ships
-
 				if (p.getOwner() == pm.neutral)
 				{
 					p.addShips(ConfigurationManager.defaultShip, (int) (p.getProduction() * ConfigurationManager.neutralProdModifier));
@@ -203,7 +202,7 @@ public class TurnManager
 	{
 		Planet o = p.getOrigin();
 		Planet d = p.getDestination();
-		Fleet f = (Fleet) o.getShipInventory().take(ConfigurationManager.defaultShip, num);
+		Fleet f = new Fleet(o.getShipInventory().take(ConfigurationManager.defaultShip, num));
 
 		o.updateToolTip();
 		f.send(o, d);

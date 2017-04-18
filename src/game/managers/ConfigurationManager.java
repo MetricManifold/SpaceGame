@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import game.objects.Destroyer;
+import game.entities.Destroyer;
 
 public class ConfigurationManager
 {
