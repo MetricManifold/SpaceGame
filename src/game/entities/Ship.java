@@ -5,7 +5,7 @@ import java.util.Map;
 
 public abstract class Ship
 {
-	protected float speed = 1.0f;
+	protected float speed = (float) 1.0;
 	protected int attack = 1;
 	protected int armor = 0;
 	protected int health = 100;
@@ -60,6 +60,17 @@ public abstract class Ship
 	public void setStrengths(Map<Class<?>, Integer> strengths)
 	{
 		this.strengths = strengths;
+	}
+	
+	/**
+	 * subtracts the given value from health and returns true if dead
+	 * @param sub
+	 * @return
+	 */
+	public boolean subtractHealth(int sub)
+	{
+		health -= sub;
+		return health <= 0;
 	}
 	
 	

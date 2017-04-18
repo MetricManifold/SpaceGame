@@ -84,6 +84,11 @@
 	-fx-alignment: center;
 }
 
+.turn-bar-button {
+	-fx-min-width: 80px;
+	-fx-padding: 3px;
+}
+
 /* PLAYER COLORS */
 
 .blue {

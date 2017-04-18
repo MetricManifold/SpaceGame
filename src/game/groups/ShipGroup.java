@@ -46,6 +46,17 @@ public class ShipGroup
 		else
 			return c.size();
 	}
+	
+	public int getCount()
+	{
+		int total = 0;
+		for (Class<?> type : ships.keySet())
+		{
+			total += getCount(type);
+		}
+		
+		return total;
+	}
 
 	/**
 	 * add given number of ship type to this group
@@ -99,14 +110,17 @@ public class ShipGroup
 	 */
 	public void add(Collection<Ship> ships)
 	{
-		if (ships.size() == 0)
-		{
-			return;
-		}
-		else
+		if (ships.size() > 0)
 		{
 			Class<?> type = ships.toArray()[0].getClass();
-			this.ships.get(type).addAll(ships);
+			if (this.ships.get(type) == null)
+			{
+				this.ships.put(type, new ArrayList<>(ships));
+			}
+			else
+			{
+				this.ships.get(type).addAll(ships);
+			}
 		}
 	}
 
@@ -195,7 +209,16 @@ public class ShipGroup
 	{
 		return new ShipGroup(ships.get(type));
 	}
-
+	
+	/**
+	 * get the whole list of ships
+	 * @return
+	 */
+	public List<Ship> getAll()
+	{
+		return Arrays.asList(ships.values().toArray(new Ship[]{}));
+	}
+	
 	/**
 	 * return a new fleet formed by removing ships from this group and adding it to the new one
 	 * 
@@ -207,17 +230,15 @@ public class ShipGroup
 	public ShipGroup take(Class<?> type, int num) throws Exception
 	{
 		List<Ship> sendShips = new ArrayList<Ship>();
-		ShipGroup f = new ShipGroup();
 		int track = 0;
 
 		// handle no ships to return
-		if (num <= 0) return f;
+		if (num <= 0) return null;
 
 		// iterate through the list to mark all the ships to move
 		for (Ship s : ships.get(type))
 		{
 			if (track++ > num) break;
-
 			sendShips.add(s);
 		}
 
@@ -229,9 +250,9 @@ public class ShipGroup
 		{
 			remove(s);
 		}
-
+		
 		// return the assembled fleet
-		return f;
+		return new ShipGroup(sendShips);
 	}
 
 }

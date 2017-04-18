@@ -18,7 +18,7 @@ public class Planet extends Space
 
 	// production per turn and ships
 	private int production;
-	private ShipInventory ships = new ShipInventory(this);
+	private ShipInventory ships = new ShipInventory();
 	private String name = ConfigurationManager.PlanetName.getName();
 	private Player owner = null;
 

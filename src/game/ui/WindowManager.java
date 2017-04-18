@@ -13,9 +13,9 @@ import javafx.stage.Stage;
 
 public class WindowManager extends Application
 {
-	private PlanetManager planets;
-	private TurnManager turnMan;
-	private PlayerManager playerMan;
+	private PlanetManager pm;
+	private TurnManager tm;
+	private PlayerManager lm;
 
 	public static final int PADX = 2, PADY = 2,
 			PX = 30, PY = 30,
@@ -33,22 +33,18 @@ public class WindowManager extends Application
 		vb.setAlignment(Pos.CENTER);
 		scene.getStylesheets().add("elements.css"); //			set the style sheet for the scene
 
-		playerMan = new PlayerManager(); //						creates the object managing players
-		planets = new PlanetManager(); //						create the planet grid with the selected x, y and density
-		turnMan = new TurnManager(); // 						create the turn bar to take input
+		lm = new PlayerManager(); //							creates the object managing players
+		pm = new PlanetManager(); //							create the planet grid with the selected x, y and density
+		tm = new TurnManager(); // 								create the turn bar to take input
 
-		planets.setEvents(playerMan, turnMan); //				set the mouse events for the grid and toolbar
-		turnMan.setEvents(playerMan, planets);
-
-		/*
-		 * add the remaining elements to the scene and start the game
-		 */
+		pm.setEvents(lm, tm);
+		tm.setEvents(lm, pm);
 
 		border.setCenter(vb);
-		vb.getChildren().addAll(turnMan.turnBar, planets.tilePane);
+		vb.getChildren().addAll(tm.turnBar, pm.tilePane);
 		border.setPadding(new Insets(PADY, PADX, PADY, PADX));
 
-		primaryStage.setTitle(TITLE); //						set the title and scene
+		primaryStage.setTitle(TITLE);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
