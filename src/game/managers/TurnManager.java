@@ -245,10 +245,9 @@ public class TurnManager
 		}
 		updatePlayerLabel(pm);
 	}
-
+	
 	/**
-	 * updates the label that shows player information
-	 * 
+	 * update the label that shows the current player and the tooltip
 	 * @param pm
 	 */
 	private void updatePlayerLabel(PlayerManager pm)
