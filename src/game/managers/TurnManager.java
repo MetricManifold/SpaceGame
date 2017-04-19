@@ -13,10 +13,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
@@ -24,13 +23,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.TilePane;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
 /**
- * Responsible for managing turns including updating planet production, fleets sent to other planets Also contains the graphical element that
+ * Responsible for managing turns including updating planet production, fleets sent to other planets Also contains the graphical element
  * 
  * @author MR SMITH
  *
@@ -40,14 +39,16 @@ public class TurnManager
 	public static final int SPACING = 10, LBL_WIDTH = 80, FIELD_WIDTH = 60;
 
 	public HBox turnBar = new HBox();
-	private Button btnNextTurn = new Button();
-	private Button btnSendShips = new Button();
+	private Label lblNextTurn = new Label();
+	private Label lblSendShips = new Label();
 	private TextField tfShipNum = new TextField();
 	private Label lblPlayer = new Label();
 	private Tooltip ttPlayer = new Tooltip();
+	private TilePane tblPlayer = new TilePane();
 	private HBox rightAlignBox = new HBox();
 	private Text gameTimeText = new Text();
 	private TextFlow gameTime = new TextFlow();
+
 	private int totalSeconds = 0;
 	private String timeFormat = "%02d : %02d";
 
@@ -55,7 +56,7 @@ public class TurnManager
 
 	public TurnManager()
 	{
-		turnBar.getChildren().addAll(tfShipNum, btnSendShips, btnNextTurn, lblPlayer, rightAlignBox);
+		turnBar.getChildren().addAll(tfShipNum, lblSendShips, lblNextTurn, lblPlayer, rightAlignBox);
 		rightAlignBox.getChildren().addAll(gameTime);
 
 		enableSend(false);
@@ -70,29 +71,29 @@ public class TurnManager
 	public void makeHBoxUI()
 	{
 		// set text and disable sending		
-		btnNextTurn.setText("Next Turn");
-		btnNextTurn.getStyleClass().add("turn-bar-button");
+		lblNextTurn.setText("Next Turn");
+		lblNextTurn.getStyleClass().add("turn-bar-button");
 
-		btnSendShips.setText("Send");
-		btnSendShips.getStyleClass().add("turn-bar-button");
+		lblSendShips.setText("Send");
+		lblSendShips.getStyleClass().add("turn-bar-button");
 
 		turnBar.getStyleClass().add("turn-bar");
-		turnBar.setAlignment(Pos.CENTER_LEFT);
 		turnBar.setSpacing((float) SPACING);
 
-		gameTime.setTextAlignment(TextAlignment.CENTER);
 		gameTime.getChildren().add(gameTimeText);
 		gameTime.getStyleClass().add("timer");
 
 		lblPlayer.getStyleClass().add("player-label");
 		lblPlayer.setMinWidth(LBL_WIDTH);
-		lblPlayer.setTooltip(ttPlayer);
-		
-		ttPlayer.getStyleClass().add("tooltip-list");
+
 		tfShipNum.setMaxWidth(FIELD_WIDTH);
 
 		rightAlignBox.setAlignment(Pos.CENTER_RIGHT);
 		HBox.setHgrow(rightAlignBox, Priority.ALWAYS);
+		
+		ttPlayer.setGraphic(tblPlayer);
+		tblPlayer.setPrefWidth(200);
+		tblPlayer.setAlignment(Pos.CENTER_RIGHT);
 	}
 
 	/**
@@ -117,7 +118,7 @@ public class TurnManager
 		oneSecond.setCycleCount(Timeline.INDEFINITE);
 		oneSecond.play();
 
-		btnNextTurn.setOnMouseClicked(new EventHandler<MouseEvent>()
+		lblNextTurn.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
 			@Override
 			public void handle(MouseEvent event)
@@ -134,7 +135,7 @@ public class TurnManager
 
 		});
 
-		btnSendShips.setOnMouseClicked(new EventHandler<MouseEvent>()
+		lblSendShips.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
 			@Override
 			public void handle(MouseEvent event)
@@ -183,6 +184,26 @@ public class TurnManager
 				}
 			}
 		});
+
+		lblPlayer.setOnMouseEntered(new EventHandler<MouseEvent>()
+		{
+			@Override
+			public void handle(MouseEvent event)
+			{
+				Point2D pnt = lblPlayer.localToScreen(lblPlayer.getLayoutBounds().getMaxX(), lblPlayer.getLayoutBounds().getMaxY());
+				ttPlayer.show(lblPlayer, pnt.getX(), pnt.getY());
+			}
+		});
+
+		lblPlayer.setOnMouseExited(new EventHandler<MouseEvent>()
+		{
+
+			@Override
+			public void handle(MouseEvent event)
+			{
+				ttPlayer.hide();
+			}
+		});
 	}
 
 	/**
@@ -224,20 +245,33 @@ public class TurnManager
 		}
 		updatePlayerLabel(pm);
 	}
-	
+
+	/**
+	 * updates the label that shows player information
+	 * 
+	 * @param pm
+	 */
 	private void updatePlayerLabel(PlayerManager pm)
 	{
 		lblPlayer.setText(pm.getCurrentPlayer().getName());
 		lblPlayer.getStyleClass().add(pm.getCurrentPlayer().getColor());
+		tblPlayer.getChildren().clear();
 		
-		StringBuilder b = new StringBuilder("Owned Planets");
 		for (Planet p : pm.getCurrentPlayer().getPlanets())
 		{
-			b.append(String.format("\n%-20s%d", p.getName(), p.getShipInventory().getCount()));
+			Text n = new Text(p.getName());
+			Text c = new Text(String.valueOf(p.getProduction()));
+			n.getStyleClass().add("tooltip-list");
+			c.getStyleClass().add("tooltip-list-production");
+			
+			tblPlayer.getChildren().addAll(n, c);
 		}
-		ttPlayer.setText(b.toString());
+		
 	}
 
+	/**
+	 * updates the time shown on the screen every second
+	 */
 	private void updateTime()
 	{
 		totalSeconds++;
@@ -268,7 +302,7 @@ public class TurnManager
 		tfShipNum.setDisable(!b);
 		tfShipNum.clear();
 		tfShipNum.requestFocus();
-		btnSendShips.setDisable(!b);
+		lblSendShips.setDisable(!b);
 	}
 
 	/**
@@ -318,11 +352,11 @@ public class TurnManager
 			// create a new fleet to send
 			int num = Integer.valueOf(tfShipNum.getText());
 			ShipGroup f = new ShipInventory(ConfigurationManager.defaultShip, num);
-			btnSendShips.setDisable(!pm.canSend(pm.getCurrentPlayer(), f));
+			lblSendShips.setDisable(!pm.canSend(pm.getCurrentPlayer(), f));
 		}
 		else
 		{
-			btnSendShips.setDisable(false);
+			lblSendShips.setDisable(false);
 		}
 	}
 }

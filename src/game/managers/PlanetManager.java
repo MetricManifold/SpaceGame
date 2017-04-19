@@ -108,109 +108,6 @@ public class PlanetManager
 		setStartPlanets(pm);
 	}
 	
-	public void handleClickPlanet(Planet p, PlayerManager pm, TurnManager tm)
-	{
-		Planet o = pm.getCurrentPlayer().getOrigin();
-		Planet d = pm.getCurrentPlayer().getDestination();
-		pm.getCurrentPlayer().clickTile(p);
-
-		if (p != null)
-		{
-
-			if (o == null)
-			{
-				if (p.getOwner() == pm.getCurrentPlayer())
-				{
-					tiles.get(p).getStyleClass().add("space-button-origin");
-				}
-			}
-			else if (d == null)
-			{
-				if (p != o)
-				{
-					tiles.get(p).getStyleClass().add("space-button-destination");
-					tm.enableSend(true);
-				}
-			}
-			else
-			{
-				clearSelection(o, d);
-				tm.enableSend(false);
-			}
-		}
-		else
-		{
-			clearSelection(o, d);
-			tm.enableSend(false);
-		}
-
-	}
-
-	/**
-	 * Clears the current selection from the grid
-	 * 
-	 * @param origin
-	 * @param destination
-	 */
-	public void clearSelection(Planet origin, Planet destination)
-	{
-		if (origin != null)
-		{
-			tiles.get(origin).getStyleClass().remove("space-button-origin");
-		}
-		if (destination != null)
-		{
-			tiles.get(destination).getStyleClass().remove("space-button-destination");
-		}
-	}
-
-	/**
-	 * transfer ownership of a planet to a given player
-	 * 
-	 * @param player
-	 * @param p
-	 */
-	public void givePlanet(Player player, Planet p)
-	{
-		// if owner is not null 
-		if (p.getOwner() != null)
-		{
-			tiles.get(p).getStyleClass().remove(p.getOwner().getColor());
-		}
-		
-		player.givePlanet(p);
-		p.setOwner(player);
-		tiles.get(p).getStyleClass().add(player.getColor());
-	}
-
-	/**
-	 * add the tooltip for the given planet
-	 * 
-	 * @param p
-	 */
-	public void setPlanetTooltip(Planet p)
-	{
-		Label l = tiles.get(p);
-
-		l.setOnMouseEntered(new EventHandler<MouseEvent>()
-		{
-			@Override
-			public void handle(MouseEvent event)
-			{
-				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX(), l.getLayoutBounds().getMaxY());
-				p.getTooltip().show(l, pnt.getX(), pnt.getY());
-			}
-		});
-		l.setOnMouseExited(new EventHandler<MouseEvent>()
-		{
-
-			@Override
-			public void handle(MouseEvent event)
-			{
-				p.getTooltip().hide();
-			}
-		});
-	}
 
 	/**
 	 * puts planets in the grid and associates them with buttons
@@ -291,6 +188,116 @@ public class PlanetManager
 		{
 			givePlanet(pm.neutral, planetArray[n]);
 		}
+	}
+	
+	/**
+	 * handles the ui change when a planet is clicked
+	 * @param p
+	 * @param pm
+	 * @param tm
+	 */
+	public void handleClickPlanet(Planet p, PlayerManager pm, TurnManager tm)
+	{
+		Planet o = pm.getCurrentPlayer().getOrigin();
+		Planet d = pm.getCurrentPlayer().getDestination();
+		pm.getCurrentPlayer().clickTile(p);
+
+		if (p != null)
+		{
+
+			if (o == null)
+			{
+				if (p.getOwner() == pm.getCurrentPlayer())
+				{
+					tiles.get(p).getStyleClass().add("space-button-origin");
+				}
+			}
+			else if (d == null)
+			{
+				if (p != o)
+				{
+					tiles.get(p).getStyleClass().add("space-button-destination");
+					tm.enableSend(true);
+				}
+			}
+			else
+			{
+				clearSelection(o, d);
+				tm.enableSend(false);
+			}
+		}
+		else
+		{
+			clearSelection(o, d);
+			tm.enableSend(false);
+		}
+
+	}
+
+	/**
+	 * clears the player's current selection from the grid
+	 * 
+	 * @param origin
+	 * @param destination
+	 */
+	public void clearSelection(Planet origin, Planet destination)
+	{
+		if (origin != null)
+		{
+			tiles.get(origin).getStyleClass().remove("space-button-origin");
+		}
+		if (destination != null)
+		{
+			tiles.get(destination).getStyleClass().remove("space-button-destination");
+		}
+	}
+
+	/**
+	 * transfer ownership of a planet to a given player
+	 * 
+	 * @param player
+	 * @param p
+	 */
+	public void givePlanet(Player player, Planet p)
+	{
+		// if owner is not null 
+		if (p.getOwner() != null)
+		{
+			tiles.get(p).getStyleClass().remove(p.getOwner().getColor());
+		}
+		
+		player.givePlanet(p);
+		p.setOwner(player);
+		tiles.get(p).getStyleClass().add(player.getColor());
+	}
+
+	/**
+	 * add the tooltip for the given planet
+	 * 
+	 * @param p
+	 */
+	public void setPlanetTooltip(Planet p)
+	{
+		Label l = tiles.get(p);
+
+		l.setOnMouseEntered(new EventHandler<MouseEvent>()
+		{
+			@Override
+			public void handle(MouseEvent event)
+			{
+				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX(), l.getLayoutBounds().getMaxY());
+				p.getTooltip().show(l, pnt.getX(), pnt.getY());
+			}
+		});
+		l.setOnMouseExited(new EventHandler<MouseEvent>()
+		{
+
+			@Override
+			public void handle(MouseEvent event)
+			{
+				p.getTooltip().hide();
+			}
+		});
 	}
 
 	/**

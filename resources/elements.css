@@ -1,3 +1,8 @@
+.scene {
+	-fx-background-color: black;
+	-fx-padding: 2px;
+}
+
 /* PLANET GRID */
 
 .planet-grid {
@@ -26,15 +31,21 @@
 /* PLANET BUTTONS */
 
 .space-button-origin {
-	-fx-effect: dropshadow(gaussian, lightblue, 6, 0.2, 0, 0);
+	-fx-border-size: 2px;
+	-fx-border-insets: -5px;
+	-fx-border-style: dashed;
+	-fx-border-color: black;
 }
 
 .space-button-destination {
-	-fx-effect: dropshadow(gaussian, pink, 6, 0.2, 0, 0);
+	-fx-border-size: 2px;
+	-fx-border-insets: -5px;
+	-fx-border-style: dashed;
+	-fx-border-color: #cc3333;
 }
 
 .space-button:hover {
-	-fx-background-size: 100% 100%;
+	-fx-effect: dropshadow(gaussian, white, 6, 0.7, 0, 0);
 }
 
 .space-button {
@@ -42,7 +53,7 @@
 	-fx-border-radius: 50%;
 
 	-fx-background-radius: 50%;
-	-fx-background-size: 80% 80%;
+	-fx-background-size: 85% 85%;
 	-fx-background-position: center;
 	-fx-background-repeat: no-repeat;
 }
@@ -70,21 +81,15 @@
 /* TURN BAR */
 
 .turn-bar {
-	-fx-background-color: gray;
+	-fx-background-color: #258e25;
 	-fx-padding: 5;
+	-fx-alignment: center;
 }
 
 .player-label {
 	-fx-padding: 3px;
-
 	-fx-text-fill: white;
-	-fx-font-weight: bold;
 	-fx-alignment: center;
-}
-
-.turn-bar-button {
-	-fx-min-width: 80px;
-	-fx-padding: 3px;
 }
 
 .timer {
@@ -94,8 +99,40 @@
 }
 
 .tooltip-list {
-	-fx-font: 11px "Monospaced";
+	-fx-fill: lightgrey;
+	-fx-font-size: 12px;
+	-fx-alignment: left;
 }
+
+.tooltip-list-production {
+	-fx-fill: white;
+	-fx-font-size: 12px;
+	-fx-alignment: right;
+}
+
+.turn-bar-button {
+	-fx-text-fill: white;
+	-fx-min-width: 80px;
+	-fx-padding: 3px;
+	-fx-alignment: center;
+	
+	-fx-background-color: #224f1e;
+	-fx-background-radius: 0px;
+
+	-fx-focus-color: -fx-control-inner-background;
+	-fx-faint-focus-color: -fx-control-inner-background;
+}
+
+.turn-bar-button:hover {
+	-fx-background-color: #10260e;
+	-fx-border: none;
+}
+
+.turn-bar-button:pressed {
+	-fx-background-insets: 0 1 1 0, 1 0 0 1, 1;
+	-fx-background-color: #557752;
+}
+
 
 /* PLAYER COLORS */
 
