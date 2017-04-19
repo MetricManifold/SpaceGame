@@ -23,7 +23,7 @@ import javafx.scene.layout.VBox;
 public class PlanetManager
 {
 	// static values for ui
-	public static final int PADH = 8, PADV = 8,
+	public static final int PADH = 5, PADV = 5,
 			TILEH = 20, TILEV = 20,
 			NUM_P_BG = 4, NUM_B_BG = 4,
 			MARGIN = 5, TOPMARGIN = 2;
@@ -50,7 +50,7 @@ public class PlanetManager
 		this.len = x * y;
 
 		makeTilePaneUI(); // 		setup tilepane UI
-		makePlanets(); // 			create the planets on this grid
+		spawnPlanets(); // 			create the planets on this grid
 
 		System.out.println("finished grid");
 	}
@@ -77,8 +77,6 @@ public class PlanetManager
 
 		String bgSelect = "planet-grid" + String.valueOf(ThreadLocalRandom.current().nextInt(NUM_B_BG) + 1);
 		tilePane.getStyleClass().addAll(bgSelect, "planet-grid");
-
-		System.out.println("created grid ui");
 	}
 
 	/**
@@ -102,47 +100,50 @@ public class PlanetManager
 				if (dx < PADH / (TILEH / PADH) && dy < PADV / (TILEV / PADV))
 				{
 					Planet p = planets.get(hashLocation(ix, iy));
-					Planet o = pm.getCurrentPlayer().getOrigin();
-					Planet d = pm.getCurrentPlayer().getDestination();
-					pm.getCurrentPlayer().clickTile(p);
-
-					if (p != null)
-					{
-
-						if (o == null)
-						{
-							if (p.getOwner() == pm.getCurrentPlayer())
-							{
-								tiles.get(p).getStyleClass().add("space-button-origin");
-							}
-						}
-						else if (d == null)
-						{
-							if (p != o)
-							{
-								tiles.get(p).getStyleClass().add("space-button-destination");
-								tm.enableSend(true);
-							}
-						}
-						else
-						{
-							clearSelection(o, d);
-							tm.enableSend(false);
-						}
-					}
-					else
-					{
-						clearSelection(o, d);
-						tm.enableSend(false);
-					}
-
+					handleClickPlanet(p, pm, tm);
 				}
 			}
 		});
 
-		makeStartPlanets(pm);
+		setStartPlanets(pm);
+	}
+	
+	public void handleClickPlanet(Planet p, PlayerManager pm, TurnManager tm)
+	{
+		Planet o = pm.getCurrentPlayer().getOrigin();
+		Planet d = pm.getCurrentPlayer().getDestination();
+		pm.getCurrentPlayer().clickTile(p);
 
-		System.out.println("set events");
+		if (p != null)
+		{
+
+			if (o == null)
+			{
+				if (p.getOwner() == pm.getCurrentPlayer())
+				{
+					tiles.get(p).getStyleClass().add("space-button-origin");
+				}
+			}
+			else if (d == null)
+			{
+				if (p != o)
+				{
+					tiles.get(p).getStyleClass().add("space-button-destination");
+					tm.enableSend(true);
+				}
+			}
+			else
+			{
+				clearSelection(o, d);
+				tm.enableSend(false);
+			}
+		}
+		else
+		{
+			clearSelection(o, d);
+			tm.enableSend(false);
+		}
+
 	}
 
 	/**
@@ -214,7 +215,7 @@ public class PlanetManager
 	/**
 	 * puts planets in the grid and associates them with buttons
 	 */
-	void makePlanets()
+	void spawnPlanets()
 	{
 		for (int i = 0; i < len; i++)
 		{
@@ -253,8 +254,6 @@ public class PlanetManager
 				tiles.put(s, l);
 			}
 		}
-
-		System.out.println("placed planets in grid");
 	}
 
 	/**
@@ -262,7 +261,7 @@ public class PlanetManager
 	 * 
 	 * @param pm
 	 */
-	void makeStartPlanets(PlayerManager pm)
+	void setStartPlanets(PlayerManager pm)
 	{
 		// make a list of planets to choose from
 		int numPlayers = ConfigurationManager.numPlayers;

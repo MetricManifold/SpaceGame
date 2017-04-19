@@ -79,14 +79,22 @@
 
 	-fx-text-fill: white;
 	-fx-font-weight: bold;
-	-fx-stroke: black;
-	-fx-stroke-width: 2px;
 	-fx-alignment: center;
 }
 
 .turn-bar-button {
 	-fx-min-width: 80px;
 	-fx-padding: 3px;
+}
+
+.timer {
+	-fx-font: 16px "Consolas";
+	-fx-padding: 5;
+	-fx-alignment: center;
+}
+
+.tooltip-list {
+	-fx-font: 11px "Monospaced";
 }
 
 /* PLAYER COLORS */

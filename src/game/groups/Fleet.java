@@ -72,8 +72,10 @@ public class Fleet extends ShipGroup
 						{
 							f.maxHealth();
 						}
+						
 						pm.givePlanet(owner, destination);
 						destination.addShips(this);
+						removeAll();
 					}
 				}
 				else
@@ -104,7 +106,7 @@ public class Fleet extends ShipGroup
 		this.destination = dest;
 
 		// log message
-		System.out.format("x%.1f, y%.1f\n", path.getX(), path.getY());
+		System.out.format("send ship on path x%.1f,y%.1f\n", path.getX(), path.getY());
 
 		for (List<Ship> l : ships.values())
 		{

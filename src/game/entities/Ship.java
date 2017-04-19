@@ -5,7 +5,7 @@ import java.util.Map;
 
 public abstract class Ship
 {
-	protected float speed = (float) 1.0;
+	protected float speed = 1.0f;
 	protected int attack = 1, armor = 0, health = 100, maxHealth = 100;
 
 	protected Map<Class<?>, Integer> strengths = new HashMap<Class<?>, Integer>();

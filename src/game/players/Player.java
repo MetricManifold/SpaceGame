@@ -93,6 +93,11 @@ public class Player
 	{
 		planets.add(p);
 	}
+	
+	public List<Planet> getPlanets()
+	{
+		return planets;
+	}
 
 	/**
 	 * removes a planet from this player's control
