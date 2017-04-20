@@ -31,7 +31,7 @@ public class Fleet extends ShipGroup
 		this.owner = owner;
 	}
 
-	public Fleet(Class<?> type, int num, Player owner)
+	public Fleet(Class<? extends Ship> type, int num, Player owner)
 	{
 		super(type, num);
 		this.owner = owner;
@@ -56,7 +56,7 @@ public class Fleet extends ShipGroup
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void update(PlanetManager pm) throws InstantiationException, IllegalAccessException
+	public void update(PlanetManager pm)
 	{
 		if (path != null)
 		{
@@ -73,7 +73,7 @@ public class Fleet extends ShipGroup
 							f.maxHealth();
 						}
 						
-						pm.givePlanet(owner, destination);
+						pm.setPlanetOwner(owner, destination);
 						destination.addShips(this);
 						removeAll();
 					}
@@ -125,17 +125,25 @@ public class Fleet extends ShipGroup
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void attack(ShipGroup defender, double defenderBonus) throws InstantiationException, IllegalAccessException
+	public void attack(ShipGroup defender, double defenderBonus)
 	{
-		Set<Class<?>> types = new HashSet<Class<?>>(ships.keySet());
+		Set<Class<? extends Ship>> types = new HashSet<Class<? extends Ship>>(ships.keySet());
 		types.addAll(defender.ships.keySet());
 
 		while (defender.getCount() > 0 && getCount() > 0)
 		{
-			for (Class<?> type : types)
+			for (Class<? extends Ship> type : types)
 			{
 				// get the map of strengths for the current class of ship, 
-				Map<Class<?>, Integer> strengths = ((Ship) type.newInstance()).getStrengths();
+				Map<Class<? extends Ship>, Integer> strengths = null;
+				try
+				{
+					strengths = type.newInstance().getStrengths();
+				}
+				catch (InstantiationException | IllegalAccessException e)
+				{
+					e.printStackTrace();
+				}
 
 				// evaluate defenders
 				if (defender.ships.containsKey(type))
@@ -221,7 +229,7 @@ public class Fleet extends ShipGroup
 		}
 	}
 
-	public void attack(Planet p) throws InstantiationException, IllegalAccessException
+	public void attack(Planet p)
 	{
 		attack(p.getShipInventory(), ConfigurationManager.planetDefenderBonus);
 	}

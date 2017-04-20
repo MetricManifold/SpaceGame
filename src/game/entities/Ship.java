@@ -9,7 +9,7 @@ public abstract class Ship
 	protected float speed = 1.0f;
 	protected int attack = 1, armor = 0, health = 100, maxHealth = 100;
 
-	protected Map<Class<?>, Integer> strengths = new HashMap<Class<?>, Integer>();
+	protected Map<Class<? extends Ship>, Integer> strengths = new HashMap<>();
 
 	public float getSpeed()
 	{
@@ -56,7 +56,7 @@ public abstract class Ship
 		health = maxHealth;
 	}
 
-	public Map<Class<?>, Integer> getStrengths()
+	public Map<Class<? extends Ship>, Integer> getStrengths()
 	{
 		return strengths;
 	}

@@ -23,6 +23,8 @@ public class WindowManager extends Application
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
+		javafx.scene.text.Font.getFamilies().forEach(f -> System.out.println(f));
+		
 		BorderPane border = new BorderPane(); //				layout the game in a border pane
 		Scene scene = new Scene(border); //						create the scene
 		VBox vb = new VBox(); //								create the box for the grid and turnbar

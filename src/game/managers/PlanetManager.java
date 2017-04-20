@@ -75,8 +75,8 @@ public class PlanetManager
 		tilePane.setPadding(new Insets(MARGIN, MARGIN, MARGIN, MARGIN));
 		tilePane.setAlignment(Pos.BASELINE_CENTER);
 
-		String bgSelect = "planet-grid" + String.valueOf(ThreadLocalRandom.current().nextInt(NUM_B_BG) + 1);
-		tilePane.getStyleClass().addAll(bgSelect, "planet-grid");
+		String bgSelect = String.format("planet-grid%d", ThreadLocalRandom.current().nextInt(NUM_B_BG) + 1);
+		tilePane.getStyleClass().addAll("planet-grid", bgSelect);
 	}
 
 	/**
@@ -84,6 +84,8 @@ public class PlanetManager
 	 */
 	public void setEvents(PlayerManager pm, TurnManager tm)
 	{
+		setStartPlanets(pm);
+		
 		tilePane.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
 			@Override
@@ -104,8 +106,6 @@ public class PlanetManager
 				}
 			}
 		});
-
-		setStartPlanets(pm);
 	}
 	
 
@@ -133,21 +133,18 @@ public class PlanetManager
 				Planet p = new Planet(s);
 
 				// set styles
-				String bgSelect = "planet-button" + String.valueOf(ThreadLocalRandom.current().nextInt(NUM_P_BG) + 1);
-				l.getStyleClass().addAll(bgSelect, "space-button");
+				String bgSelect = String.format("planet-button%d", ThreadLocalRandom.current().nextInt(NUM_P_BG) + 1);
+				l.getStyleClass().addAll("space-button", bgSelect);
 
 				// add the planet to the grid and planets list
 				tiles.put(p, l);
 				planets.put(hashLocation(i % x, i / y), p);
-
+				
 				setPlanetTooltip(p);
 			}
 			else
 			{
-				// set styles
 				l.getStyleClass().add("space-button");
-
-				// add the planet to the planet grid
 				tiles.put(s, l);
 			}
 		}
@@ -165,29 +162,22 @@ public class PlanetManager
 		Planet[] planetArray = getPlanetArray();
 
 		// make a list denoting each of the planets
-		List<Integer> nums = new ArrayList<Integer>();
-		for (Integer i : IntStream.range(0, planets.size()).toArray())
-		{
-			nums.add(i);
-		}
+		List<Integer> nums = new ArrayList<>();
+		IntStream.range(0, planets.size()).forEach(i -> nums.add(i));
 
 		while (numPlayers-- > 0)
 		{
 			// pick a random value from the planet array
 			int r = ThreadLocalRandom.current().nextInt(nums.size());
-			int pick = nums.get(r);
+			int pick = nums.remove(r);
 			Planet p = planetArray[pick];
 
-			givePlanet(pm.getPlayer(numPlayers), p);
+			setPlanetOwner(pm.getPlayer(numPlayers), p);
 			p.setProduction(10);
 			p.produceShips();
-			nums.remove(r);
 		}
 
-		for (int n : nums)
-		{
-			givePlanet(pm.neutral, planetArray[n]);
-		}
+		nums.forEach(n -> setPlanetOwner(pm.neutral, planetArray[n]));
 	}
 	
 	/**
@@ -204,7 +194,6 @@ public class PlanetManager
 
 		if (p != null)
 		{
-
 			if (o == null)
 			{
 				if (p.getOwner() == pm.getCurrentPlayer())
@@ -258,7 +247,7 @@ public class PlanetManager
 	 * @param player
 	 * @param p
 	 */
-	public void givePlanet(Player player, Planet p)
+	public void setPlanetOwner(Player player, Planet p)
 	{
 		// if owner is not null 
 		if (p.getOwner() != null)
@@ -266,8 +255,7 @@ public class PlanetManager
 			tiles.get(p).getStyleClass().remove(p.getOwner().getColor());
 		}
 		
-		player.givePlanet(p);
-		p.setOwner(player);
+		player.addPlanet(p);
 		tiles.get(p).getStyleClass().add(player.getColor());
 	}
 
@@ -285,7 +273,7 @@ public class PlanetManager
 			@Override
 			public void handle(MouseEvent event)
 			{
-				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX(), l.getLayoutBounds().getMaxY());
+				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX() + 10, l.getLayoutBounds().getMaxY());
 				p.getTooltip().show(l, pnt.getX(), pnt.getY());
 			}
 		});
@@ -340,6 +328,11 @@ public class PlanetManager
 	public int getSizeY()
 	{
 		return maxv;
+	}
+	
+	public Map<Space, Label> getTiles()
+	{
+		return tiles;
 	}
 
 }
