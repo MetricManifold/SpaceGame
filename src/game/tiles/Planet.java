@@ -2,6 +2,7 @@ package game.tiles;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import game.entities.Ship;
 import game.groups.Fleet;
 import game.groups.ShipInventory;
 import game.helpers.Displacement;
@@ -90,7 +91,7 @@ public class Planet extends Space
 	 * @param num
 	 *            number of ships
 	 */
-	public void addShips(Class<?> type, int num)
+	public void addShips(Class<? extends Ship> type, int num)
 	{
 		ships.add(type, num);
 		updateToolTip();

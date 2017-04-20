@@ -13,7 +13,7 @@ public class ShipInventory extends ShipGroup
 		super();
 	}
 
-	public ShipInventory(Class<?> type, int num)
+	public ShipInventory(Class<? extends Ship> type, int num)
 	{
 		super(type, num);
 	}
@@ -34,30 +34,9 @@ public class ShipInventory extends ShipGroup
 	 * @param type
 	 * @return
 	 */
-	public ShipInventory getAll(Class<?> type)
+	public ShipInventory getAll(Class<? extends Ship> type)
 	{
 		return new ShipInventory(ships.get(type));
 	}
 	
-	/**
-	 * return a new fleet formed by removing ships from this group and adding it to the new one
-	 * 
-	 * @param type
-	 * @param num
-	 * @return
-	 * @throws Exception
-	 */
-	public ShipInventory take(Class<?> type, int num) throws Exception
-	{
-		// log message
-		System.out.println("taking " + String.valueOf(num) + " ships of type " + type.getName());
-		System.out.println("there are " + String.valueOf(getCount(type)) + " ships of that type");
-		
-		// handle no ships to return
-		if (num <= 0) return null;
-		remove(type, num);
-
-		// return the assembled fleet
-		return new ShipInventory(type, num);
-	}
 }

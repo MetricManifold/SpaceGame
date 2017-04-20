@@ -1,5 +1,6 @@
 package game.entities;
 
+
 public class Fighter extends Ship
 {
 	public Fighter()

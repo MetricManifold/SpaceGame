@@ -2,6 +2,7 @@ package game.entities;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class Ship
 {
@@ -60,11 +61,6 @@ public abstract class Ship
 		return strengths;
 	}
 
-	public void setStrengths(Map<Class<?>, Integer> strengths)
-	{
-		this.strengths = strengths;
-	}
-
 	/**
 	 * subtracts the given value from health and returns true if dead
 	 * 
@@ -84,6 +80,30 @@ public abstract class Ship
 	public boolean isDead()
 	{
 		return health <= 0;
+	}
+	
+	public int getBonus(Class<? extends Ship> type)
+	{
+		if (strengths.containsKey(type))
+		{
+			return strengths.get(type);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	
+	public Class<? extends Ship> getFirstStrengthFrom(Set<Class<? extends Ship>> cs)
+	{
+		if (cs.retainAll(strengths.keySet()))
+		{
+			return cs.iterator().next();
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 }

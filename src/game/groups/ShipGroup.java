@@ -11,7 +11,7 @@ import game.entities.Ship;
 
 public abstract class ShipGroup
 {
-	protected Map<Class<?>, List<Ship>> ships = new HashMap<Class<?>, List<Ship>>();
+	protected Map<Class<? extends Ship>, List<Ship>> ships = new HashMap<>();
 
 	public ShipGroup()
 	{}
@@ -21,7 +21,7 @@ public abstract class ShipGroup
 		this.ships = group.ships;
 	}
 
-	public ShipGroup(Class<?> type, int num)
+	public ShipGroup(Class<? extends Ship> type, int num)
 	{
 		add(type, num);
 	}
@@ -36,14 +36,11 @@ public abstract class ShipGroup
 		add(ships);
 	}
 
-	public int getCount(Class<?> type)
+	public int getCount(Class<? extends Ship> type)
 	{
 		List<Ship> c = ships.get(type);
-
-		if (c == null)
-			return 0;
-		else
-			return c.size();
+		if (c == null) return 0;
+		else return c.size();
 	}
 
 	/**
@@ -54,7 +51,7 @@ public abstract class ShipGroup
 	public int getCount()
 	{
 		int total = 0;
-		for (Class<?> type : ships.keySet())
+		for (Class<? extends Ship> type : ships.keySet())
 		{
 			total += getCount(type);
 		}
@@ -68,7 +65,7 @@ public abstract class ShipGroup
 	 * @param type
 	 * @param num
 	 */
-	public void add(Class<?> type, int num)
+	public void add(Class<? extends Ship> type, int num)
 	{
 		if (ships.get(type) == null)
 		{
@@ -95,7 +92,7 @@ public abstract class ShipGroup
 	 */
 	public void add(Ship ship)
 	{
-		Class<?> type = ship.getClass();
+		Class<? extends Ship> type = ship.getClass();
 		if (ships.get(type) == null)
 		{
 			ships.put(type, Arrays.asList(ship));
@@ -115,7 +112,7 @@ public abstract class ShipGroup
 	{
 		if (ships.size() > 0)
 		{
-			Class<?> type = ships.toArray()[0].getClass();
+			Class<? extends Ship> type = ships.iterator().next().getClass();
 			if (this.ships.get(type) == null)
 			{
 				this.ships.put(type, new ArrayList<>(ships));
@@ -163,7 +160,7 @@ public abstract class ShipGroup
 	 */
 	public void remove(Ship ship) throws Exception
 	{
-		Class<?> type = ship.getClass();
+		Class<? extends Ship> type = ship.getClass();
 		List<Ship> l = ships.get(type);
 
 		if (l == null || l.isEmpty()) throw new Exception("attempted to remove ship that doesn't exist");
@@ -180,7 +177,7 @@ public abstract class ShipGroup
 	{
 		if (!ships.isEmpty())
 		{
-			List<Ship> sl = this.ships.get(ships.toArray()[0].getClass());
+			List<Ship> sl = this.ships.get(ships.iterator().next().getClass());
 			for (int i = 0, len = ships.size(); i < len; i++)
 			{
 				sl.remove(0);
@@ -196,11 +193,11 @@ public abstract class ShipGroup
 	 * @param num
 	 * @throws Exception
 	 */
-	public void remove(Class<?> type, int num) throws Exception
+	public void remove(Class<? extends Ship> type, int num) throws Exception
 	{
-		for (int i = 0; i < num; i++)
+		for (int i = 0, len = ships.get(type).size(); i < num; i++)
 		{
-			ships.get(type).remove(0);
+			ships.get(type).remove(len - i - 0);
 		}
 	}
 
@@ -209,7 +206,7 @@ public abstract class ShipGroup
 	 */
 	public void removeAll()
 	{
-		ships = new HashMap<Class<?>, List<Ship>>();
+		ships.clear();
 	}
 
 	/**
@@ -220,7 +217,7 @@ public abstract class ShipGroup
 	public List<Ship> getAll()
 	{
 		List<Ship> r = new ArrayList<Ship>();
-		for (Class<?> type : ships.keySet())
+		for (Class<? extends Ship> type : ships.keySet())
 		{
 			r.addAll(ships.get(type));
 		}
@@ -236,7 +233,7 @@ public abstract class ShipGroup
 	 */
 	public boolean contains(ShipGroup g)
 	{
-		for (Class<?> type : g.ships.keySet())
+		for (Class<? extends Ship> type : g.ships.keySet())
 		{
 			if (getCount(type) < g.getCount(type)) return false;
 		}

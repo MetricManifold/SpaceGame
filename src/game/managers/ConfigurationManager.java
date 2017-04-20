@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import game.entities.Destroyer;
+import game.entities.Ship;
 
 public class ConfigurationManager
 {
@@ -15,7 +16,7 @@ public class ConfigurationManager
 	public static double planetDensity = 0.15,
 		neutralProdModifier = 0.30,
 		planetDefenderBonus = 1.08;
-	public static Class<?> defaultShip = Destroyer.class;
+	public static Class<? extends Ship> defaultShip = Destroyer.class;
 
 	public static final String[] COLORS = {
 		"white", "red", "blue", "orange", "teal", "purple",
