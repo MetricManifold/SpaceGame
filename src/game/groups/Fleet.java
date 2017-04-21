@@ -1,13 +1,20 @@
 package game.groups;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import game.entities.Ship;
+import game.helpers.AccumulateInteger;
+import game.helpers.AccumulateValue;
 import game.helpers.Displacement;
+import game.helpers.Tuple;
 import game.managers.ConfigurationManager;
 import game.managers.PlanetManager;
 import game.players.Player;
@@ -70,9 +77,9 @@ public class Fleet extends ShipGroup
 					{
 						for (Ship f : getAll())
 						{
-							f.maxHealth();
+							f.heal();
 						}
-						
+
 						pm.setPlanetOwner(owner, destination);
 						destination.addShips(this);
 						removeAll();
@@ -112,7 +119,7 @@ public class Fleet extends ShipGroup
 		{
 			for (Ship s : l)
 			{
-				if (s.getSpeed() < speed) speed = s.getSpeed();
+				if (s.speed < speed) speed = s.speed;
 			}
 		}
 	}
@@ -127,105 +134,132 @@ public class Fleet extends ShipGroup
 	 */
 	public void attack(ShipGroup defender, double defenderBonus)
 	{
+		// get the set of all types in this conflict
 		Set<Class<? extends Ship>> types = new HashSet<Class<? extends Ship>>(ships.keySet());
 		types.addAll(defender.ships.keySet());
 
+		// make variables for the damage accumulation
+		Map<Class<? extends Ship>, List<Ship>> attackers = ships;
+		Map<Class<? extends Ship>, List<Ship>> defenders = defender.ships;
+		Map<Class<? extends Ship>, AccumulateInteger> atk = new HashMap<>();
+		Map<Class<? extends Ship>, AccumulateInteger> dfn = new HashMap<>();
+		attackers.keySet().forEach(t -> dfn.put(t, new AccumulateInteger()));
+		defenders.keySet().forEach(t -> atk.put(t, new AccumulateInteger()));
+
+		dfn.put(Ship.class, new AccumulateInteger());
+		atk.put(Ship.class, new AccumulateInteger());
+
+		// create a mapping of types to total damage against that type
+
+		for (Ship s : getAll())
+		{
+			Class<? extends Ship> str = s.getFirstStrengthFrom(defenders.keySet());
+			if (str != null)
+			{
+				atk.get(str).add(s.attack + s.getBonus(str));
+			}
+			else
+			{
+				atk.get(Ship.class).add(s.attack);
+			}
+		}
+
+		for (Ship s : defender.getAll())
+		{
+			Class<? extends Ship> str = s.getFirstStrengthFrom(attackers.keySet());
+			if (str != null)
+			{
+				dfn.get(str).add((int) ((s.attack + s.getBonus(str)) * defenderBonus));
+			}
+			else
+			{
+				dfn.get(Ship.class).add((int) (s.attack * defenderBonus));
+			}
+		}
+
 		while (defender.getCount() > 0 && getCount() > 0)
 		{
-			for (Class<? extends Ship> type : types)
+
+			// remove all the keys that do no damage
+
+			for (Class<? extends Ship> t : dfn.keySet())
 			{
-				// get the map of strengths for the current class of ship, 
-				Map<Class<? extends Ship>, Integer> strengths = null;
-				try
+				if (dfn.get(t).get() == 0)
 				{
-					strengths = type.newInstance().getStrengths();
+					dfn.remove(t);
 				}
-				catch (InstantiationException | IllegalAccessException e)
+			}
+
+			for (Class<? extends Ship> t : atk.keySet())
+			{
+				if (atk.get(t).get() == 0)
 				{
-					e.printStackTrace();
+					atk.remove(t);
 				}
+			}
 
-				// evaluate defenders
-				if (defender.ships.containsKey(type))
+			// iterate over every type of ship
+			for (Class<? extends Ship> t : types)
+			{
+				System.out.format("attack power at %d, defense power at %d", atk.get(t).get(), dfn.get(t).get());
+
+				/*
+				 * defenders
+				 */
+
+				// get the damage against this type and all the attacking ships
+				int dmg = (dfn.containsKey(t)) ? dfn.get(t).get() : dfn.get(Ship.class).get();
+
+				Iterator<Ship> it = attackers.get(t).iterator();
+				while (it.hasNext() && dmg >= 0)
 				{
-					// filter strengths based on attacker makeup
-					Set<Class<?>> strSet = new HashSet<Class<?>>(strengths.keySet());
-					strSet.retainAll(ships.keySet());
-					Class<?>[] strAll = strSet.toArray(new Class<?>[] {});
+					Ship s = it.next();
+					dmg -= s.health;
 
-					// get the list of attackers
-					List<Ship> attackers = getAll();
-
-					// for each of the defenders ships of the current type, damage an attacker
-					for (Ship s : defender.ships.get(type))
+					if (dmg >= 0)
 					{
-						// check whether to apply strength
-						if (strSet.isEmpty() || !ships.containsKey(strAll[0]))
-						{
-							Ship atk = attackers.get(0);
-							atk.subtractHealth((int) (s.getAttack() * defenderBonus));
-
-							// if the attacker is dead, remove it from the ships
-							if (atk.isDead())
-							{
-								ships.get(atk.getClass()).remove(atk);
-							}
-						}
-						else
-						{
-							// get list of weak ships and last one in that list.
-							List<Ship> atl = ships.get(strAll[0]);
-							Ship atk = atl.get(atl.size() - 1);
-
-							atk.subtractHealth((int) ((s.getAttack() + s.getStrengths().get(strAll[0])) * defenderBonus));
-							if (atk.isDead())
-							{
-								atl.remove(atl.size() - 1);
-							}
-						}
+						// remove the ship from the list and subtract its damage
+						it.remove();
+						Class<? extends Ship> str = s.getFirstStrengthFrom(defenders.keySet());
+						atk.get(str).sub(s.attack + s.getBonus(str));
+					}
+					else
+					{
+						// leave remaining health and exit
+						s.health = -dmg;
 					}
 				}
+				
+				/*
+				 * attackers
+				 */
 
-				// evaluate attackers
-				if (ships.containsKey(type))
+				t = (atk.containsKey(t)) ? t : Ship.class;
+
+				// get the damage against this type and all the defending ships
+				int dmg = (atk.containsKey(t)) ? atk.get(t).get() : atk.get(Ship.class).get();
+
+				Iterator<Ship> it = defenders.get(t).iterator();
+				while (it.hasNext() && dmg >= 0)
 				{
-					// filter strengths based on defender makeup
-					Set<Class<?>> strSet = new HashSet<Class<?>>(strengths.keySet());
-					strSet.retainAll(defender.ships.keySet());
-					Class<?>[] strAll = strSet.toArray(new Class<?>[] {});
+					Ship s = it.next();
+					dmg -= s.health;
 
-					// get the list of defenders
-					List<Ship> defenders = defender.getAll();
-
-					// for each of the defenders ships of the current type, damage an attacker
-					for (Ship s : ships.get(type))
+					if (dmg >= 0)
 					{
-						// check whether to apply strength
-						if (strSet.isEmpty() || !defender.ships.containsKey(strAll[0]))
-						{
-							Ship dfn = defenders.get(0);
-							dfn.subtractHealth((int) (s.getAttack()));
-
-							if (dfn.isDead())
-							{
-								defender.ships.get(dfn.getClass()).remove(dfn);
-							}
-						}
-						else
-						{
-							// get list of weak ships and last one in that list
-							List<Ship> dfl = defender.ships.get(strAll[0]);
-							Ship dfn = dfl.get(dfl.size() - 1);
-
-							dfn.subtractHealth((int) (s.getAttack()));
-							if (dfn.isDead())
-							{
-								dfl.remove(dfl.size() - 1);
-							}
-						}
+						// remove the ship from the list and subtract its damage
+						it.remove();
+						Class<? extends Ship> str = s.getFirstStrengthFrom(attackers.keySet());
+						dfn.get(str).sub(s.attack + s.getBonus(str));
+					}
+					else
+					{
+						// leave remaining health and exit
+						s.health = -dmg;
 					}
 				}
 			}
+
 		}
 	}
 

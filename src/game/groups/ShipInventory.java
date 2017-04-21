@@ -2,8 +2,8 @@ package game.groups;
 
 import java.util.List;
 
-import game.entities.Destroyer;
 import game.entities.Ship;
+import game.managers.ConfigurationManager;
 
 public class ShipInventory extends ShipGroup
 {
@@ -25,7 +25,7 @@ public class ShipInventory extends ShipGroup
 
 	public void add(int production)
 	{
-		add(Destroyer.class, production);
+		add(ConfigurationManager.defaultShip, production);
 	}
 
 	/**

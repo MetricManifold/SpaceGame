@@ -10,6 +10,6 @@ public class Fighter extends Ship
 		armor = 0;
 		health = 50;
 		
-		strengths.put(Bomber.class, 2);
+		strengths.put(Bomber.class, 5);
 	}
 }
