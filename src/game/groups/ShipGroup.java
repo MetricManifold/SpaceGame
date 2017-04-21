@@ -6,8 +6,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import game.entities.Ship;
+import game.helpers.AccumulateInteger;
 
 public abstract class ShipGroup
 {
@@ -241,4 +243,30 @@ public abstract class ShipGroup
 		return true;
 	}
 
+	
+	/**
+	 * sums the total damage from the ships in this group into the given map object, arranging it
+	 * based on strengths vs {@code keys}, otherwise placed accumulated by {@code Ship.class}
+	 * must iterate over all ships in the group
+	 * @param atk
+	 */
+	protected void countDamage(Map<Class<? extends Ship>, AccumulateInteger> atk, Set<Class<? extends Ship>> keys)
+	{
+		keys.forEach(t -> atk.put(t, new AccumulateInteger()));
+		atk.put(Ship.class, new AccumulateInteger());
+		
+		for (Ship s : getAll())
+		{
+			Class<? extends Ship> str = s.getFirstStrengthFrom(keys);
+			if (str != null)
+			{
+				atk.get(str).add(s.attack + s.getBonus(str));
+			}
+			else
+			{
+				atk.get(Ship.class).add(s.attack);
+			}
+		}
+	}
+	
 }

@@ -21,4 +21,16 @@ public class AccumulateInteger implements AccumulateValue<Integer>
 	{
 		return acc;
 	}
+
+	@Override
+	public void mul(Double mul)
+	{
+		acc *= mul;
+	}
+
+	@Override
+	public void div(Double div)
+	{
+		acc /= div;
+	}
 }
