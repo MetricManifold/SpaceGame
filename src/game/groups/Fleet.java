@@ -1,22 +1,14 @@
 package game.groups;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import game.entities.Ship;
 import game.helpers.AccumulateInteger;
-import game.helpers.AccumulateValue;
 import game.helpers.Displacement;
-import game.helpers.Tuple;
 import game.managers.ConfigurationManager;
 import game.managers.PlanetManager;
 import game.players.Player;
@@ -147,66 +139,6 @@ public class Fleet extends ShipGroup
 		// add the defender bonus
 		dfn.keySet().forEach(k -> dfn.get(k).mul(defenderBonus));
 
-		// create a filter for removing 0 damages
-		Consumer<Map<Class<? extends Ship>, AccumulateInteger>> filter = map -> {
-			for (Class<? extends Ship> t : map.keySet())
-			{
-				if (map.get(t).get() <= 0) map.remove(t);
-			}
-		};
-
-		// simulate attack of A attacking B
-		Consumer<Tuple<Tuple<ShipGroup, Map<Class<? extends Ship>, AccumulateInteger>>, Tuple<ShipGroup, Map<Class<? extends Ship>, AccumulateInteger>>>> sides = tup -> {
-			ShipGroup attackers = tup._1._1;
-			ShipGroup defenders = tup._2._1;
-			Map<Class<? extends Ship>, AccumulateInteger> attackerDamageMap = tup._1._2;
-			Map<Class<? extends Ship>, AccumulateInteger> defenderDamageMap = tup._2._2;
-			Set<Class<? extends Ship>> attackingTypes = attackers.ships.keySet();
-			Set<Class<? extends Ship>> defendingTypes = defenders.ships.keySet();
-
-			if (attackerDamageMap.size() - 1 > defendingTypes.size())
-			{
-				attackerDamageMap.clear();
-				defenders.countDamage(attackerDamageMap, attackingTypes);
-			}
-			
-			filter.accept(attackerDamageMap);
-
-			for (Class<? extends Ship> damageType : defenderDamageMap)
-			{
-				int dmg = dfn.get(damageType).get();
-
-				if (damageType == Ship.class)
-				{
-					Iterator<Ship> it = attackers.getAll().iterator();
-					while (it.hasNext() && dmg >= 0)
-					{
-						Ship s = it.next();
-						dmg -= s.health;
-						if (dmg >= 0)
-						{
-							it.remove();
-							Class<? extends Ship> str = s.getFirstStrengthFrom(defender.ships.keySet());
-							if (str == null)
-							{
-								atk.get(Ship.class).sub(s.attack + s.getBonus);
-							}
-							atk.get(str).sub(s.attack + s.getBonus(str));
-						}
-						else
-						{
-							s.health = -dmg;
-						}
-					}
-				}
-				else
-				{
-					Iterator<Ship> it = attackers.ships.get(damageType).iterator();
-				}
-
-			}
-
-		};
 
 		// perform attack while both parties have ships
 		while (defender.getCount() > 0 && getCount() > 0)
