@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import game.entities.Ship;
 import game.helpers.AccumulateInteger;
 import game.helpers.Displacement;
+import game.helpers.Pointer;
 import game.managers.ConfigurationManager;
 import game.managers.PlanetManager;
 import game.players.Player;
@@ -128,23 +129,42 @@ public class Fleet extends ShipGroup
 	 */
 	public void attack(ShipGroup defender, double defenderBonus)
 	{
-		// make variables for the damage accumulation
-		Map<Class<? extends Ship>, AccumulateInteger> atk = new HashMap<>();
-		Map<Class<? extends Ship>, AccumulateInteger> dfn = new HashMap<>();
 
-		// fill the accumulation variables
-		defender.countDamage(dfn, ships.keySet());
-		countDamage(atk, defender.ships.keySet());
+		// a denotes attacker, b denotes defender
+		Pointer<Integer> c_a = new Pointer<>(getCount());
+		Pointer<Integer> c_b = new Pointer<>(defender.getCount());
+		Pointer<Integer> d_a = new Pointer<>(0);
+		Pointer<Integer> d_b = new Pointer<>(0);
+		Map<Class<? extends Ship>, Pointer<Integer>> d_a_str = new HashMap<>();
+		Map<Class<? extends Ship>, Pointer<Integer>> d_b_str = new HashMap<>();
+		Map<Class<? extends Ship>, Pointer<Integer>> h_a_str = new HashMap<>();
+		Map<Class<? extends Ship>, Pointer<Integer>> h_b_str = new HashMap<>();
 
-		// add the defender bonus
-		dfn.keySet().forEach(k -> dfn.get(k).mul(defenderBonus));
+		// get the total attack of the fleet
+		getAll().forEach(s -> d_a.v += s.attack);
+		defender.getAll().forEach(s -> d_b.v += (int) (s.attack * defenderBonus));
+
+		// create a damage map to pointer by type
+		ships.keySet().forEach(k -> {
+			d_a_str.put(k, new Pointer<Integer>(0));
+			ships.get(k).forEach(s -> d_a_str.get(k).v += s.attack);
+		});
+		defender.ships.keySet().forEach(k -> {
+			d_b_str.put(k, new Pointer<Integer>(0));
+			ships.get(k).forEach(s -> d_b_str.get(k).v += s.attack);
+		});
+
+		// create a health map to pointer by type
+		ships.keySet().forEach(k -> {
+			h_a_str.put(k, new Pointer<Integer>(0));
+			ships.get(k).forEach(s -> h_a_str.get(k).v += s.health);
+		});
+		defender.ships.keySet().forEach(k -> {
+			h_b_str.put(k, new Pointer<Integer>(0));
+			ships.get(k).forEach(s -> h_b_str.get(k).v += s.health);
+		});
 
 
-		// perform attack while both parties have ships
-		while (defender.getCount() > 0 && getCount() > 0)
-		{
-
-		}
 	}
 
 	public void attack(Planet p)
