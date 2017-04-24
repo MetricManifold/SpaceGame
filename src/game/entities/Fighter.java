@@ -1,5 +1,6 @@
 package game.entities;
 
+import game.helpers.Tuple;
 
 public class Fighter extends Ship
 {
@@ -10,6 +11,6 @@ public class Fighter extends Ship
 		armor = 0;
 		health = 50;
 		
-		strengths.put(Bomber.class, 5);
+		strength = new Tuple<Class<? extends Ship>, Integer>(Bomber.class, 5);
 	}
 }

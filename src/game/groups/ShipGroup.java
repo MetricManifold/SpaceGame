@@ -10,6 +10,7 @@ import java.util.Set;
 
 import game.entities.Ship;
 import game.helpers.AccumulateInteger;
+import game.helpers.Tuple;
 
 public abstract class ShipGroup
 {
@@ -257,10 +258,10 @@ public abstract class ShipGroup
 		
 		for (Ship s : getAll())
 		{
-			Class<? extends Ship> str = s.getFirstStrengthFrom(keys);
+			Tuple<Class<? extends Ship>, Integer> str = s.getStrength();
 			if (str != null)
 			{
-				atk.get(str).add(s.attack + s.getBonus(str));
+				atk.get(str._1).add(s.attack + str._2);
 			}
 			else
 			{

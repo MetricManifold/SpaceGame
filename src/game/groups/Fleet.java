@@ -1,5 +1,6 @@
 package game.groups;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.function.Consumer;
 import game.entities.Ship;
 import game.helpers.AccumulateInteger;
 import game.helpers.Displacement;
+import game.helpers.MatrixPntInt;
 import game.helpers.Pointer;
 import game.managers.ConfigurationManager;
 import game.managers.PlanetManager;
@@ -129,8 +131,9 @@ public class Fleet extends ShipGroup
 	 */
 	public void attack(ShipGroup defender, double defenderBonus)
 	{
+		List<Class<? extends Ship>> attackerTypeArray = new ArrayList<>(ships.keySet());
+		List<Class<? extends Ship>> defenderTypeArray = new ArrayList<>(defender.ships.keySet());
 
-		// a denotes attacker, b denotes defender
 		Pointer<Integer> c_a = new Pointer<>(getCount());
 		Pointer<Integer> c_b = new Pointer<>(defender.getCount());
 		Pointer<Integer> d_a = new Pointer<>(0);
@@ -163,7 +166,14 @@ public class Fleet extends ShipGroup
 			h_b_str.put(k, new Pointer<Integer>(0));
 			ships.get(k).forEach(s -> h_b_str.get(k).v += s.health);
 		});
+		
+		MatrixPntInt ms_a = new MatrixPntInt(1, defenderTypeArray.size(), new Pointer<Integer>(0));
+		MatrixPntInt ms_b = new MatrixPntInt(1, attackerTypeArray.size(), new Pointer<Integer>(0));
 
+		for (int i = 0, len = defenderTypeArray.size(); i < len; i++)
+		{
+			//ms_a.set(0, i, defenderTypeArray.get(i).newInstance());
+		}
 
 	}
 
