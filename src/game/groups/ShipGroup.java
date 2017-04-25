@@ -17,7 +17,8 @@ public abstract class ShipGroup
 	protected Map<Class<? extends Ship>, List<Ship>> ships = new HashMap<>();
 
 	public ShipGroup()
-	{}
+	{
+	}
 
 	public ShipGroup(ShipGroup group)
 	{
@@ -42,7 +43,8 @@ public abstract class ShipGroup
 	public int getCount(Class<? extends Ship> type)
 	{
 		List<Ship> c = ships.get(type);
-		if (c == null) return 0;
+		if (c == null)
+			return 0;
 		else return c.size();
 	}
 
@@ -84,7 +86,8 @@ public abstract class ShipGroup
 			}
 		}
 		catch (Exception e)
-		{}
+		{
+		}
 
 	}
 
@@ -166,7 +169,8 @@ public abstract class ShipGroup
 		Class<? extends Ship> type = ship.getClass();
 		List<Ship> l = ships.get(type);
 
-		if (l == null || l.isEmpty()) throw new Exception("attempted to remove ship that doesn't exist");
+		if (l == null || l.isEmpty())
+			throw new Exception("attempted to remove ship that doesn't exist");
 		else l.remove(ship);
 	}
 
@@ -244,30 +248,85 @@ public abstract class ShipGroup
 		return true;
 	}
 
-	
 	/**
-	 * sums the total damage from the ships in this group into the given map object, arranging it
-	 * based on strengths vs {@code keys}, otherwise placed accumulated by {@code Ship.class}
-	 * must iterate over all ships in the group
+	 * sums the total damage from the ships in this group into the given map object, arranging it based on strengths vs {@code keys}, otherwise placed
+	 * accumulated by {@code Ship.class} must iterate over all ships in the group
+	 * 
 	 * @param atk
 	 */
 	protected void countDamage(Map<Class<? extends Ship>, AccumulateInteger> atk, Set<Class<? extends Ship>> keys)
 	{
 		keys.forEach(t -> atk.put(t, new AccumulateInteger()));
 		atk.put(Ship.class, new AccumulateInteger());
-		
+
 		for (Ship s : getAll())
 		{
 			Tuple<Class<? extends Ship>, Integer> str = s.getStrength();
 			if (str != null)
 			{
-				atk.get(str._1).add(s.attack + str._2);
+				atk.get(str._1).add(str._2);
 			}
-			else
-			{
-				atk.get(Ship.class).add(s.attack);
-			}
+			atk.get(Ship.class).add(s.attack);
+		}
+	}
+
+	/**
+	 * get the total damage done by the fleet (not including strengths)
+	 * @return
+	 */
+	protected int getTotalDamage()
+	{
+		Map<Class<? extends Ship>, AccumulateInteger> atk = new HashMap<>();
+		countDamage(atk, ships.keySet());
+		return atk.get(Ship.class).get();
+	}
+	
+	/**
+	 * get the average damage of the fleet
+	 * @return
+	 */
+	protected int getAverageDamage()
+	{
+		return getTotalDamage() / getCount();
+	}
+
+	/**
+	 * returns a mapping of each ship type to total type health
+	 */
+	protected void countHealth(Map<Class<? extends Ship>, AccumulateInteger> hp)
+	{
+		ships.keySet().forEach(t -> hp.put(t, new AccumulateInteger()));
+
+		for (Ship s : getAll())
+		{
+			hp.get(s.getClass()).add(s.health);
 		}
 	}
 	
+	/**
+	 * get the total health of the fleet
+	 * @return
+	 */
+	protected int getTotalHealth()
+	{
+		Map<Class<? extends Ship>, AccumulateInteger> hp = new HashMap<>();
+		countHealth(hp);
+		int total = 0;
+		
+		for (AccumulateInteger v : hp.values())
+		{
+			total += v.get();
+		}
+		
+		return total;
+	}
+	
+	/**
+	 * get the average health of the fleet
+	 * @return
+	 */
+	protected int getAverageHealth()
+	{
+		return getTotalHealth() / getCount();
+	}
 }

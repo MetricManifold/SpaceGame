@@ -8,4 +8,9 @@ public class Pointer<T>
 	{
 		this.v = v;
 	}
+
+	public Pointer(Pointer<T> k)
+	{
+		this.v = k.v;
+	}
 }

@@ -282,12 +282,22 @@ public class TurnManager
 				}
 			}
 
-			fleets.forEach(f -> f.update(pg));
+			fleets.forEach(f -> {
+				try
+				{
+					f.update(pg);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			});
+			
 			fleets.removeIf(f -> f.getCount() == 0);
 		}
 
 		updatePlayerLabel(pm, pg);
-		
+
 		lblClick = false;
 		ttPlayer.hide();
 	}

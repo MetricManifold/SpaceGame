@@ -3,14 +3,16 @@ package game.groups;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import game.entities.Ship;
 import game.helpers.AccumulateInteger;
 import game.helpers.Displacement;
-import game.helpers.MatrixPntInt;
+import game.helpers.PointerIntegerMatrix;
 import game.helpers.Pointer;
 import game.managers.ConfigurationManager;
 import game.managers.PlanetManager;
@@ -57,10 +59,11 @@ public class Fleet extends ShipGroup
 	 * update the status of this fleet, including position if moving
 	 * 
 	 * @param pm
+	 * @throws Exception
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void update(PlanetManager pm)
+	public void update(PlanetManager pm) throws Exception
 	{
 		if (path != null)
 		{
@@ -129,55 +132,88 @@ public class Fleet extends ShipGroup
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void attack(ShipGroup defender, double defenderBonus)
+	public void attack(ShipGroup defender, double defenderBonus) throws Exception
 	{
-		List<Class<? extends Ship>> attackerTypeArray = new ArrayList<>(ships.keySet());
-		List<Class<? extends Ship>> defenderTypeArray = new ArrayList<>(defender.ships.keySet());
+		Set<Class<? extends Ship>> allTypes = new HashSet<>(ships.keySet());
+		allTypes.addAll(defender.ships.keySet());
+		List<Class<? extends Ship>> allTypesList = new ArrayList<>(allTypes);
+		int tn = allTypesList.size();
 
-		Pointer<Integer> c_a = new Pointer<>(getCount());
-		Pointer<Integer> c_b = new Pointer<>(defender.getCount());
-		Pointer<Integer> d_a = new Pointer<>(0);
-		Pointer<Integer> d_b = new Pointer<>(0);
-		Map<Class<? extends Ship>, Pointer<Integer>> d_a_str = new HashMap<>();
-		Map<Class<? extends Ship>, Pointer<Integer>> d_b_str = new HashMap<>();
-		Map<Class<? extends Ship>, Pointer<Integer>> h_a_str = new HashMap<>();
-		Map<Class<? extends Ship>, Pointer<Integer>> h_b_str = new HashMap<>();
+		int maxHpA = getTotalHealth();
+		int maxHpB = defender.getTotalHealth();
 
-		// get the total attack of the fleet
-		getAll().forEach(s -> d_a.v += s.attack);
-		defender.getAll().forEach(s -> d_b.v += (int) (s.attack * defenderBonus));
+		// damage and strength map
+		PointerIntegerMatrix d_p = new PointerIntegerMatrix(tn, tn, new Pointer<Integer>(0));
+		PointerIntegerMatrix m_p = new PointerIntegerMatrix(tn, tn, new Pointer<Integer>(0));
 
-		// create a damage map to pointer by type
-		ships.keySet().forEach(k -> {
-			d_a_str.put(k, new Pointer<Integer>(0));
-			ships.get(k).forEach(s -> d_a_str.get(k).v += s.attack);
-		});
-		defender.ships.keySet().forEach(k -> {
-			d_b_str.put(k, new Pointer<Integer>(0));
-			ships.get(k).forEach(s -> d_b_str.get(k).v += s.attack);
-		});
+		// matrix for damages
+		PointerIntegerMatrix d_a = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
+		PointerIntegerMatrix d_b = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
 
-		// create a health map to pointer by type
-		ships.keySet().forEach(k -> {
-			h_a_str.put(k, new Pointer<Integer>(0));
-			ships.get(k).forEach(s -> h_a_str.get(k).v += s.health);
-		});
-		defender.ships.keySet().forEach(k -> {
-			h_b_str.put(k, new Pointer<Integer>(0));
-			ships.get(k).forEach(s -> h_b_str.get(k).v += s.health);
-		});
-		
-		MatrixPntInt ms_a = new MatrixPntInt(1, defenderTypeArray.size(), new Pointer<Integer>(0));
-		MatrixPntInt ms_b = new MatrixPntInt(1, attackerTypeArray.size(), new Pointer<Integer>(0));
+		// matrix for healths		
+		PointerIntegerMatrix h_a = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
+		PointerIntegerMatrix h_b = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
 
-		for (int i = 0, len = defenderTypeArray.size(); i < len; i++)
+		for (int i = 0; i < tn; i++)
 		{
-			//ms_a.set(0, i, defenderTypeArray.get(i).newInstance());
+			Class<? extends Ship> t = allTypesList.get(i);
+			Ship s = t.newInstance();
+
+			h_a.set(0, i, getCount(t) * s.health);
+			h_b.set(0, i, defender.getCount(t) * s.health);
+			d_p.set(i, i, -s.getStrength()._2);
+
+			int a_a = getTotalDamage() / defender.ships.keySet().size();
+			int a_b = (int) (defender.getTotalDamage() / ships.keySet().size() * defenderBonus);
+
+			if (defender.ships.containsKey(t))
+			{
+				d_a.set(0, i, -a_a);
+			}
+			else
+			{
+				d_a.set(0, i, 0);
+			}
+
+			if (ships.containsKey(t))
+			{
+				d_b.set(0, i, -a_b);
+			}
+			else
+			{
+				d_b.set(0, i, 0);
+			}
+
+			for (int j = 0; j < tn; j++)
+			{
+				int val = (s.getStrength()._1 == s.getStrength()._1) ? 1 : 0;
+				m_p.set(i, j, val);
+			}
+		}
+
+		PointerIntegerMatrix check = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
+		while (!h_a.equals(check) && !h_b.equals(check))
+		{
+			h_a = d_b.add(h_b.mul(d_p).mul(m_p));
+			h_b = d_a.add(h_a.mul(d_p).mul(m_p));
+
+			int newHpA = 0, newHpB = 0;
+			for (int i = 0; i < tn; i++)
+			{
+				if (h_a.get(0, i).v < 0) h_a.set(0, i, 0);
+				if (h_b.get(0, i).v < 0) h_b.set(0, i, 0);
+
+				newHpA += h_a.get(0, i).v;
+				newHpB += h_b.get(0, i).v;
+			}
+
+			d_a = d_a.mul(newHpA / maxHpA);
+			d_b = d_b.mul(newHpB / maxHpB);
 		}
 
 	}
 
-	public void attack(Planet p)
+	public void attack(Planet p) throws Exception
 	{
 		attack(p.getShipInventory(), ConfigurationManager.planetDefenderBonus);
 	}
