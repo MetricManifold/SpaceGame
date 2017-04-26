@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import game.entities.Ship;
 import game.helpers.AccumulateInteger;
@@ -138,9 +137,18 @@ public class Fleet extends ShipGroup
 		allTypes.addAll(defender.ships.keySet());
 		List<Class<? extends Ship>> allTypesList = new ArrayList<>(allTypes);
 		int tn = allTypesList.size();
-
-		int maxHpA = getTotalHealth();
-		int maxHpB = defender.getTotalHealth();
+		
+		int iniHpA = getTotalHealth();
+		int iniHpB = defender.getTotalHealth();
+		
+		int dmgA = getTotalDamage();
+		int dmgB = defender.getTotalDamage();
+		
+		int tCountA = ships.size();
+		int tCountB = defender.ships.size();
+		
+		Map<Class<? extends Ship>, AccumulateInteger> maxHpA = countMaxHealth();
+		Map<Class<? extends Ship>, AccumulateInteger> maxHpB = defender.countMaxHealth();
 
 		// damage and strength map
 		PointerIntegerMatrix d_p = new PointerIntegerMatrix(tn, tn, new Pointer<Integer>(0));
@@ -163,8 +171,8 @@ public class Fleet extends ShipGroup
 			h_b.set(0, i, defender.getCount(t) * s.health);
 			d_p.set(i, i, -s.getStrength()._2);
 
-			int a_a = getTotalDamage() / defender.ships.keySet().size();
-			int a_b = (int) (defender.getTotalDamage() / ships.keySet().size() * defenderBonus);
+			int a_a = dmgA / defender.ships.keySet().size();
+			int a_b = (int) (dmgB / ships.keySet().size() * defenderBonus);
 
 			if (defender.ships.containsKey(t))
 			{
@@ -207,9 +215,16 @@ public class Fleet extends ShipGroup
 				newHpB += h_b.get(0, i).v;
 			}
 
-			d_a = d_a.mul(newHpA / maxHpA);
-			d_b = d_b.mul(newHpB / maxHpB);
+			d_a = d_a.mul(newHpA / iniHpA);
+			d_b = d_b.mul(newHpB / iniHpB);
 		}
+		
+		for (int i = 0; i < tn; i++)
+		{
+			int curHp = h_a.get(0, i).v;
+			
+		}
+		
 
 	}
 

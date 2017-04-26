@@ -254,8 +254,9 @@ public abstract class ShipGroup
 	 * 
 	 * @param atk
 	 */
-	protected void countDamage(Map<Class<? extends Ship>, AccumulateInteger> atk, Set<Class<? extends Ship>> keys)
+	protected Map<Class<? extends Ship>, AccumulateInteger> countDamage(Set<Class<? extends Ship>> keys)
 	{
+		Map<Class<? extends Ship>, AccumulateInteger> atk = new HashMap<>();
 		keys.forEach(t -> atk.put(t, new AccumulateInteger()));
 		atk.put(Ship.class, new AccumulateInteger());
 
@@ -268,6 +269,8 @@ public abstract class ShipGroup
 			}
 			atk.get(Ship.class).add(s.attack);
 		}
+		
+		return atk;
 	}
 
 	/**
@@ -276,8 +279,7 @@ public abstract class ShipGroup
 	 */
 	protected int getTotalDamage()
 	{
-		Map<Class<? extends Ship>, AccumulateInteger> atk = new HashMap<>();
-		countDamage(atk, ships.keySet());
+		Map<Class<? extends Ship>, AccumulateInteger> atk = countDamage(ships.keySet());
 		return atk.get(Ship.class).get();
 	}
 	
@@ -293,14 +295,40 @@ public abstract class ShipGroup
 	/**
 	 * returns a mapping of each ship type to total type health
 	 */
-	protected void countHealth(Map<Class<? extends Ship>, AccumulateInteger> hp)
+	protected Map<Class<? extends Ship>, AccumulateInteger> countHealth()
 	{
+		Map<Class<? extends Ship>, AccumulateInteger> hp = new HashMap<>();
 		ships.keySet().forEach(t -> hp.put(t, new AccumulateInteger()));
 
 		for (Ship s : getAll())
 		{
 			hp.get(s.getClass()).add(s.health);
 		}
+		
+		return hp;
+	}
+	
+	/**
+	 * returns a mapping of each ship type to maximum health of family
+	 */
+	protected Map<Class<? extends Ship>, AccumulateInteger> countMaxHealth()
+	{
+		Map<Class<? extends Ship>, AccumulateInteger> hp = new HashMap<>();
+		ships.keySet().forEach(t -> hp.put(t, new AccumulateInteger()));
+
+		for (Class<? extends Ship> t : ships.keySet())
+		{
+			try
+			{
+				hp.get(t).add(t.newInstance().maxHealth * getCount(t));
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return hp;
 	}
 	
 	/**
@@ -309,8 +337,7 @@ public abstract class ShipGroup
 	 */
 	protected int getTotalHealth()
 	{
-		Map<Class<? extends Ship>, AccumulateInteger> hp = new HashMap<>();
-		countHealth(hp);
+		Map<Class<? extends Ship>, AccumulateInteger> hp = countHealth();
 		int total = 0;
 		
 		for (AccumulateInteger v : hp.values())
