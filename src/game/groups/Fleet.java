@@ -198,12 +198,13 @@ public class Fleet extends ShipGroup
 				m_p.set(i, j, val);
 			}
 		}
+		
+		PointerIntegerMatrix h_a0 = new PointerIntegerMatrix(h_a);
+		PointerIntegerMatrix h_b0 = new PointerIntegerMatrix(h_b);
 
 		PointerIntegerMatrix check = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
 		while (!h_a.equals(check) && !h_b.equals(check))
 		{
-			h_a = d_b.add(h_b.mul(d_p).mul(m_p));
-			h_b = d_a.add(h_a.mul(d_p).mul(m_p));
 
 			int newHpA = 0, newHpB = 0;
 			for (int i = 0; i < tn; i++)
@@ -215,6 +216,9 @@ public class Fleet extends ShipGroup
 				newHpB += h_b.get(0, i).v;
 			}
 
+			h_a = h_a.add(d_b.add(h_b.mul(d_p).mul(m_p)));
+			h_b = h_b.add(d_a.add(h_a.mul(d_p).mul(m_p)));
+			
 			d_a = d_a.mul(newHpA / iniHpA);
 			d_b = d_b.mul(newHpB / iniHpB);
 		}

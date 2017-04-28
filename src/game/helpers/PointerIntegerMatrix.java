@@ -5,7 +5,7 @@ public class PointerIntegerMatrix extends Matrix<Pointer<Integer>>
 {
 
 	@SuppressWarnings("unchecked")
-	public PointerIntegerMatrix(int x, int y, Pointer<Integer> k)
+	public PointerIntegerMatrix(int x, int y, Pointer<Integer> k) throws Exception
 	{
 		super(x, y);
 		this.matrix = (Pointer<Integer>[]) new Pointer[x * y];
@@ -15,9 +15,19 @@ public class PointerIntegerMatrix extends Matrix<Pointer<Integer>>
 			this.matrix[i] = k;
 		}
 	}
-
-	public PointerIntegerMatrix mul(PointerIntegerMatrix m)
+	
+	public PointerIntegerMatrix(PointerIntegerMatrix m) throws Exception
 	{
+		super(m);
+	}
+	
+	public PointerIntegerMatrix mul(PointerIntegerMatrix m) throws Exception
+	{
+		if (col != m.row)
+		{
+			throw new Exception("attempt to multiply matrices of incompatible sizes");
+		}
+		
 		PointerIntegerMatrix r = new PointerIntegerMatrix(row, m.col, new Pointer<Integer>(0));
 		
 		for (int i = 0; i < row; i++)
@@ -37,7 +47,7 @@ public class PointerIntegerMatrix extends Matrix<Pointer<Integer>>
 		return r;
 	}
 	
-	public PointerIntegerMatrix mul(double n)
+	public PointerIntegerMatrix mul(double n) throws Exception
 	{
 		PointerIntegerMatrix r = new PointerIntegerMatrix(row, col, new Pointer<Integer>(0));
 		

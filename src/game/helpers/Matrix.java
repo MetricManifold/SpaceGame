@@ -8,7 +8,7 @@ public class Matrix<T>
 	protected T[] matrix;
 
 	@SuppressWarnings("unchecked")
-	public Matrix(int x, int y, T k)
+	public Matrix(int x, int y, T k) throws Exception
 	{
 		this(x, y);
 		this.matrix = (T[]) Array.newInstance(k.getClass(), x * y);
@@ -19,11 +19,33 @@ public class Matrix<T>
 		}
 	}
 
-	protected Matrix(int x, int y)
+	protected Matrix(int x, int y) throws Exception
 	{
+		if (x <= 0 || y <= 0)
+		{
+			throw new Exception("matrix is of incorrect size");
+		}
+		
 		this.row = x;
 		this.col = y;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public Matrix(Matrix<T> m) throws Exception
+	{
+		this(m.row, m.col);
+		
+		Class<?> t = m.get(0, 0).getClass();
+		this.matrix = (T[]) Array.newInstance(t, row * col);
+		
+		
+		for (int i = 0; i < row * col; i++)
+		{
+			matrix[i] = (T) t.getConstructor(t).newInstance(m.matrix[i]);
+		}
+		
+	}
+
 
 	/**
 	 * return the value in the x-th row and y-th column
