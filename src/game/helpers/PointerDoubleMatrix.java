@@ -1,14 +1,14 @@
 package game.helpers;
 
 
-public class PointerIntegerMatrix extends Matrix<Pointer<Integer>>
+public class PointerDoubleMatrix extends Matrix<Pointer<Double>>
 {
 
 	@SuppressWarnings("unchecked")
-	public PointerIntegerMatrix(int x, int y, Pointer<Integer> k) throws Exception
+	public PointerDoubleMatrix(int x, int y, Pointer<Double> k) throws Exception
 	{
 		super(x, y);
-		this.matrix = (Pointer<Integer>[]) new Pointer[x * y];
+		this.matrix = (Pointer<Double>[]) new Pointer[x * y];
 		
 		for (int i = 0; i < x * y; i++)
 		{
@@ -16,25 +16,25 @@ public class PointerIntegerMatrix extends Matrix<Pointer<Integer>>
 		}
 	}
 	
-	public PointerIntegerMatrix(PointerIntegerMatrix m) throws Exception
+	public PointerDoubleMatrix(PointerDoubleMatrix m) throws Exception
 	{
 		super(m);
 	}
 	
-	public PointerIntegerMatrix mul(PointerIntegerMatrix m) throws Exception
+	public PointerDoubleMatrix mul(PointerDoubleMatrix m) throws Exception
 	{
 		if (col != m.row)
 		{
 			throw new Exception("attempt to multiply matrices of incompatible sizes");
 		}
 		
-		PointerIntegerMatrix r = new PointerIntegerMatrix(row, m.col, new Pointer<Integer>(0));
+		PointerDoubleMatrix r = new PointerDoubleMatrix(row, m.col, new Pointer<Double>(0d));
 		
 		for (int i = 0; i < row; i++)
 		{
 			for (int j = 0; j < m.col; j++)
 			{
-				int v = 0;
+				double v = 0d;
 				for (int n = 0; n < col; n++)
 				{
 					v += get(i, n).v + m.get(n, j).v;
@@ -47,15 +47,15 @@ public class PointerIntegerMatrix extends Matrix<Pointer<Integer>>
 		return r;
 	}
 	
-	public PointerIntegerMatrix mul(double n) throws Exception
+	public PointerDoubleMatrix mul(double n) throws Exception
 	{
-		PointerIntegerMatrix r = new PointerIntegerMatrix(row, col, new Pointer<Integer>(0));
+		PointerDoubleMatrix r = new PointerDoubleMatrix(row, col, new Pointer<Double>(0d));
 		
 		for (int i = 0; i < row; i++)
 		{
 			for (int j = 0; j < col; j++)
 			{
-				r.set(i, j, (int) (n * r.get(i, j).v));
+				r.set(i, j, n * r.get(i, j).v);
 			}
 		}
 		
@@ -63,14 +63,14 @@ public class PointerIntegerMatrix extends Matrix<Pointer<Integer>>
 	}
 
 
-	public PointerIntegerMatrix add(PointerIntegerMatrix m) throws Exception
+	public PointerDoubleMatrix add(PointerDoubleMatrix m) throws Exception
 	{
 		if (m.col != col || m.row != row)
 		{
 			throw new Exception("cannot add differently sized matrices");
 		}
 		
-		PointerIntegerMatrix r = new PointerIntegerMatrix(row, m.col, new Pointer<Integer>(0));
+		PointerDoubleMatrix r = new PointerDoubleMatrix(row, m.col, new Pointer<Double>(0d));
 		
 		for (int i = 0; i < row; i++)
 		{
@@ -83,14 +83,14 @@ public class PointerIntegerMatrix extends Matrix<Pointer<Integer>>
 		return r;
 	}
 	
-	public PointerIntegerMatrix sub(PointerIntegerMatrix m) throws Exception
+	public PointerDoubleMatrix sub(PointerDoubleMatrix m) throws Exception
 	{
 		if (m.col != col || m.row != row)
 		{
 			throw new Exception("cannot add differently sized matrices");
 		}
 		
-		PointerIntegerMatrix r = new PointerIntegerMatrix(row, m.col, new Pointer<Integer>(0));
+		PointerDoubleMatrix r = new PointerDoubleMatrix(row, m.col, new Pointer<Double>(0d));
 		
 		for (int i = 0; i < row; i++)
 		{
@@ -103,13 +103,13 @@ public class PointerIntegerMatrix extends Matrix<Pointer<Integer>>
 		return r;
 	}
 	
-	public void set(int x, int y, Integer v)
+	public void set(int x, int y, Double v)
 	{
 		matrix[x * row + y].v = v;
 	}
 	
 	@Override
-	public boolean equals(Matrix<Pointer<Integer>> m)
+	public boolean equals(Matrix<Pointer<Double>> m)
 	{
 		if (m.row != row || m.col != col) return false;
 
@@ -123,6 +123,11 @@ public class PointerIntegerMatrix extends Matrix<Pointer<Integer>>
 		}
 
 		return r;
+	}
+
+	public void set(int x, int y, Integer v)
+	{
+		set(x, y, (double) v);
 	}
 	
 }

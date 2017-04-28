@@ -11,7 +11,7 @@ import java.util.Set;
 import game.entities.Ship;
 import game.helpers.AccumulateInteger;
 import game.helpers.Displacement;
-import game.helpers.PointerIntegerMatrix;
+import game.helpers.PointerDoubleMatrix;
 import game.helpers.Pointer;
 import game.managers.ConfigurationManager;
 import game.managers.PlanetManager;
@@ -141,26 +141,28 @@ public class Fleet extends ShipGroup
 		int iniHpA = getTotalHealth();
 		int iniHpB = defender.getTotalHealth();
 		
-		int dmgA = getTotalDamage();
-		int dmgB = defender.getTotalDamage();
-		
-		int tCountA = ships.size();
-		int tCountB = defender.ships.size();
+		int dmgA = -getTotalDamage();
+		int dmgB = (int) (-defender.getTotalDamage() * defenderBonus);
+		int avgDmgA = dmgA / defender.ships.keySet().size();
+		int avgDmgB =  dmgB / ships.keySet().size();
 		
 		Map<Class<? extends Ship>, AccumulateInteger> maxHpA = countMaxHealth();
 		Map<Class<? extends Ship>, AccumulateInteger> maxHpB = defender.countMaxHealth();
 
 		// damage and strength map
-		PointerIntegerMatrix d_p = new PointerIntegerMatrix(tn, tn, new Pointer<Integer>(0));
-		PointerIntegerMatrix m_p = new PointerIntegerMatrix(tn, tn, new Pointer<Integer>(0));
+		PointerDoubleMatrix d_p = new PointerDoubleMatrix(tn, tn, new Pointer<Double>(0d));
+		PointerDoubleMatrix m_p = new PointerDoubleMatrix(tn, tn, new Pointer<Double>(0d));
+		
+		PointerDoubleMatrix h_a_max = new PointerDoubleMatrix(tn, tn, new Pointer<Double>(0d));
+		PointerDoubleMatrix h_b_max = new PointerDoubleMatrix(tn, tn, new Pointer<Double>(0d));
 
 		// matrix for damages
-		PointerIntegerMatrix d_a = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
-		PointerIntegerMatrix d_b = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
+		PointerDoubleMatrix d_a = new PointerDoubleMatrix(1, tn, new Pointer<Double>(0d));
+		PointerDoubleMatrix d_b = new PointerDoubleMatrix(1, tn, new Pointer<Double>(0d));
 
 		// matrix for healths		
-		PointerIntegerMatrix h_a = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
-		PointerIntegerMatrix h_b = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
+		PointerDoubleMatrix h_a = new PointerDoubleMatrix(1, tn, new Pointer<Double>(0d));
+		PointerDoubleMatrix h_b = new PointerDoubleMatrix(1, tn, new Pointer<Double>(0d));
 
 		for (int i = 0; i < tn; i++)
 		{
@@ -170,13 +172,13 @@ public class Fleet extends ShipGroup
 			h_a.set(0, i, getCount(t) * s.health);
 			h_b.set(0, i, defender.getCount(t) * s.health);
 			d_p.set(i, i, -s.getStrength()._2);
-
-			int a_a = dmgA / defender.ships.keySet().size();
-			int a_b = (int) (dmgB / ships.keySet().size() * defenderBonus);
+			
+			h_a_max.set(i, i, 1 / maxHpA.get(t).get());
+			h_b_max.set(i, i, 1 / maxHpB.get(t).get());
 
 			if (defender.ships.containsKey(t))
 			{
-				d_a.set(0, i, -a_a);
+				d_a.set(0, i, avgDmgA);
 			}
 			else
 			{
@@ -185,7 +187,7 @@ public class Fleet extends ShipGroup
 
 			if (ships.containsKey(t))
 			{
-				d_b.set(0, i, -a_b);
+				d_b.set(0, i, avgDmgB);
 			}
 			else
 			{
@@ -199,10 +201,10 @@ public class Fleet extends ShipGroup
 			}
 		}
 		
-		PointerIntegerMatrix h_a0 = new PointerIntegerMatrix(h_a);
-		PointerIntegerMatrix h_b0 = new PointerIntegerMatrix(h_b);
+		PointerDoubleMatrix h_a0 = new PointerDoubleMatrix(h_a);
+		PointerDoubleMatrix h_b0 = new PointerDoubleMatrix(h_b);
 
-		PointerIntegerMatrix check = new PointerIntegerMatrix(1, tn, new Pointer<Integer>(0));
+		PointerDoubleMatrix check = new PointerDoubleMatrix(1, tn, new Pointer<Double>(0d));
 		while (!h_a.equals(check) && !h_b.equals(check))
 		{
 
@@ -216,16 +218,13 @@ public class Fleet extends ShipGroup
 				newHpB += h_b.get(0, i).v;
 			}
 
-			h_a = h_a.add(d_b.add(h_b.mul(d_p).mul(m_p)));
-			h_b = h_b.add(d_a.add(h_a.mul(d_p).mul(m_p)));
-			
-			d_a = d_a.mul(newHpA / iniHpA);
-			d_b = d_b.mul(newHpB / iniHpB);
+			h_a = h_a.add(d_a.mul(newHpA / iniHpA).add(d_p.mul(m_p)));
+			h_b = h_b.add(d_b.mul(newHpB / iniHpB).add(d_p.mul(m_p)));
 		}
 		
 		for (int i = 0; i < tn; i++)
 		{
-			int curHp = h_a.get(0, i).v;
+			double curHp = h_a.get(0, i).v;
 			
 		}
 		
