@@ -25,30 +25,29 @@ public class Matrix<T>
 		{
 			throw new Exception("matrix is of incorrect size");
 		}
-		
+
 		this.row = x;
 		this.col = y;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Matrix(Matrix<T> m) throws Exception
 	{
 		this(m.row, m.col);
-		
+
 		Class<?> t = m.get(0, 0).getClass();
 		this.matrix = (T[]) Array.newInstance(t, row * col);
-		
-		
+
 		for (int i = 0; i < row * col; i++)
 		{
 			matrix[i] = (T) t.getConstructor(t).newInstance(m.matrix[i]);
 		}
-		
-	}
 
+	}
 
 	/**
 	 * return the value in the x-th row and y-th column
+	 * 
 	 * @param x
 	 * @param y
 	 * @return
@@ -60,6 +59,7 @@ public class Matrix<T>
 
 	/**
 	 * set the value in the x-th row and y-th column
+	 * 
 	 * @param x
 	 * @param y
 	 * @param v
@@ -83,12 +83,12 @@ public class Matrix<T>
 
 	/**
 	 * check if this matrix's values equal to another
+	 * 
 	 * @param m
 	 * @return
 	 */
 	public boolean equals(Matrix<T> m)
 	{
-
 		if (m.row != row || m.col != col) return false;
 
 		boolean r = true;
@@ -96,10 +96,29 @@ public class Matrix<T>
 		{
 			for (int j = 0; j < col; j++)
 			{
-				if (m.get(i, j) != get(i, j)) r = false;
+				if (!m.get(i, j).equals(get(i, j))) r = false;
 			}
 		}
 
 		return r;
+	}
+
+	@Override
+	public String toString()
+	{
+		StringBuilder b = new StringBuilder();
+		for (int i = 0; i < row * col; i++)
+		{
+			if (i % row == 0) b.append('[');
+			b.append(String.format(" %s ", matrix[i].toString()));
+
+			if ((i + 1) % row == 0)
+			{
+				b.append(']');
+				if (i + 1 != row * col) b.append('\n');
+			}
+		}
+
+		return b.toString();
 	}
 }

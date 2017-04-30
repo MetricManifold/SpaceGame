@@ -21,10 +21,12 @@ public class TestFleet extends TestCase
 	
 	public void testAttack() throws Exception
 	{
-		attacker.add(Destroyer.class, 100);
-		defender.add(Destroyer.class, 100);
+		attacker.add(Destroyer.class, 10000);
+		defender.add(Destroyer.class, 10000);
 		
-		attacker.attack(defender, 1.05);
+		attacker.attack(defender, 1.10);
+		
+		assertTrue(true);
 	}
 
 }

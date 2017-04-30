@@ -263,12 +263,13 @@ public abstract class ShipGroup
 		for (Ship s : getAll())
 		{
 			Tuple<Class<? extends Ship>, Integer> str = s.getStrength();
-			if (str != null)
+			if (str._1 != null)
 			{
 				atk.get(str._1).add(str._2);
 			}
 			atk.get(Ship.class).add(s.attack);
 		}
+		
 		
 		return atk;
 	}

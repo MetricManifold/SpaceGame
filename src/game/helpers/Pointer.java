@@ -13,4 +13,10 @@ public class Pointer<T>
 	{
 		this.v = k.v;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return v.toString();
+	}
 }

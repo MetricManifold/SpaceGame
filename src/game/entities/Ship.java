@@ -6,12 +6,13 @@ public abstract class Ship
 {
 	public float speed = 1.0f;
 	public int attack = 1, armor = 0, health = 100, maxHealth = 100;
-	protected Tuple<Class<? extends Ship>, Integer> strength;
+	protected Tuple<Class<? extends Ship>, Integer> strength = new Tuple<>(null, 0);
 
 	public Tuple<Class<? extends Ship>, Integer> getStrength()
 	{
 		return strength;
 	}
+	
 
 	/**
 	 * get whether or not health has been depleted

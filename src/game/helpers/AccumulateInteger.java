@@ -13,7 +13,7 @@ public class AccumulateInteger implements AccumulateValue<Integer>
 	@Override
 	public void add(Integer add)
 	{
-		add += add;
+		acc += add;
 	}
 
 	@Override

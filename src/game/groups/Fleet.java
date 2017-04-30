@@ -2,17 +2,13 @@ package game.groups;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import game.entities.Ship;
-import game.helpers.AccumulateInteger;
 import game.helpers.Displacement;
 import game.helpers.PointerDoubleMatrix;
-import game.helpers.Pointer;
 import game.managers.ConfigurationManager;
 import game.managers.PlanetManager;
 import game.players.Player;
@@ -138,32 +134,27 @@ public class Fleet extends ShipGroup
 		List<Class<? extends Ship>> allTypesList = new ArrayList<>(allTypes);
 		int tn = allTypesList.size();
 		
-		int iniHpA = getTotalHealth();
-		int iniHpB = defender.getTotalHealth();
+		double iniHpA = getTotalHealth();
+		double iniHpB = defender.getTotalHealth();
 		
 		int dmgA = -getTotalDamage();
 		int dmgB = (int) (-defender.getTotalDamage() * defenderBonus);
-		int avgDmgA = dmgA / defender.ships.keySet().size();
-		int avgDmgB =  dmgB / ships.keySet().size();
+		double avgDmgA = dmgA / defender.ships.keySet().size();
+		double avgDmgB =  dmgB / ships.keySet().size();
 		
-		Map<Class<? extends Ship>, AccumulateInteger> maxHpA = countMaxHealth();
-		Map<Class<? extends Ship>, AccumulateInteger> maxHpB = defender.countMaxHealth();
-
-		// damage and strength map
-		PointerDoubleMatrix d_p = new PointerDoubleMatrix(tn, tn, new Pointer<Double>(0d));
-		PointerDoubleMatrix m_p = new PointerDoubleMatrix(tn, tn, new Pointer<Double>(0d));
+		// damage, strength map and individual ship health
+		PointerDoubleMatrix d_p = new PointerDoubleMatrix(1, tn);
+		PointerDoubleMatrix m_p = new PointerDoubleMatrix(tn, tn);
+		PointerDoubleMatrix h_p = new PointerDoubleMatrix(tn, tn);
 		
-		PointerDoubleMatrix h_a_max = new PointerDoubleMatrix(tn, tn, new Pointer<Double>(0d));
-		PointerDoubleMatrix h_b_max = new PointerDoubleMatrix(tn, tn, new Pointer<Double>(0d));
-
 		// matrix for damages
-		PointerDoubleMatrix d_a = new PointerDoubleMatrix(1, tn, new Pointer<Double>(0d));
-		PointerDoubleMatrix d_b = new PointerDoubleMatrix(1, tn, new Pointer<Double>(0d));
+		PointerDoubleMatrix d_a = new PointerDoubleMatrix(1, tn);
+		PointerDoubleMatrix d_b = new PointerDoubleMatrix(1, tn);
 
 		// matrix for healths		
-		PointerDoubleMatrix h_a = new PointerDoubleMatrix(1, tn, new Pointer<Double>(0d));
-		PointerDoubleMatrix h_b = new PointerDoubleMatrix(1, tn, new Pointer<Double>(0d));
-
+		PointerDoubleMatrix h_a = new PointerDoubleMatrix(1, tn);
+		PointerDoubleMatrix h_b = new PointerDoubleMatrix(1, tn);
+		
 		for (int i = 0; i < tn; i++)
 		{
 			Class<? extends Ship> t = allTypesList.get(i);
@@ -171,11 +162,9 @@ public class Fleet extends ShipGroup
 
 			h_a.set(0, i, getCount(t) * s.health);
 			h_b.set(0, i, defender.getCount(t) * s.health);
-			d_p.set(i, i, -s.getStrength()._2);
+			d_p.set(0, i, -s.getStrength()._2);
+			h_p.set(i, i, 1 / s.maxHealth);
 			
-			h_a_max.set(i, i, 1 / maxHpA.get(t).get());
-			h_b_max.set(i, i, 1 / maxHpB.get(t).get());
-
 			if (defender.ships.containsKey(t))
 			{
 				d_a.set(0, i, avgDmgA);
@@ -200,33 +189,26 @@ public class Fleet extends ShipGroup
 				m_p.set(i, j, val);
 			}
 		}
-		
-		PointerDoubleMatrix h_a0 = new PointerDoubleMatrix(h_a);
-		PointerDoubleMatrix h_b0 = new PointerDoubleMatrix(h_b);
 
-		PointerDoubleMatrix check = new PointerDoubleMatrix(1, tn, new Pointer<Double>(0d));
-		while (!h_a.equals(check) && !h_b.equals(check))
+		PointerDoubleMatrix check = new PointerDoubleMatrix(1, tn, 0d);
+		while (!h_a.equals(check) || !h_b.equals(check))
 		{
 
-			int newHpA = 0, newHpB = 0;
+			double newHpA = 0, newHpB = 0;
 			for (int i = 0; i < tn; i++)
 			{
-				if (h_a.get(0, i).v < 0) h_a.set(0, i, 0);
-				if (h_b.get(0, i).v < 0) h_b.set(0, i, 0);
+				if (h_a.get(0, i).v < 1) h_a.set(0, i, 0d);
+				if (h_b.get(0, i).v < 1) h_b.set(0, i, 0d);
 
 				newHpA += h_a.get(0, i).v;
 				newHpB += h_b.get(0, i).v;
 			}
 
-			h_a = h_a.add(d_a.mul(newHpA / iniHpA).add(d_p.mul(m_p)));
-			h_b = h_b.add(d_b.mul(newHpB / iniHpB).add(d_p.mul(m_p)));
+			
+			h_a = h_a.add(d_a.mul(newHpA / iniHpA).add(d_p.mul(h_b).mul(h_p).mul(m_p)));
+			h_b = h_b.add(d_b.mul(newHpB / iniHpB).add(d_p.mul(h_a).mul(h_p).mul(m_p)));
 		}
 		
-		for (int i = 0; i < tn; i++)
-		{
-			double curHp = h_a.get(0, i).v;
-			
-		}
 		
 
 	}
@@ -237,3 +219,9 @@ public class Fleet extends ShipGroup
 	}
 
 }
+
+
+
+
+
+
