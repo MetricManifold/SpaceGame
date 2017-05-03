@@ -18,18 +18,24 @@ public class WindowManager extends Application
 
 	public static final int PX = 30, PY = 30, SIZEX = 300, SIZEY = 250;
 	public static final double D = 0.07;
-	public static final String TITLE = "Konquest II";
+	public static final String TITLE = "Starfare";
+	public static Scene scene, setup;
+	public static Stage primaryStage;
 
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
-		javafx.scene.text.Font.getFamilies().forEach(f -> System.out.println(f));
+		WindowManager.primaryStage = primaryStage;
 		
 		BorderPane border = new BorderPane(); //				layout the game in a border pane
-		Scene scene = new Scene(border); //						create the scene
+		BorderPane border2 = new BorderPane();
 		VBox vb = new VBox(); //								create the box for the grid and turnbar
 
+		scene = new Scene(border); //							create the scene
+		setup = new Scene(border2);
+		
 		vb.setAlignment(Pos.CENTER);
+		vb.getStyleClass().add("vbox-main");
 		scene.getStylesheets().add("elements.css"); //			set the style sheet for the scene
 
 		lm = new PlayerManager(); //							creates the object managing players
@@ -48,6 +54,11 @@ public class WindowManager extends Application
 		primaryStage.show();
 
 		System.out.println("game started");
+	}
+	
+	public void swapScene(Scene scene)
+	{
+		primaryStage.setScene(scene);
 	}
 
 	/**

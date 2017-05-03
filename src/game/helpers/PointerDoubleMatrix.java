@@ -98,7 +98,7 @@ public class PointerDoubleMatrix extends Matrix<Pointer<Double>>
 
 		PointerDoubleMatrix r = new PointerDoubleMatrix(row, col, new Pointer<Double>(0d));
 
-		for (int i = 0; i < row; i++)
+		for (int i = 0; i < row * col; i++)
 		{
 			r.matrix[i].v = matrix[i].v + m.matrix[i].v;
 		}

@@ -1,6 +1,12 @@
 .scene {
 	-fx-background-color: black;
 	-fx-padding: 2px;
+	-fx-background-image: url("backgroundmain.jpg");
+	-fx-background-opacity: 0.3;
+}
+
+.vbox-main {
+	-fx-effect: dropshadow(gaussian, black, 16, 0.5, 0, 0);
 }
 
 /* PLANET GRID */
@@ -31,15 +37,15 @@
 /* PLANET BUTTONS */
 
 .space-button-origin {
-	-fx-border-insets: -3px;
+	-fx-border-insets: -2px;
 	-fx-border-style: dashed;
-	-fx-border-color: lightblue;
+	-fx-border-color: white;
 }
 
 .space-button-destination {
-	-fx-border-insets: -3px;
+	-fx-border-insets: -2px;
 	-fx-border-style: dashed;
-	-fx-border-color: pink;
+	-fx-border-color: white;
 }
 
 .space-button-illuminate {
@@ -47,7 +53,8 @@
 }
 
 .space-button:hover {
-	-fx-effect: dropshadow(gaussian, white, 6, 0.7, 0, 0);
+	-fx-background-size: 100%;
+	/*-fx-effect: dropshadow(gaussian, white, 6, 0.7, 0, 0);*/
 }
 
 .space-button {
@@ -55,7 +62,7 @@
 	-fx-border-radius: 50%;
 
 	-fx-background-radius: 50%;
-	-fx-background-size: 85% 85%;
+	-fx-background-size: 85%;
 	-fx-background-position: center;
 	-fx-background-repeat: no-repeat;
 }
@@ -86,6 +93,7 @@
 	-fx-background-color: #0c4422;
 	-fx-padding: 5;
 	-fx-alignment: center;
+	-fx-effect: innershadow(gaussian, #051c0a, 12, 0.2, 0, 0);
 }
 
 .player-label {
@@ -93,6 +101,7 @@
 	-fx-text-fill: white;
 	-fx-alignment: center;
 	-fx-font: 12px "Century Gothic";
+	-fx-background-radius: 8;
 }
 
 .timer {
@@ -102,7 +111,7 @@
 }
 
 .tooltip-list:hover {
-	-fx-font-style: oblique;
+	-fx-color: gray;
 }
 
 .tooltip-list {

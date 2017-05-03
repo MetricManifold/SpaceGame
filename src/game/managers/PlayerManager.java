@@ -15,16 +15,21 @@ public class PlayerManager
 	private Player[] players;
 	public final Player neutral;
 
+	public enum Controller
+	{
+		AI, HUMAN, NEUTRAL
+	};
+
 	public PlayerManager()
 	{
 		int numPlayers = ConfigurationManager.numPlayers;
 
 		players = new Player[numPlayers];
-		neutral = new Player(0, ConfigurationManager.COLORS[0]);
+		neutral = new Player(0, ConfigurationManager.COLORS[0], Controller.NEUTRAL);
 
 		for (int i = 0; i < numPlayers; i++)
 		{
-			players[i] = new Player(i, ConfigurationManager.COLORS[i]);
+			players[i] = new Player(i, ConfigurationManager.COLORS[i], Controller.HUMAN);
 		}
 	}
 

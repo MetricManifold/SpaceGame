@@ -292,7 +292,7 @@ public class TurnManager
 					e.printStackTrace();
 				}
 			});
-			
+
 			fleets.removeIf(f -> f.getCount() == 0);
 		}
 
@@ -300,6 +300,7 @@ public class TurnManager
 
 		lblClick = false;
 		ttPlayer.hide();
+		pm.getCurrentPlayer().update(pg, this, pm);
 	}
 
 	/**

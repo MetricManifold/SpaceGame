@@ -136,10 +136,9 @@ public class Fleet extends ShipGroup
 
 		double iniHpA = getTotalHealth();
 		double iniHpB = defender.getTotalHealth();
-
 		double avgDmgA = -getTotalDamage() / defender.ships.keySet().size();
-		double avgDmgB = -defender.getTotalDamage() * defenderBonus / ships.keySet().size();
-
+		double avgDmgB = -defender.getTotalDamage() / ships.keySet().size() * defenderBonus;
+		
 		// damage, strength map and individual ship health
 		PointerDoubleMatrix d_p = new PointerDoubleMatrix(1, tn);
 		PointerDoubleMatrix m_p = new PointerDoubleMatrix(tn, tn);
@@ -153,7 +152,7 @@ public class Fleet extends ShipGroup
 		// matrix for healths		
 		PointerDoubleMatrix h_a = new PointerDoubleMatrix(1, tn);
 		PointerDoubleMatrix h_b = new PointerDoubleMatrix(1, tn);
-
+		
 		for (int i = 0; i < tn; i++)
 		{
 			Class<? extends Ship> t = allTypesList.get(i);
@@ -190,19 +189,19 @@ public class Fleet extends ShipGroup
 		}
 
 		PointerDoubleMatrix check = new PointerDoubleMatrix(1, tn, 0d);
-		while (!h_a.equals(check) || !h_b.equals(check))
+		while (!h_a.equals(check) && !h_b.equals(check))
 		{
 			double newHpA = h_a.dot(u_p);
 			double newHpB = h_b.dot(u_p);
-			
+
+			h_a = h_a.add(d_b.mul(newHpB / iniHpB).add(d_p.mul(h_b).mul(h_p).mul(m_p)));
+			h_b = h_b.add(d_a.mul(newHpA / iniHpA).add(d_p.mul(h_a).mul(h_p).mul(m_p)));
+
 			for (int i = 0; i < tn; i++)
 			{
-				if (h_a.get(0, i).v < 0.1 && h_a.get(0, i).v > 0) h_a.set(0, i, 0d);
-				if (h_b.get(0, i).v < 0.1 && h_b.get(0, i).v > 0) h_b.set(0, i, 0d);
+				if (h_a.get(0, i).v < 1) h_a.set(0, i, 0d);
+				if (h_b.get(0, i).v < 1) h_b.set(0, i, 0d);
 			}
-
-			h_a = h_a.add(d_a.mul(newHpA / iniHpA).add(d_p.mul(h_b).mul(h_p).mul(m_p)));
-			h_b = h_b.add(d_b.mul(newHpB / iniHpB).add(d_p.mul(h_a).mul(h_p).mul(m_p)));
 		}
 
 		defender.removeAll();
@@ -212,7 +211,6 @@ public class Fleet extends ShipGroup
 		{
 			Class<? extends Ship> t = allTypesList.get(i);
 			Ship s = t.newInstance();
-			
 			
 			if (h_a.get(0, i).v > 0)
 			{
@@ -224,7 +222,7 @@ public class Fleet extends ShipGroup
 				defender.add(t, (int) Math.ceil(h_b.get(0, i).v / s.health));
 			}
 		}
-
+		
 	}
 
 	public void attack(Planet p) throws Exception

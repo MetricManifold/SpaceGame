@@ -3,6 +3,9 @@ package game.players;
 import java.util.ArrayList;
 import java.util.List;
 
+import game.managers.PlanetManager;
+import game.managers.PlayerManager;
+import game.managers.TurnManager;
 import game.tiles.Planet;
 import game.tiles.Space;
 
@@ -13,14 +16,21 @@ public class Player
 	private int num;
 	private String color;
 	private boolean alive = true;
+	private PlayerManager.Controller controller;
 
-	public Player(int num, String color)
+	public Player(int num, String color, PlayerManager.Controller controller)
 	{
 		this.num = num;
 		this.color = color;
+		this.controller = controller;
 
 		origin = null;
 		destination = null;
+	}
+
+	public PlayerManager.Controller getController()
+	{
+		return controller;
 	}
 
 	public void setDestination(Planet destination)
@@ -94,7 +104,7 @@ public class Player
 		p.setOwner(this);
 		planets.add(p);
 	}
-	
+
 	public List<Planet> getPlanets()
 	{
 		return planets;
@@ -159,5 +169,15 @@ public class Player
 	public boolean isAlive()
 	{
 		return alive;
+	}
+
+	/**
+	 * updates the state of this player
+	 * @param pg
+	 * @param tm
+	 * @param pm
+	 */
+	public void update(PlanetManager pg, TurnManager tm, PlayerManager pm)
+	{
 	}
 }
