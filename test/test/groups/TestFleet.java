@@ -7,7 +7,6 @@ import junit.framework.TestCase;
 
 public class TestFleet extends TestCase
 {
-	
 	protected Fleet attacker;
 	protected ShipInventory defender;
 	protected Player player;
@@ -23,10 +22,14 @@ public class TestFleet extends TestCase
 	{
 		attacker.add(Destroyer.class, 10000);
 		defender.add(Destroyer.class, 10000);
-		
 		attacker.attack(defender, 1.10);
 		
-		assertTrue(true);
+		boolean success = true;
+		
+		if (attacker.getCount() != 0) success = false;
+		if (defender.getCount() == 0) success = false;
+		
+		assertTrue(success);
 	}
 
 }

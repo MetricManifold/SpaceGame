@@ -54,7 +54,7 @@ public class Matrix<T>
 	 */
 	public T get(int x, int y)
 	{
-		return matrix[x * row + y];
+		return matrix[x * col + y];
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class Matrix<T>
 	 */
 	public void set(int x, int y, T v)
 	{
-		matrix[x * row + y] = v;
+		matrix[x * col + y] = v;
 	}
 
 	@Override
@@ -109,10 +109,10 @@ public class Matrix<T>
 		StringBuilder b = new StringBuilder();
 		for (int i = 0; i < row * col; i++)
 		{
-			if (i % row == 0) b.append('[');
+			if (i % col == 0) b.append('[');
 			b.append(String.format(" %s ", matrix[i].toString()));
 
-			if ((i + 1) % row == 0)
+			if ((i + 1) % col == 0)
 			{
 				b.append(']');
 				if (i + 1 != row * col) b.append('\n');

@@ -133,20 +133,19 @@ public class Fleet extends ShipGroup
 		allTypes.addAll(defender.ships.keySet());
 		List<Class<? extends Ship>> allTypesList = new ArrayList<>(allTypes);
 		int tn = allTypesList.size();
-		
+
 		double iniHpA = getTotalHealth();
 		double iniHpB = defender.getTotalHealth();
-		
-		int dmgA = -getTotalDamage();
-		int dmgB = (int) (-defender.getTotalDamage() * defenderBonus);
-		double avgDmgA = dmgA / defender.ships.keySet().size();
-		double avgDmgB =  dmgB / ships.keySet().size();
-		
+
+		double avgDmgA = -getTotalDamage() / defender.ships.keySet().size();
+		double avgDmgB = -defender.getTotalDamage() * defenderBonus / ships.keySet().size();
+
 		// damage, strength map and individual ship health
 		PointerDoubleMatrix d_p = new PointerDoubleMatrix(1, tn);
 		PointerDoubleMatrix m_p = new PointerDoubleMatrix(tn, tn);
 		PointerDoubleMatrix h_p = new PointerDoubleMatrix(tn, tn);
-		
+		PointerDoubleMatrix u_p = new PointerDoubleMatrix(tn, 1, 1d);
+
 		// matrix for damages
 		PointerDoubleMatrix d_a = new PointerDoubleMatrix(1, tn);
 		PointerDoubleMatrix d_b = new PointerDoubleMatrix(1, tn);
@@ -154,7 +153,7 @@ public class Fleet extends ShipGroup
 		// matrix for healths		
 		PointerDoubleMatrix h_a = new PointerDoubleMatrix(1, tn);
 		PointerDoubleMatrix h_b = new PointerDoubleMatrix(1, tn);
-		
+
 		for (int i = 0; i < tn; i++)
 		{
 			Class<? extends Ship> t = allTypesList.get(i);
@@ -164,7 +163,7 @@ public class Fleet extends ShipGroup
 			h_b.set(0, i, defender.getCount(t) * s.health);
 			d_p.set(0, i, -s.getStrength()._2);
 			h_p.set(i, i, 1 / s.maxHealth);
-			
+
 			if (defender.ships.containsKey(t))
 			{
 				d_a.set(0, i, avgDmgA);
@@ -193,23 +192,38 @@ public class Fleet extends ShipGroup
 		PointerDoubleMatrix check = new PointerDoubleMatrix(1, tn, 0d);
 		while (!h_a.equals(check) || !h_b.equals(check))
 		{
-
-			double newHpA = 0, newHpB = 0;
+			double newHpA = h_a.dot(u_p);
+			double newHpB = h_b.dot(u_p);
+			
 			for (int i = 0; i < tn; i++)
 			{
-				if (h_a.get(0, i).v < 1) h_a.set(0, i, 0d);
-				if (h_b.get(0, i).v < 1) h_b.set(0, i, 0d);
-
-				newHpA += h_a.get(0, i).v;
-				newHpB += h_b.get(0, i).v;
+				if (h_a.get(0, i).v < 0.1 && h_a.get(0, i).v > 0) h_a.set(0, i, 0d);
+				if (h_b.get(0, i).v < 0.1 && h_b.get(0, i).v > 0) h_b.set(0, i, 0d);
 			}
 
-			
 			h_a = h_a.add(d_a.mul(newHpA / iniHpA).add(d_p.mul(h_b).mul(h_p).mul(m_p)));
 			h_b = h_b.add(d_b.mul(newHpB / iniHpB).add(d_p.mul(h_a).mul(h_p).mul(m_p)));
 		}
+
+		defender.removeAll();
+		removeAll();
 		
-		
+		for (int i = 0; i < tn; i++)
+		{
+			Class<? extends Ship> t = allTypesList.get(i);
+			Ship s = t.newInstance();
+			
+			
+			if (h_a.get(0, i).v > 0)
+			{
+				add(t, (int) Math.ceil(h_a.get(0, i).v / s.health));
+			}
+			
+			if (h_b.get(0, i).v > 0)
+			{
+				defender.add(t, (int) Math.ceil(h_b.get(0, i).v / s.health));
+			}
+		}
 
 	}
 
@@ -219,9 +233,3 @@ public class Fleet extends ShipGroup
 	}
 
 }
-
-
-
-
-
-

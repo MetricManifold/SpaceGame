@@ -139,7 +139,7 @@ public class PointerDoubleMatrix extends Matrix<Pointer<Double>>
 	 */
 	public void set(int x, int y, Double v)
 	{
-		matrix[x * row + y].v = v;
+		matrix[x * col + y].v = v;
 	}
 
 	/**
@@ -169,6 +169,51 @@ public class PointerDoubleMatrix extends Matrix<Pointer<Double>>
 		}
 
 		return r;
+	}
+
+	/**
+	 * takes the dot product with another 1d matrix
+	 * 
+	 * @param m
+	 * @return
+	 * @throws Exception
+	 */
+	public double dot(PointerDoubleMatrix m) throws Exception
+	{
+		if (row != 1)
+		{
+			throw new Exception("attempting to take dot product of incorrectly sized matrices");
+		}
+
+		return mul(m).get(0, 0).v;
+	}
+
+	/**
+	 * given a string in a matrix format, separated by spaces, convert values to double
+	 * and enter into the matrix
+	 * @param s
+	 * @throws Exception 
+	 */
+	public void set(String s) throws Exception
+	{
+		String[] rows = s.split("\\n");
+		int i = 0;
+
+		try {
+
+			for (String row : rows)
+			{
+				String[] elements = row.split("\\s+");
+				for (String element : elements)
+				{
+					matrix[i++] = new Pointer<Double>(Double.valueOf(element));
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			throw new Exception("failed to modify matrix (i = " + i + ")", e);
+		}
 	}
 
 }
