@@ -111,7 +111,7 @@
 }
 
 .tooltip-list:hover {
-	-fx-color: gray;
+	-fx-fill: gray;
 }
 
 .tooltip-list {
@@ -124,6 +124,10 @@
 	-fx-fill: white;
 	-fx-font-size: 14px;
 	-fx-alignment: left;
+}
+
+.tooltip-list-title:hover {
+	-fx-fill: yellow;
 }
 
 .tooltip-list-production {

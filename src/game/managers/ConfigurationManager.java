@@ -11,7 +11,9 @@ public class ConfigurationManager
 {
 	public static int shipStartCount = 10,
 		numPlayers = 2, playerMax = 14,
-		gridX = 10, gridY = 25;
+		gridX = 10, gridY = 25, 
+		maxGridX = 30, maxGridY = 30,
+		defGridX = 20, defGridY = 20;
 
 	public static double planetDensity = 0.15,
 		neutralProdModifier = 0.30,

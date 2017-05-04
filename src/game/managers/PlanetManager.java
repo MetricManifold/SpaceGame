@@ -25,7 +25,7 @@ import javafx.scene.layout.VBox;
 public class PlanetManager
 {
 	// static values for ui
-	public static final int PADH = 5, PADV = 5,
+	private static final int PADH = 5, PADV = 5,
 		TILEH = 25, TILEV = 25,
 		NUM_P_BG = 4, NUM_B_BG = 4,
 		MARGIN = 5, TOPMARGIN = 2;
@@ -34,7 +34,7 @@ public class PlanetManager
 	private Map<Space, Label> tiles = new HashMap<Space, Label>();
 	private Map<Integer, Planet> planets = new HashMap<Integer, Planet>();
 
-	private int maxh, maxv, x, y, len;
+	private int sizeh, sizev, defSizeh, defSizev, x, y, len;
 	private double density;
 
 	private StackPane pane = new StackPane();
@@ -47,8 +47,10 @@ public class PlanetManager
 		this.y = ConfigurationManager.gridY;
 		this.density = ConfigurationManager.planetDensity;
 
-		this.maxh = (TILEH + PADH) * x + MARGIN * 2 - PADH;
-		this.maxv = (TILEV + PADV) * y + MARGIN * 2 - PADV;
+		this.defSizeh = (TILEH + PADH) * ConfigurationManager.defGridX + MARGIN * 2 - PADH;
+		this.defSizev = (TILEH + PADH) * ConfigurationManager.defGridX + MARGIN * 2 - PADH;
+		this.sizeh = (TILEH + PADH) * x + MARGIN * 2 - PADH;
+		this.sizev = (TILEV + PADV) * y + MARGIN * 2 - PADV;
 		this.len = x * y;
 
 		makeTilePaneUI(); // 		setup tilepane UI
@@ -74,7 +76,7 @@ public class PlanetManager
 		tilePane.setPrefColumns(x);
 		tilePane.setPrefRows(y);
 
-		tilePane.setMaxSize(maxh, maxv);
+		tilePane.setMaxSize(sizeh, sizev);
 		tilePane.setPadding(new Insets(MARGIN, MARGIN, MARGIN, MARGIN));
 		tilePane.setAlignment(Pos.BASELINE_CENTER);
 
@@ -320,7 +322,7 @@ public class PlanetManager
 	 */
 	public int getSizeX()
 	{
-		return maxh;
+		return sizeh;
 	}
 
 	/**
@@ -330,7 +332,17 @@ public class PlanetManager
 	 */
 	public int getSizeY()
 	{
-		return maxv;
+		return sizev;
+	}
+	
+	public int getDefSizeX()
+	{
+		return defSizeh;
+	}
+	
+	public int getDefSizeY()
+	{
+		return defSizev;
 	}
 
 	public Map<Space, Label> getTiles()

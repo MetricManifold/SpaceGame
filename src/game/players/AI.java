@@ -17,7 +17,7 @@ public class AI extends Player
 	@Override
 	public void update(PlanetManager pg, TurnManager tm, PlayerManager pm)
 	{
-		tm.nextTurn(pm, pg);
+		tm.nextTurn();
 	}
 
 }

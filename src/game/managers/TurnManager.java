@@ -1,6 +1,7 @@
 package game.managers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import game.groups.Fleet;
 import game.groups.ShipGroup;
@@ -39,7 +40,7 @@ import javafx.util.Duration;
  */
 public class TurnManager
 {
-	public static final int SPACING = 10, LBL_WIDTH = 80, FIELD_WIDTH = 60, PLAYER_LIST_WIDTH = 150;
+	private static final int SPACING = 10, LBL_WIDTH = 80, FIELD_WIDTH = 60, PLAYER_LIST_WIDTH = 150;
 
 	private HBox turnBar = new HBox();
 
@@ -60,6 +61,7 @@ public class TurnManager
 	private VBox v1 = new VBox();
 	private VBox v2 = new VBox();
 	private VBox v3 = new VBox();
+	private int sortColumn = 1;
 
 	/*
 	 * elements associated with the game time
@@ -69,6 +71,12 @@ public class TurnManager
 	private TextFlow gameTime = new TextFlow();
 	private int totalSeconds = 0;
 	private String timeFormat = "%02d : %02d";
+
+	/*
+	 * managers used by this manager
+	 */
+	private PlanetManager PG;
+	private PlayerManager PM;
 
 	private List<Fleet> fleets = new ArrayList<Fleet>();
 
@@ -124,6 +132,7 @@ public class TurnManager
 		{
 			titles[i] = new Text(t);
 			titles[i].getStyleClass().add("tooltip-list-title");
+			tooltipSortHandle(titles[i], i);
 			i++;
 		}
 
@@ -145,8 +154,13 @@ public class TurnManager
 	 */
 	public void setEvents(PlayerManager pm, PlanetManager pg)
 	{
+		PM = pm;
+		PG = pg;
+
+		turnBar.setMinWidth(pg.getDefSizeX());
+		turnBar.setPrefWidth(pg.getSizeX());
 		turnBar.setMaxWidth(pg.getSizeX());
-		updatePlayerLabel(pm, pg);
+		updatePlayerLabel();
 
 		Timeline oneSecond = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>()
 		{
@@ -166,7 +180,7 @@ public class TurnManager
 			{
 				try
 				{
-					nextTurn(pm, pg);
+					nextTurn();
 				}
 				catch (Exception e)
 				{
@@ -183,7 +197,7 @@ public class TurnManager
 			{
 				try
 				{
-					sendShips(pm, pg);
+					sendShips();
 				}
 				catch (Exception e)
 				{
@@ -198,7 +212,7 @@ public class TurnManager
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue)
 			{
 				if (!newValue.matches("\\d*")) tfShipNum.setText(newValue.replaceAll("[^\\d]", ""));
-				shipNumFieldHandle(pm);
+				shipNumFieldHandle();
 			}
 		});
 
@@ -211,7 +225,7 @@ public class TurnManager
 				{
 					try
 					{
-						sendShips(pm, pg);
+						sendShips();
 					}
 					catch (Exception e)
 					{
@@ -236,7 +250,6 @@ public class TurnManager
 
 		lblPlayer.setOnMouseExited(new EventHandler<MouseEvent>()
 		{
-
 			@Override
 			public void handle(MouseEvent event)
 			{
@@ -254,6 +267,7 @@ public class TurnManager
 				if (!lblClick) ttPlayer.hide();
 			}
 		});
+		
 	}
 
 	/**
@@ -262,18 +276,18 @@ public class TurnManager
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	public void nextTurn(PlayerManager pm, PlanetManager pg)
+	public void nextTurn()
 	{
-		pg.clearSelection(pm.getCurrentPlayer().getOrigin(), pm.getCurrentPlayer().getDestination());
-		pm.nextPlayer();
-		
+		PG.clearSelection(PM.getCurrentPlayer().getOrigin(), PM.getCurrentPlayer().getDestination());
+		PM.nextPlayer();
+
 		// produce ships if all players have made their turn
-		if (pm.getPlayer(1) == pm.getCurrentPlayer())
+		if (PM.getPlayer(1) == PM.getCurrentPlayer())
 		{
-			for (Planet p : pg.getPlanetArray())
+			for (Planet p : PG.getPlanetArray())
 			{
 				// if owner is neutral, produce 75% total ships
-				if (p.getOwner() == pm.neutral)
+				if (p.getOwner() == PM.neutral)
 				{
 					p.addShips(ConfigurationManager.defaultShip, (int) (p.getProduction() * ConfigurationManager.neutralProdModifier));
 				}
@@ -283,34 +297,35 @@ public class TurnManager
 				}
 			}
 
-			fleets.forEach(f -> {
+			for (Fleet f : fleets)
+			{
 				try
 				{
-					f.update(pg);
+					f.update(PG);
 				}
 				catch (Exception e)
 				{
 					e.printStackTrace();
 				}
-			});
+			}
 
 			fleets.removeIf(f -> f.getCount() == 0);
 		}
 
-		updatePlayerLabel(pm, pg);
+		updatePlayerLabel();
 		enableSend(false);
 
 		lblClick = false;
 		ttPlayer.hide();
-		pm.getCurrentPlayer().update(pg, this, pm);
+		PM.getCurrentPlayer().update(PG, this, PM);
 	}
 
 	/**
 	 * handle behaviour of textfield
 	 * 
-	 * @param pm
+	 * @param PM
 	 */
-	public void shipNumFieldHandle(PlayerManager pm)
+	public void shipNumFieldHandle()
 	{
 		// check if the value does not exceed ships to send
 		if (!tfShipNum.getText().isEmpty())
@@ -319,9 +334,9 @@ public class TurnManager
 			int num = Integer.valueOf(tfShipNum.getText());
 			ShipGroup f = new ShipInventory(ConfigurationManager.defaultShip, num);
 
-			if (!pm.canSend(pm.getCurrentPlayer(), f))
+			if (!PM.canSend(PM.getCurrentPlayer(), f))
 			{
-				tfShipNum.setText(String.valueOf(pm.getCurrentPlayer().getOrigin().getShipInventory().getCount()));
+				tfShipNum.setText(String.valueOf(PM.getCurrentPlayer().getOrigin().getShipInventory().getCount()));
 			}
 		}
 	}
@@ -329,23 +344,43 @@ public class TurnManager
 	/**
 	 * update the label that shows the current player and the tooltip
 	 * 
-	 * @param pm
+	 * @param PM
 	 */
-	private void updatePlayerLabel(PlayerManager pm, PlanetManager pg)
+	private void updatePlayerLabel()
 	{
 		if (lblPlayer.getStyleClass().size() > 2)
 		{
 			lblPlayer.getStyleClass().remove(2);
 		}
 
-		lblPlayer.getStyleClass().add(pm.getCurrentPlayer().getColor());
-		lblPlayer.setText(pm.getCurrentPlayer().getName());
-
+		lblPlayer.getStyleClass().add(PM.getCurrentPlayer().getColor());
+		lblPlayer.setText(PM.getCurrentPlayer().getName());
+		
+		updatePlayerPlanetList();
+	}
+	
+	private void updatePlayerPlanetList()
+	{
 		v1.getChildren().remove(1, v1.getChildren().size());
 		v2.getChildren().remove(1, v2.getChildren().size());
 		v3.getChildren().remove(1, v3.getChildren().size());
 
-		for (Planet p : pm.getCurrentPlayer().getPlanets())
+		List<Planet> planets = PM.getCurrentPlayer().getPlanets();
+
+		int sortColumnAbs = Math.abs(sortColumn);
+		int sortColumnSign = sortColumn / sortColumnAbs;
+
+		switch (sortColumnAbs)
+		{
+		case 1:
+			Collections.sort(planets, (a, b) -> sortColumnSign * a.getName().compareToIgnoreCase(b.getName()));
+		case 2:
+			Collections.sort(planets, (a, b) -> sortColumnSign * (a.getProduction() - b.getProduction()));
+		case 3:
+			Collections.sort(planets, (a, b) -> sortColumnSign * (a.getShipInventory().getCount() - b.getShipInventory().getCount()));
+		}
+
+		for (Planet p : planets)
 		{
 			Text n = new Text(p.getName());
 			Text c = new Text(String.valueOf(p.getProduction()));
@@ -359,18 +394,25 @@ public class TurnManager
 			v2.getChildren().add(c);
 			v3.getChildren().add(t);
 
-			setListTextHover(n, p, pg);
+			setListTextHover(n, p);
 		}
 	}
 
-	private void setListTextHover(Text t, Planet p, PlanetManager pg)
+	/**
+	 * highlights the planet when name is hovered in the list
+	 * 
+	 * @param t
+	 * @param p
+	 * @param PG
+	 */
+	private void setListTextHover(Text t, Planet p)
 	{
 		t.setOnMouseEntered(new EventHandler<MouseEvent>()
 		{
 			@Override
 			public void handle(MouseEvent event)
 			{
-				pg.getTiles().get(p).getStyleClass().add("space-button-illuminate");
+				PG.getTiles().get(p).getStyleClass().add("space-button-illuminate");
 			}
 		});
 
@@ -379,9 +421,37 @@ public class TurnManager
 			@Override
 			public void handle(MouseEvent event)
 			{
-				pg.getTiles().get(p).getStyleClass().remove("space-button-illuminate");
+				PG.getTiles().get(p).getStyleClass().remove("space-button-illuminate");
 			}
 		});
+	}
+
+	/**
+	 * clicking the title will reset the list and sort it according to title clicked
+	 * 
+	 * @param text
+	 * @param i
+	 */
+	private void tooltipSortHandle(Text text, int i)
+	{
+		text.setOnMouseClicked(new EventHandler<MouseEvent>()
+		{
+			@Override
+			public void handle(MouseEvent event)
+			{
+				if (Math.abs(sortColumn) == i + 1)
+				{
+					sortColumn = -sortColumn;
+				}
+				else
+				{
+					sortColumn = i + 1;
+				}
+				
+				updatePlayerPlanetList();
+			}
+		});
+
 	}
 
 	/**
@@ -426,15 +496,15 @@ public class TurnManager
 	 * @param num
 	 * @throws Exception
 	 */
-	public void sendShips(PlayerManager pm, PlanetManager pg) throws Exception
+	public void sendShips() throws Exception
 	{
 		if (!tfShipNum.getText().isEmpty())
 		{
 			int num = Integer.valueOf(tfShipNum.getText());
-			Player p = pm.getCurrentPlayer();
+			Player p = PM.getCurrentPlayer();
 			Fleet f = new Fleet(ConfigurationManager.defaultShip, num, p);
 
-			if (pm.canSend(p, f))
+			if (PM.canSend(p, f))
 			{
 				try
 				{
@@ -447,8 +517,8 @@ public class TurnManager
 					fleets.add(f);
 
 					enableSend(false);
-					pg.clearSelection(pm.getCurrentPlayer().getOrigin(), pm.getCurrentPlayer().getDestination());
-					pm.getCurrentPlayer().clearSelection();
+					PG.clearSelection(PM.getCurrentPlayer().getOrigin(), PM.getCurrentPlayer().getDestination());
+					PM.getCurrentPlayer().clearSelection();
 				}
 				catch (Exception e)
 				{
@@ -456,9 +526,9 @@ public class TurnManager
 				}
 			}
 		}
-		updatePlayerLabel(pm, pg);
+		updatePlayerLabel();
 	}
-	
+
 	public Pane getPane()
 	{
 		return turnBar;
