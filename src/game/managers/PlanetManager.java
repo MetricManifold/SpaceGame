@@ -17,6 +17,8 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 
@@ -24,9 +26,9 @@ public class PlanetManager
 {
 	// static values for ui
 	public static final int PADH = 5, PADV = 5,
-			TILEH = 20, TILEV = 20,
-			NUM_P_BG = 4, NUM_B_BG = 4,
-			MARGIN = 5, TOPMARGIN = 2;
+		TILEH = 20, TILEV = 20,
+		NUM_P_BG = 4, NUM_B_BG = 4,
+		MARGIN = 5, TOPMARGIN = 2;
 
 	// planets and corresponding buttons
 	private Map<Space, Label> tiles = new HashMap<Space, Label>();
@@ -35,7 +37,8 @@ public class PlanetManager
 	private int maxh, maxv, x, y, len;
 	private double density;
 
-	public TilePane tilePane = new TilePane(Orientation.HORIZONTAL);
+	private StackPane pane = new StackPane();
+	private TilePane tilePane = new TilePane(Orientation.HORIZONTAL);
 
 	public PlanetManager()
 	{
@@ -61,6 +64,7 @@ public class PlanetManager
 	void makeTilePaneUI()
 	{
 		VBox.setMargin(tilePane, new Insets(TOPMARGIN, 0, 0, 0));
+		pane.getChildren().add(tilePane);
 
 		tilePane.setHgap(PADH);
 		tilePane.setVgap(PADV);
@@ -85,7 +89,7 @@ public class PlanetManager
 	public void setEvents(PlayerManager pm, TurnManager tm)
 	{
 		setStartPlanets(pm);
-		
+
 		tilePane.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
 			@Override
@@ -107,7 +111,6 @@ public class PlanetManager
 			}
 		});
 	}
-	
 
 	/**
 	 * puts planets in the grid and associates them with buttons
@@ -139,7 +142,7 @@ public class PlanetManager
 				// add the planet to the grid and planets list
 				tiles.put(p, l);
 				planets.put(hashLocation(i % x, i / y), p);
-				
+
 				setPlanetTooltip(p);
 			}
 			else
@@ -179,9 +182,10 @@ public class PlanetManager
 
 		nums.forEach(n -> setPlanetOwner(pm.neutral, planetArray[n]));
 	}
-	
+
 	/**
 	 * handles the ui change when a planet is clicked
+	 * 
 	 * @param p
 	 * @param pm
 	 * @param tm
@@ -254,7 +258,7 @@ public class PlanetManager
 		{
 			tiles.get(p).getStyleClass().remove(p.getOwner().getColor());
 		}
-		
+
 		player.addPlanet(p);
 		tiles.get(p).getStyleClass().add(player.getColor());
 	}
@@ -267,14 +271,14 @@ public class PlanetManager
 	public void setPlanetTooltip(Planet p)
 	{
 		Label l = tiles.get(p);
-
+		
 		l.setOnMouseEntered(new EventHandler<MouseEvent>()
 		{
 			@Override
 			public void handle(MouseEvent event)
 			{
-				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX() + 10, l.getLayoutBounds().getMaxY());
-				p.getTooltip().show(l, pnt.getX(), pnt.getY());
+				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX(), l.getLayoutBounds().getMaxY());
+				p.getTooltip().show(l, pnt.getX() + 10, pnt.getY());
 			}
 		});
 		l.setOnMouseExited(new EventHandler<MouseEvent>()
@@ -329,10 +333,15 @@ public class PlanetManager
 	{
 		return maxv;
 	}
-	
+
 	public Map<Space, Label> getTiles()
 	{
 		return tiles;
+	}
+	
+	public Pane getPane()
+	{
+		return pane;
 	}
 
 }

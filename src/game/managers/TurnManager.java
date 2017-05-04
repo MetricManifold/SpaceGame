@@ -24,6 +24,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -40,7 +41,7 @@ public class TurnManager
 {
 	public static final int SPACING = 10, LBL_WIDTH = 80, FIELD_WIDTH = 60, PLAYER_LIST_WIDTH = 150;
 
-	public HBox turnBar = new HBox();
+	private HBox turnBar = new HBox();
 
 	/*
 	 * elements associated with ship sending and next turn
@@ -297,6 +298,7 @@ public class TurnManager
 		}
 
 		updatePlayerLabel(pm, pg);
+		enableSend(false);
 
 		lblClick = false;
 		ttPlayer.hide();
@@ -455,6 +457,11 @@ public class TurnManager
 			}
 		}
 		updatePlayerLabel(pm, pg);
+	}
+	
+	public Pane getPane()
+	{
+		return turnBar;
 	}
 
 }

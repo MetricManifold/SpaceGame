@@ -37,15 +37,15 @@
 /* PLANET BUTTONS */
 
 .space-button-origin {
-	-fx-border-insets: -2px;
-	-fx-border-style: dashed;
-	-fx-border-color: white;
+	-fx-border-insets: -3px;
+	-fx-border-style: solid;
+	-fx-border-color: linear-gradient(lightgray, transparent, lightgray);
 }
 
 .space-button-destination {
-	-fx-border-insets: -2px;
-	-fx-border-style: dashed;
-	-fx-border-color: white;
+	-fx-border-insets: -3px;
+	-fx-border-style: solid;
+	-fx-border-color: linear-gradient(white, transparent, white);
 }
 
 .space-button-illuminate {
@@ -92,6 +92,7 @@
 .turn-bar {
 	-fx-background-color: #0c4422;
 	-fx-padding: 5;
+	-fx-margin-bottom: 5px;
 	-fx-alignment: center;
 	-fx-effect: innershadow(gaussian, #051c0a, 12, 0.2, 0, 0);
 }
