@@ -92,7 +92,6 @@
 .turn-bar {
 	-fx-background-color: #0c4422;
 	-fx-padding: 5;
-	-fx-margin-bottom: 5px;
 	-fx-alignment: center;
 	-fx-effect: innershadow(gaussian, #051c0a, 12, 0.2, 0, 0);
 }
@@ -106,7 +105,7 @@
 }
 
 .timer {
-	-fx-font: 16px "Consolas";
+	-fx-font: 10px "Consolas";
 	-fx-padding: 5;
 	-fx-alignment: center;
 }
@@ -149,7 +148,7 @@
 
 .turn-bar-button {
 	-fx-text-fill: white;
-	-fx-min-width: 80px;
+	-fx-min-width: 65px;
 	-fx-padding: 4px;
 	-fx-alignment: center;
 

@@ -266,7 +266,7 @@ public class TurnManager
 	{
 		pg.clearSelection(pm.getCurrentPlayer().getOrigin(), pm.getCurrentPlayer().getDestination());
 		pm.nextPlayer();
-
+		
 		// produce ships if all players have made their turn
 		if (pm.getPlayer(1) == pm.getCurrentPlayer())
 		{
@@ -394,7 +394,7 @@ public class TurnManager
 		int seconds = totalSeconds % 60;
 
 		String time = String.format(timeFormat, minutes, seconds);
-		gameTimeText.setText(time);
+		gameTimeText.setText("");
 	}
 
 	/**

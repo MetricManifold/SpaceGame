@@ -26,7 +26,7 @@ public class PlanetManager
 {
 	// static values for ui
 	public static final int PADH = 5, PADV = 5,
-		TILEH = 20, TILEV = 20,
+		TILEH = 25, TILEV = 25,
 		NUM_P_BG = 4, NUM_B_BG = 4,
 		MARGIN = 5, TOPMARGIN = 2;
 
@@ -47,9 +47,8 @@ public class PlanetManager
 		this.y = ConfigurationManager.gridY;
 		this.density = ConfigurationManager.planetDensity;
 
-		this.maxh = (TILEH + PADH) * x + MARGIN * 2;
-		this.maxv = (TILEV + PADV) * y + MARGIN * 2;
-
+		this.maxh = (TILEH + PADH) * x + MARGIN * 2 - PADH;
+		this.maxv = (TILEV + PADV) * y + MARGIN * 2 - PADV;
 		this.len = x * y;
 
 		makeTilePaneUI(); // 		setup tilepane UI
@@ -103,7 +102,7 @@ public class PlanetManager
 				double dy = sy - iy; // 									fractional distance y
 
 				// check if selection is before padding
-				if (dx < PADH / (TILEH / PADH) && dy < PADV / (TILEV / PADV))
+				if (dx < (TILEH + PADH) / PADH && dy < (TILEV + PADV) / PADV)
 				{
 					Planet p = planets.get(hashLocation(ix, iy));
 					handleClickPlanet(p, pm, tm);
@@ -121,7 +120,7 @@ public class PlanetManager
 		{
 			// create the necessary elements
 			Label l = new Label();
-			Space s = new Space(i % x, i / y);
+			Space s = new Space(i % x, i / x);
 
 			// modify button to correct size and action
 			l.setMinSize(TILEH, TILEV);
@@ -141,7 +140,7 @@ public class PlanetManager
 
 				// add the planet to the grid and planets list
 				tiles.put(p, l);
-				planets.put(hashLocation(i % x, i / y), p);
+				planets.put(hashLocation(i % x, i / x), p);
 
 				setPlanetTooltip(p);
 			}
