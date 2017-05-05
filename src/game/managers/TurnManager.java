@@ -15,9 +15,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
@@ -27,22 +27,27 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
 /**
- * Responsible for managing turns including updating planet production, fleets sent to other planets Also contains the graphical element
+ * Responsible for managing turns including updating planet production, fleets sent to other planets 
+ * Also contains the graphical element
  * 
  * @author MR SMITH
  *
  */
 public class TurnManager
 {
-	private static final int SPACING = 10, LBL_WIDTH = 80, FIELD_WIDTH = 60, PLAYER_LIST_WIDTH = 150;
+	private static final int SPACING = 10, LBL_WIDTH = 80, FIELD_WIDTH = 60, PLAYER_LIST_WIDTH = 250, MIN_WIDTH = 420;
 
+	private VBox pane = new VBox();
 	private HBox turnBar = new HBox();
+	private StackPane centerPane = new StackPane();
+	private ScrollPane scrollList = new ScrollPane();
 
 	/*
 	 * elements associated with ship sending and next turn
@@ -55,7 +60,6 @@ public class TurnManager
 	/*
 	 * elements associated with the player label and planet list
 	 */
-	private Tooltip ttPlayer = new Tooltip();
 	private BorderPane tblPlayer = new BorderPane();
 	private boolean lblClick = false;
 	private VBox v1 = new VBox();
@@ -70,7 +74,7 @@ public class TurnManager
 	private Text gameTimeText = new Text();
 	private TextFlow gameTime = new TextFlow();
 	private int totalSeconds = 0;
-	private String timeFormat = "%02d : %02d";
+	private String timeFormat = "%02d:%02d";
 
 	/*
 	 * managers used by this manager
@@ -82,6 +86,9 @@ public class TurnManager
 
 	public TurnManager()
 	{
+		centerPane.getChildren().add(tblPlayer);
+		scrollList.setContent(centerPane);
+		pane.getChildren().addAll(turnBar, scrollList);
 		turnBar.getChildren().addAll(tfShipNum, lblSendShips, lblNextTurn, lblPlayer, rightAlignBox);
 		rightAlignBox.getChildren().addAll(gameTime);
 
@@ -116,10 +123,9 @@ public class TurnManager
 		tfShipNum.getStyleClass().add("turn-bar-entry");
 
 		rightAlignBox.setAlignment(Pos.CENTER_RIGHT);
+		centerPane.prefWidthProperty().bind(pane.widthProperty());
 		HBox.setHgrow(rightAlignBox, Priority.ALWAYS);
-
-		ttPlayer.setGraphic(tblPlayer);
-		tblPlayer.setPrefWidth(PLAYER_LIST_WIDTH);
+		StackPane.setAlignment(tblPlayer, Pos.CENTER);
 
 		v1.setAlignment(Pos.CENTER_LEFT);
 		v2.setAlignment(Pos.CENTER_RIGHT);
@@ -143,6 +149,18 @@ public class TurnManager
 		tblPlayer.setLeft(v1);
 		tblPlayer.setCenter(v2);
 		tblPlayer.setRight(v3);
+		tblPlayer.setMaxWidth(PLAYER_LIST_WIDTH);
+		tblPlayer.getStyleClass().add("table-list");
+		scrollList.setMaxHeight(100);
+		scrollList.prefViewportHeightProperty().bind(tblPlayer.heightProperty());
+		scrollList.getStyleClass().addAll("scroll-list", "edge-to-edge");
+		scrollList.setVisible(lblClick);
+		scrollList.setManaged(lblClick);
+		scrollList.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		scrollList.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		
+		pane.setSpacing(3);
+		
 
 	}
 
@@ -157,9 +175,9 @@ public class TurnManager
 		PM = pm;
 		PG = pg;
 
-		turnBar.setMinWidth(pg.getDefSizeX());
-		turnBar.setPrefWidth(pg.getSizeX());
-		turnBar.setMaxWidth(pg.getSizeX());
+		pane.setMinWidth(MIN_WIDTH);
+		pane.setPrefWidth(pg.getSizeX());
+		pane.setMaxWidth(pg.getSizeX());
 		updatePlayerLabel();
 
 		Timeline oneSecond = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>()
@@ -235,27 +253,6 @@ public class TurnManager
 			}
 		});
 
-		lblPlayer.setOnMouseEntered(new EventHandler<MouseEvent>()
-		{
-			@Override
-			public void handle(MouseEvent event)
-			{
-				if (!lblClick)
-				{
-					Point2D pnt = lblPlayer.localToScreen(lblPlayer.getLayoutBounds().getMaxX(), lblPlayer.getLayoutBounds().getMaxY());
-					ttPlayer.show(lblPlayer, pnt.getX(), pnt.getY());
-				}
-			}
-		});
-
-		lblPlayer.setOnMouseExited(new EventHandler<MouseEvent>()
-		{
-			@Override
-			public void handle(MouseEvent event)
-			{
-				if (!lblClick) ttPlayer.hide();
-			}
-		});
 
 		lblPlayer.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
@@ -264,7 +261,8 @@ public class TurnManager
 			public void handle(MouseEvent event)
 			{
 				lblClick = !lblClick;
-				if (!lblClick) ttPlayer.hide();
+				scrollList.setVisible(lblClick);
+				scrollList.setManaged(lblClick);
 			}
 		});
 		
@@ -314,9 +312,6 @@ public class TurnManager
 
 		updatePlayerLabel();
 		enableSend(false);
-
-		lblClick = false;
-		ttPlayer.hide();
 		PM.getCurrentPlayer().update(PG, this, PM);
 	}
 
@@ -359,6 +354,9 @@ public class TurnManager
 		updatePlayerPlanetList();
 	}
 	
+	/**
+	 * updates the planet list for the player label
+	 */
 	private void updatePlayerPlanetList()
 	{
 		v1.getChildren().remove(1, v1.getChildren().size());
@@ -424,6 +422,15 @@ public class TurnManager
 				PG.getTiles().get(p).getStyleClass().remove("space-button-illuminate");
 			}
 		});
+		
+		t.setOnMouseClicked(new EventHandler<MouseEvent>()
+		{
+			@Override
+			public void handle(MouseEvent event)
+			{
+				PG.handleClickPlanet(p);
+			}
+		});
 	}
 
 	/**
@@ -447,7 +454,7 @@ public class TurnManager
 				{
 					sortColumn = i + 1;
 				}
-				
+
 				updatePlayerPlanetList();
 			}
 		});
@@ -464,7 +471,7 @@ public class TurnManager
 		int seconds = totalSeconds % 60;
 
 		String time = String.format(timeFormat, minutes, seconds);
-		gameTimeText.setText("");
+		gameTimeText.setText(time);
 	}
 
 	/**
@@ -531,7 +538,7 @@ public class TurnManager
 
 	public Pane getPane()
 	{
-		return turnBar;
+		return pane;
 	}
 
 }

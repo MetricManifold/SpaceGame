@@ -87,6 +87,40 @@
 	-fx-cursor: hand;
 }
 
+.planet-button5 {
+	-fx-background-image: url("planet5.png");
+	-fx-cursor: hand;
+}
+
+.planet-button6 {
+	-fx-background-image: url("planet6.png");
+	-fx-cursor: hand;
+}
+
+.planet-button7 {
+	-fx-background-image: url("planet7.png");
+	-fx-cursor: hand;
+}
+
+
+.planet-button8 {
+	-fx-background-image: url("planet8.png");
+	-fx-cursor: hand;
+}
+
+
+.planet-button9 {
+	-fx-background-image: url("planet9.png");
+	-fx-cursor: hand;
+}
+
+
+.planet-button10 {
+	-fx-background-image: url("planet10.png");
+	-fx-cursor: hand;
+}
+
+
 /* TURN BAR */
 
 .turn-bar {
@@ -94,6 +128,22 @@
 	-fx-padding: 5;
 	-fx-alignment: center;
 	-fx-effect: innershadow(gaussian, #051c0a, 12, 0.2, 0, 0);
+}
+
+.scroll-list {
+	-fx-background: transparent;
+	-fx-background-insets: 0;
+	-fx-padding: 0;
+}
+
+.scroll-list:focused {
+	-fx-background-insets: 0;
+}
+
+.table-list {
+	-fx-background-color: rgba(163, 255, 253, 0.2);
+	-fx-padding: 3 10;
+	-fx-background-radius: 8;
 }
 
 .player-label {
@@ -104,8 +154,12 @@
 	-fx-background-radius: 8;
 }
 
+.player-label:hover {
+	-fx-effect: innershadow(gaussian, white, 6, 0.0, 0, 0);
+}
+
 .timer {
-	-fx-font: 10px "Consolas";
+	-fx-font: 12px "Consolas";
 	-fx-padding: 5;
 	-fx-alignment: center;
 }

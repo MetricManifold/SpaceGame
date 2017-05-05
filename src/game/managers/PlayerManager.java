@@ -17,7 +17,7 @@ public class PlayerManager
 
 	public enum Controller
 	{
-		AI, HUMAN, NEUTRAL
+		AI, HUMAN, NEUTRAL, HOSTILE
 	};
 
 	public PlayerManager()

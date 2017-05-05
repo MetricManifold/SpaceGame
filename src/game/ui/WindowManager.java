@@ -91,6 +91,7 @@ public class WindowManager extends Application
 		scene = new Scene(border); //							create the scene
 		setup = new Scene(border2);
 
+		vb.setSpacing(3);
 		vb.setAlignment(Pos.CENTER);
 		vb.getStyleClass().add("vbox-main");
 		scene.getStylesheets().add("elements.css"); //			set the style sheet for the scene

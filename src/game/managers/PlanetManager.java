@@ -27,18 +27,21 @@ public class PlanetManager
 	// static values for ui
 	private static final int PADH = 5, PADV = 5,
 		TILEH = 25, TILEV = 25,
-		NUM_P_BG = 4, NUM_B_BG = 4,
+		NUM_P_BG = 10, NUM_B_BG = 4,
 		MARGIN = 5, TOPMARGIN = 2;
 
 	// planets and corresponding buttons
 	private Map<Space, Label> tiles = new HashMap<Space, Label>();
 	private Map<Integer, Planet> planets = new HashMap<Integer, Planet>();
 
-	private int sizeh, sizev, defSizeh, defSizev, x, y, len;
+	private int sizeh, sizev, x, y, len;
 	private double density;
 
 	private StackPane pane = new StackPane();
 	private TilePane tilePane = new TilePane(Orientation.HORIZONTAL);
+
+	private PlayerManager PM;
+	private TurnManager TM;
 
 	public PlanetManager()
 	{
@@ -47,8 +50,6 @@ public class PlanetManager
 		this.y = ConfigurationManager.gridY;
 		this.density = ConfigurationManager.planetDensity;
 
-		this.defSizeh = (TILEH + PADH) * ConfigurationManager.defGridX + MARGIN * 2 - PADH;
-		this.defSizev = (TILEH + PADH) * ConfigurationManager.defGridX + MARGIN * 2 - PADH;
 		this.sizeh = (TILEH + PADH) * x + MARGIN * 2 - PADH;
 		this.sizev = (TILEV + PADV) * y + MARGIN * 2 - PADV;
 		this.len = x * y;
@@ -89,7 +90,10 @@ public class PlanetManager
 	 */
 	public void setEvents(PlayerManager pm, TurnManager tm)
 	{
-		setStartPlanets(pm);
+		TM = tm;
+		PM = pm;
+
+		setStartPlanets();
 
 		tilePane.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
@@ -107,7 +111,7 @@ public class PlanetManager
 				if (dx < (TILEH + PADH) / PADH && dy < (TILEV + PADV) / PADV)
 				{
 					Planet p = planets.get(hashLocation(ix, iy));
-					handleClickPlanet(p, pm, tm);
+					handleClickPlanet(p);
 				}
 			}
 		});
@@ -156,10 +160,8 @@ public class PlanetManager
 
 	/**
 	 * give players one starting planet
-	 * 
-	 * @param pm
 	 */
-	void setStartPlanets(PlayerManager pm)
+	void setStartPlanets()
 	{
 		// make a list of planets to choose from
 		int numPlayers = ConfigurationManager.numPlayers;
@@ -176,32 +178,30 @@ public class PlanetManager
 			int pick = nums.remove(r);
 			Planet p = planetArray[pick];
 
-			setPlanetOwner(pm.getPlayer(numPlayers), p);
+			setPlanetOwner(PM.getPlayer(numPlayers), p);
 			p.setProduction(10);
 			p.produceShips();
 		}
 
-		nums.forEach(n -> setPlanetOwner(pm.neutral, planetArray[n]));
+		nums.forEach(n -> setPlanetOwner(PM.neutral, planetArray[n]));
 	}
 
 	/**
 	 * handles the ui change when a planet is clicked
 	 * 
 	 * @param p
-	 * @param pm
-	 * @param tm
 	 */
-	public void handleClickPlanet(Planet p, PlayerManager pm, TurnManager tm)
+	public void handleClickPlanet(Planet p)
 	{
-		Planet o = pm.getCurrentPlayer().getOrigin();
-		Planet d = pm.getCurrentPlayer().getDestination();
-		pm.getCurrentPlayer().clickTile(p);
+		Planet o = PM.getCurrentPlayer().getOrigin();
+		Planet d = PM.getCurrentPlayer().getDestination();
+		PM.getCurrentPlayer().clickTile(p);
 
 		if (p != null)
 		{
 			if (o == null)
 			{
-				if (p.getOwner() == pm.getCurrentPlayer())
+				if (p.getOwner() == PM.getCurrentPlayer())
 				{
 					tiles.get(p).getStyleClass().add("space-button-origin");
 				}
@@ -211,19 +211,19 @@ public class PlanetManager
 				if (p != o)
 				{
 					tiles.get(p).getStyleClass().add("space-button-destination");
-					tm.enableSend(true);
+					TM.enableSend(true);
 				}
 			}
 			else
 			{
 				clearSelection(o, d);
-				tm.enableSend(false);
+				TM.enableSend(false);
 			}
 		}
 		else
 		{
 			clearSelection(o, d);
-			tm.enableSend(false);
+			TM.enableSend(false);
 		}
 
 	}
@@ -272,7 +272,7 @@ public class PlanetManager
 	public void setPlanetTooltip(Planet p)
 	{
 		Label l = tiles.get(p);
-		
+
 		l.setOnMouseEntered(new EventHandler<MouseEvent>()
 		{
 			@Override
@@ -334,22 +334,37 @@ public class PlanetManager
 	{
 		return sizev;
 	}
-	
-	public int getDefSizeX()
+
+	public int getTileH()
 	{
-		return defSizeh;
+		return TILEH;
+	}
+
+	public int getTileV()
+	{
+		return TILEV;
 	}
 	
-	public int getDefSizeY()
+	public int getPadH()
 	{
-		return defSizev;
+		return PADH;
+	}
+	
+	public int getPadV()
+	{
+		return PADV;
+	}
+	
+	public int getMargin()
+	{
+		return MARGIN;
 	}
 
 	public Map<Space, Label> getTiles()
 	{
 		return tiles;
 	}
-	
+
 	public Pane getPane()
 	{
 		return pane;
