@@ -1,8 +1,12 @@
 package game.managers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import game.groups.Fleet;
 import game.groups.ShipGroup;
 import game.groups.ShipInventory;
@@ -15,11 +19,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -29,6 +33,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
@@ -82,7 +87,7 @@ public class TurnManager
 	private PlanetManager PG;
 	private PlayerManager PM;
 
-	private List<Fleet> fleets = new ArrayList<Fleet>();
+	private Map<Fleet, Line> fleets = new HashMap<Fleet, Line>();
 
 	public TurnManager()
 	{
@@ -151,6 +156,7 @@ public class TurnManager
 		tblPlayer.setRight(v3);
 		tblPlayer.setMaxWidth(PLAYER_LIST_WIDTH);
 		tblPlayer.getStyleClass().add("table-list");
+		
 		scrollList.setMaxHeight(100);
 		scrollList.prefViewportHeightProperty().bind(tblPlayer.heightProperty());
 		scrollList.getStyleClass().addAll("scroll-list", "edge-to-edge");
@@ -295,7 +301,7 @@ public class TurnManager
 				}
 			}
 
-			for (Fleet f : fleets)
+			for (Fleet f : fleets.keySet())
 			{
 				try
 				{
@@ -307,7 +313,7 @@ public class TurnManager
 				}
 			}
 
-			fleets.removeIf(f -> f.getCount() == 0);
+			fleets.keySet().removeIf(f -> f.getCount() == 0);
 		}
 
 		updatePlayerLabel();
@@ -481,7 +487,7 @@ public class TurnManager
 	 */
 	public List<Fleet> getFleets()
 	{
-		return fleets;
+		return new ArrayList<>(fleets.keySet());
 	}
 
 	/**
@@ -521,8 +527,8 @@ public class TurnManager
 					o.getShipInventory().remove(f);
 					o.updateToolTip();
 					f.send(o, d);
-					fleets.add(f);
-
+					
+					sendFleet(f, o, d);
 					enableSend(false);
 					PG.clearSelection(PM.getCurrentPlayer().getOrigin(), PM.getCurrentPlayer().getDestination());
 					PM.getCurrentPlayer().clearSelection();
@@ -534,6 +540,19 @@ public class TurnManager
 			}
 		}
 		updatePlayerLabel();
+	}
+	
+	public void sendFleet(Fleet f, Planet o, Planet d)
+	{
+		Label ol = PG.getTiles().get(o);
+		Label od = PG.getTiles().get(d);
+		Point2D pnt1 = ol.localToScreen(ol.getLayoutBounds().getMaxX(), ol.getLayoutBounds().getMaxY());
+		Point2D pnt2 = od.localToScreen(od.getLayoutBounds().getMaxX(), od.getLayoutBounds().getMaxY());
+		Line l = new Line(pnt1.getX(), pnt1.getY(), pnt2.getX(), pnt2.getY());
+		
+		fleets.put(f, l);
+		
+		
 	}
 
 	public Pane getPane()

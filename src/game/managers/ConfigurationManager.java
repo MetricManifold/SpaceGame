@@ -10,14 +10,17 @@ import game.entities.Ship;
 public class ConfigurationManager
 {
 	public static int shipStartCount = 10,
+		initialProduction = 10,
 		numPlayers = 2, playerMax = 14,
 		gridX = 10, gridY = 25, 
 		maxGridX = 30, maxGridY = 30,
 		defGridX = 20, defGridY = 20;
 
 	public static double planetDensity = 0.15,
-		neutralProdModifier = 0.30,
-		planetDefenderBonus = 1.08;
+		neutralProdModifier = 0.50,
+		planetDefenderBonus = 1.10;
+	
+	public static boolean neutralShipsVisible = false;
 	public static Class<? extends Ship> defaultShip = Destroyer.class;
 
 	public static final String[] COLORS = {

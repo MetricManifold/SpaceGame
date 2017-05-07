@@ -179,8 +179,8 @@ public class PlanetManager
 			Planet p = planetArray[pick];
 
 			setPlanetOwner(PM.getPlayer(numPlayers), p);
-			p.setProduction(10);
-			p.produceShips();
+			p.setProduction(ConfigurationManager.initialProduction);
+			p.addShips(ConfigurationManager.defaultShip, ConfigurationManager.shipStartCount);
 		}
 
 		nums.forEach(n -> setPlanetOwner(PM.neutral, planetArray[n]));

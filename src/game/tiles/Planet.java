@@ -108,13 +108,21 @@ public class Planet extends Space
 	 */
 	public void updateToolTip()
 	{
-		String strNumShips = (owner.getNum() != 0) ? "Ships:\t" + ships.getCount(ConfigurationManager.defaultShip) + "\n" : "";
+		
+		String strNumShips;
+		if (owner.getNum() != 0 || ConfigurationManager.neutralShipsVisible)
+		{
+			strNumShips = String.valueOf(ships.getCount(ConfigurationManager.defaultShip));
+		}
+		else
+		{
+			strNumShips = "?";
+		}
+		
+		String strStats = String.format("Name:\t%s\nShips:\t%s\nIndustry:\t%d\nOwner:\t", getName(), strNumShips, getProduction());
 
 		// create text
-		Text stats = new Text("Name:\t" + getName() + "\n" +
-				strNumShips +
-				"Industry:\t" + getProduction() + "\n" +
-				"Owner:\t");
+		Text stats = new Text(strStats);
 		Text name = new Text(owner.getName());
 
 		// format text
