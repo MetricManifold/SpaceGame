@@ -50,6 +50,11 @@ public class Fleet extends ShipGroup
 		this.owner = owner;
 	}
 
+	public Planet getDestination()
+	{
+		return destination;
+	}
+	
 	/**
 	 * update the status of this fleet, including position if moving
 	 * 

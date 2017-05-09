@@ -8,6 +8,7 @@ import game.groups.ShipInventory;
 import game.helpers.Displacement;
 import game.managers.ConfigurationManager;
 import game.players.Player;
+import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -80,7 +81,6 @@ public class Planet extends Space
 	public void addShips(Fleet f)
 	{
 		ships.add(f);
-		updateToolTip();
 	}
 
 	/**
@@ -94,44 +94,33 @@ public class Planet extends Space
 	public void addShips(Class<? extends Ship> type, int num)
 	{
 		ships.add(type, num);
-		updateToolTip();
 	}
 
 	public void produceShips()
 	{
 		ships.add(production);
-		updateToolTip();
 	}
 
 	/**
 	 * updates the tooltip for this planet
 	 */
-	public void updateToolTip()
+	@Override
+	public Tooltip getTooltip()
 	{
-		
-		String strNumShips;
-		if (owner.getNum() != 0 || ConfigurationManager.neutralShipsVisible)
-		{
-			strNumShips = String.valueOf(ships.getCount(ConfigurationManager.defaultShip));
-		}
-		else
-		{
-			strNumShips = "?";
-		}
-		
+		String strNumShips = (owner.getNum() == 0 && !ConfigurationManager.neutralShipsVisible) ? "?" : String.valueOf(getShipCount());
 		String strStats = String.format("Name:\t%s\nShips:\t%s\nIndustry:\t%d\nOwner:\t", getName(), strNumShips, getProduction());
 
 		// create text
 		Text stats = new Text(strStats);
 		Text name = new Text(owner.getName());
-
-		// format text
 		stats.setFill(Color.WHITE);
 		name.getStyleClass().add(owner.getColor());
+
 		TextFlow txt = new TextFlow(stats, name);
 		txt.setPrefHeight(0);
 
 		tooltip.setGraphic(txt);
+		return tooltip;
 	}
 
 	/**
@@ -144,6 +133,11 @@ public class Planet extends Space
 		return name;
 	}
 
+	public int getShipCount()
+	{
+		return  ships.getCount(ConfigurationManager.defaultShip);
+	}
+
 	/**
 	 * set the owner of this planet to the specified player
 	 * 
@@ -152,7 +146,6 @@ public class Planet extends Space
 	public void setOwner(Player owner)
 	{
 		this.owner = owner;
-		updateToolTip();
 	}
 
 	/**
@@ -173,7 +166,6 @@ public class Planet extends Space
 	public void setProduction(int production)
 	{
 		this.production = production;
-		updateToolTip();
 	}
 
 }

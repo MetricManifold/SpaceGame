@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
+import game.groups.Fleet;
 import game.players.Player;
 import game.tiles.Planet;
 import game.tiles.Space;
@@ -280,6 +281,14 @@ public class PlanetManager
 			{
 				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX(), l.getLayoutBounds().getMaxY());
 				p.getTooltip().show(l, pnt.getX() + 10, pnt.getY());
+				
+				for (Fleet f : TM.getFleets())
+				{
+					if (f.getDestination() == p)
+					{
+						pane.getChildren().add(TM.getFleetMap().get(f));
+					}
+				}
 			}
 		});
 		l.setOnMouseExited(new EventHandler<MouseEvent>()
@@ -289,6 +298,14 @@ public class PlanetManager
 			public void handle(MouseEvent event)
 			{
 				p.getTooltip().hide();
+				
+				for (Fleet f : TM.getFleets())
+				{
+					if (f.getDestination() == p)
+					{
+						pane.getChildren().remove(TM.getFleetMap().get(f));
+					}
+				}
 			}
 		});
 	}
