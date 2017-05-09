@@ -12,7 +12,7 @@ public class ConfigurationManager
 	public static int shipStartCount = 10,
 		initialProduction = 10,
 		numPlayers = 2, playerMax = 14,
-		gridX = 10, gridY = 25, 
+		gridX = 25, gridY = 10, 
 		maxGridX = 30, maxGridY = 30,
 		defGridX = 20, defGridY = 20;
 
