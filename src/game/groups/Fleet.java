@@ -16,7 +16,7 @@ import game.tiles.Planet;
 
 public class Fleet extends ShipGroup
 {
-	private Displacement path = null;
+	private Displacement displacement = null;
 	private Planet destination = null;
 	private float speed = Integer.MAX_VALUE;
 	private Player owner;
@@ -55,6 +55,11 @@ public class Fleet extends ShipGroup
 		return destination;
 	}
 	
+	public Displacement getDisplacement()
+	{
+		return displacement;
+	}
+	
 	/**
 	 * update the status of this fleet, including position if moving
 	 * 
@@ -65,9 +70,9 @@ public class Fleet extends ShipGroup
 	 */
 	public void update(PlanetManager pm) throws Exception
 	{
-		if (path != null)
+		if (displacement != null)
 		{
-			if (path.subtract(speed).length() < speed)
+			if (displacement.subtract(speed).length() < speed)
 			{
 				if (owner != destination.getOwner())
 				{
@@ -90,12 +95,12 @@ public class Fleet extends ShipGroup
 					destination.addShips(this);
 				}
 
-				path = null;
+				displacement = null;
 				destination = null;
 			}
 			else
 			{
-				path = path.subtract(speed);
+				displacement = displacement.subtract(speed);
 			}
 		}
 	}
@@ -108,12 +113,8 @@ public class Fleet extends ShipGroup
 	 */
 	public void send(Planet origin, Planet dest)
 	{
-		// set the path and destination
-		this.path = dest.getPosition().subtract(origin.getPosition());
+		this.displacement = dest.getPosition().subtract(origin.getPosition());
 		this.destination = dest;
-
-		// log message
-		System.out.format("send ship on path x%.1f,y%.1f\n", path.getX(), path.getY());
 
 		for (List<Ship> l : ships.values())
 		{

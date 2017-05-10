@@ -1,8 +1,6 @@
 package game.ui;
 
-import game.managers.PlanetManager;
-import game.managers.PlayerManager;
-import game.managers.TurnManager;
+import game.managers.*;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -23,8 +21,8 @@ public class WindowManager extends Application
 	public static final String TITLE = "Starfare";
 	public static Scene scene, setup;
 
-	private PlanetManager pm;
-	private TurnManager tm;
+	private PlanetManagerUI pm;
+	private TurnManagerUI tm;
 	private PlayerManager lm;
 
 	private static final int SPLASH_WIDTH = 660, SPLASH_HEIGHT = 360, LOGO_WIDTH = SPLASH_WIDTH - 80;
@@ -97,11 +95,11 @@ public class WindowManager extends Application
 		scene.getStylesheets().add("elements.css"); //			set the style sheet for the scene
 
 		lm = new PlayerManager(); //							creates the object managing players
-		pm = new PlanetManager(); //							create the planet grid with the selected x, y and density
-		tm = new TurnManager(); // 								create the turn bar to take input
+		pm = new PlanetManagerUI(); //							create the planet grid with the selected x, y and density
+		tm = new TurnManagerUI(); // 								create the turn bar to take input
 
-		pm.setEvents(lm, tm);
-		tm.setEvents(lm, pm);
+		pm.setup(lm, tm);
+		tm.setup(lm, pm);
 
 		border.setCenter(vb);
 		border.getStyleClass().add("scene");

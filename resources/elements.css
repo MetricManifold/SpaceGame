@@ -229,7 +229,7 @@
 	-fx-background-color: #10260e;
 }
 
-.turn-bar-button:pressed {
+.turn-bar-button:action {
 	-fx-background-insets: 0 1 1 0, 1 0 0 1, 1;
 	-fx-background-color: #557752;
 }

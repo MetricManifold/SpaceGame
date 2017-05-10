@@ -1,5 +1,7 @@
 package game.helpers;
 
+import game.ui.PlanetManagerUI;
+
 public class Displacement
 {
 	private float x, y;
@@ -48,4 +50,26 @@ public class Displacement
 	{
 		return y;
 	}
+
+	public double getWorldX()
+	{
+		double t = PlanetManagerUI.getMargin() + (0.5 * PlanetManagerUI.getTileH()) + (PlanetManagerUI.getTileH() + PlanetManagerUI.getPadH()) * x;
+		return t;
+	}
+
+	public double getWorldY()
+	{
+		double t = PlanetManagerUI.getMargin() + (0.5 * PlanetManagerUI.getTileV()) + (PlanetManagerUI.getTileV() + PlanetManagerUI.getPadV()) * y; 
+		return t;
+	}
 }
+
+
+
+
+
+
+
+
+
+

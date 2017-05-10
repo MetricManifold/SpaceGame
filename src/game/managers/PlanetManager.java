@@ -7,154 +7,62 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
-import game.groups.Fleet;
 import game.players.Player;
 import game.tiles.Planet;
 import game.tiles.Space;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
 
 public class PlanetManager
 {
-	// static values for ui
-	private static final int PADH = 5, PADV = 5,
-		TILEH = 25, TILEV = 25,
-		NUM_P_BG = 10, NUM_B_BG = 4,
-		MARGIN = 5, TOPMARGIN = 2;
-
 	// planets and corresponding buttons
-	private Map<Space, Label> tiles = new HashMap<Space, Label>();
-	private Map<Integer, Planet> planets = new HashMap<Integer, Planet>();
+	protected Map<Integer, Planet> planets = new HashMap<Integer, Planet>();
+	protected Map<Integer, Space> spaces = new HashMap<Integer, Space>();
 
-	private int sizeh, sizev, x, y, len;
-	private double density;
+	protected int sizeh, sizev, x, y, len;
+	protected double density;
 
-	private StackPane pane = new StackPane();
-	private TilePane tilePane = new TilePane(Orientation.HORIZONTAL);
-
-	private PlayerManager PM;
-	private TurnManager TM;
+	protected PlayerManager PM;
+	protected TurnManager TM;
 
 	public PlanetManager()
 	{
-		// initialize local variables
 		this.x = ConfigurationManager.gridX;
 		this.y = ConfigurationManager.gridY;
 		this.density = ConfigurationManager.planetDensity;
-
-		this.sizeh = (TILEH + PADH) * x + MARGIN * 2 - PADH;
-		this.sizev = (TILEV + PADV) * y + MARGIN * 2 - PADV;
 		this.len = x * y;
-
-		makeTilePaneUI(); // 		setup tilepane UI
-		spawnPlanets(); // 			create the planets on this grid
-
-		System.out.println("finished grid");
-	}
-
-	/**
-	 * Sets the properties related to tilepane UI
-	 */
-	void makeTilePaneUI()
-	{
-		VBox.setMargin(tilePane, new Insets(TOPMARGIN, 0, 0, 0));
-		pane.getChildren().add(tilePane);
-
-		tilePane.setHgap(PADH);
-		tilePane.setVgap(PADV);
-
-		tilePane.setPrefTileWidth(TILEH);
-		tilePane.setPrefTileHeight(TILEV);
-
-		tilePane.setPrefColumns(x);
-		tilePane.setPrefRows(y);
-
-		tilePane.setMaxSize(sizeh, sizev);
-		tilePane.setPadding(new Insets(MARGIN, MARGIN, MARGIN, MARGIN));
-		tilePane.setAlignment(Pos.BASELINE_CENTER);
-
-		String bgSelect = String.format("planet-grid%d", ThreadLocalRandom.current().nextInt(NUM_B_BG) + 1);
-		tilePane.getStyleClass().addAll("planet-grid", bgSelect);
 	}
 
 	/**
 	 * Sets the mouse event associated with the tilepane to find all the grid locations
 	 */
-	public void setEvents(PlayerManager pm, TurnManager tm)
+	public void setup(PlayerManager pm, TurnManager tm)
 	{
 		TM = tm;
 		PM = pm;
 
+		spawnPlanets();
 		setStartPlanets();
-
-		tilePane.setOnMouseClicked(new EventHandler<MouseEvent>()
-		{
-			@Override
-			public void handle(MouseEvent event)
-			{
-				double sx = (event.getX() - MARGIN) / (TILEH + PADH); // 	normalized selected x
-				double sy = (event.getY() - MARGIN) / (TILEV + PADV); // 	normalized selected y
-				int ix = (int) sx; //										integer distance x
-				int iy = (int) sy; //										integer distance y
-				double dx = sx - ix; //										fractional distance x
-				double dy = sy - iy; // 									fractional distance y
-
-				// check if selection is before padding
-				if (dx < (TILEH + PADH) / PADH && dy < (TILEV + PADV) / PADV)
-				{
-					Planet p = planets.get(hashLocation(ix, iy));
-					handleClickPlanet(p);
-				}
-			}
-		});
 	}
 
 	/**
 	 * puts planets in the grid and associates them with buttons
 	 */
-	void spawnPlanets()
+	public void spawnPlanets()
 	{
 		for (int i = 0; i < len; i++)
 		{
 			// create the necessary elements
-			Label l = new Label();
 			Space s = new Space(i % x, i / x);
-
-			// modify button to correct size and action
-			l.setMinSize(TILEH, TILEV);
-			l.setMaxSize(TILEH, TILEV);
-
-			tilePane.getChildren().add(l);
 
 			// choose whether to create a planet or empty space
 			double prob = ThreadLocalRandom.current().nextDouble();
 			if (prob < density)
 			{
 				Planet p = new Planet(s);
-
-				// set styles
-				String bgSelect = String.format("planet-button%d", ThreadLocalRandom.current().nextInt(NUM_P_BG) + 1);
-				l.getStyleClass().addAll("space-button", bgSelect);
-
-				// add the planet to the grid and planets list
-				tiles.put(p, l);
 				planets.put(hashLocation(i % x, i / x), p);
-
-				setPlanetTooltip(p);
 			}
 			else
 			{
-				l.getStyleClass().add("space-button");
-				tiles.put(s, l);
+				spaces.put(hashLocation(i % x, i / x), s);
 			}
 		}
 	}
@@ -162,7 +70,7 @@ public class PlanetManager
 	/**
 	 * give players one starting planet
 	 */
-	void setStartPlanets()
+	public void setStartPlanets()
 	{
 		// make a list of planets to choose from
 		int numPlayers = ConfigurationManager.numPlayers;
@@ -188,66 +96,6 @@ public class PlanetManager
 	}
 
 	/**
-	 * handles the ui change when a planet is clicked
-	 * 
-	 * @param p
-	 */
-	public void handleClickPlanet(Planet p)
-	{
-		Planet o = PM.getCurrentPlayer().getOrigin();
-		Planet d = PM.getCurrentPlayer().getDestination();
-		PM.getCurrentPlayer().clickTile(p);
-
-		if (p != null)
-		{
-			if (o == null)
-			{
-				if (p.getOwner() == PM.getCurrentPlayer())
-				{
-					tiles.get(p).getStyleClass().add("space-button-origin");
-				}
-			}
-			else if (d == null)
-			{
-				if (p != o)
-				{
-					tiles.get(p).getStyleClass().add("space-button-destination");
-					TM.enableSend(true);
-				}
-			}
-			else
-			{
-				clearSelection(o, d);
-				TM.enableSend(false);
-			}
-		}
-		else
-		{
-			clearSelection(o, d);
-			TM.enableSend(false);
-		}
-
-	}
-
-	/**
-	 * clears the player's current selection from the grid
-	 * 
-	 * @param origin
-	 * @param destination
-	 */
-	public void clearSelection(Planet origin, Planet destination)
-	{
-		if (origin != null)
-		{
-			tiles.get(origin).getStyleClass().remove("space-button-origin");
-		}
-		if (destination != null)
-		{
-			tiles.get(destination).getStyleClass().remove("space-button-destination");
-		}
-	}
-
-	/**
 	 * transfer ownership of a planet to a given player
 	 * 
 	 * @param player
@@ -255,59 +103,7 @@ public class PlanetManager
 	 */
 	public void setPlanetOwner(Player player, Planet p)
 	{
-		// if owner is not null 
-		if (p.getOwner() != null)
-		{
-			tiles.get(p).getStyleClass().remove(p.getOwner().getColor());
-		}
-
 		player.addPlanet(p);
-		tiles.get(p).getStyleClass().add(player.getColor());
-	}
-
-	/**
-	 * add the tooltip for the given planet
-	 * 
-	 * @param p
-	 */
-	public void setPlanetTooltip(Planet p)
-	{
-		Label l = tiles.get(p);
-
-		l.setOnMouseEntered(new EventHandler<MouseEvent>()
-		{
-			@Override
-			public void handle(MouseEvent event)
-			{
-				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX(), l.getLayoutBounds().getMaxY());
-				p.getTooltip().show(l, pnt.getX() + 10, pnt.getY());
-				
-				for (Fleet f : TM.getFleets())
-				{
-					if (f.getDestination() == p)
-					{
-						pane.getChildren().add(TM.getFleetMap().get(f));
-					}
-				}
-			}
-		});
-		l.setOnMouseExited(new EventHandler<MouseEvent>()
-		{
-
-			@Override
-			public void handle(MouseEvent event)
-			{
-				p.getTooltip().hide();
-				
-				for (Fleet f : TM.getFleets())
-				{
-					if (f.getDestination() == p)
-					{
-						pane.getChildren().remove(TM.getFleetMap().get(f));
-					}
-				}
-			}
-		});
 	}
 
 	/**
@@ -317,7 +113,7 @@ public class PlanetManager
 	 * @param y
 	 * @return
 	 */
-	int hashLocation(int x, int y)
+	protected int hashLocation(int x, int y)
 	{
 		return x + this.x * y;
 	}
@@ -350,41 +146,6 @@ public class PlanetManager
 	public int getSizeY()
 	{
 		return sizev;
-	}
-
-	public int getTileH()
-	{
-		return TILEH;
-	}
-
-	public int getTileV()
-	{
-		return TILEV;
-	}
-	
-	public int getPadH()
-	{
-		return PADH;
-	}
-	
-	public int getPadV()
-	{
-		return PADV;
-	}
-	
-	public int getMargin()
-	{
-		return MARGIN;
-	}
-
-	public Map<Space, Label> getTiles()
-	{
-		return tiles;
-	}
-
-	public Pane getPane()
-	{
-		return pane;
 	}
 
 }
