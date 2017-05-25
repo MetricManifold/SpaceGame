@@ -15,9 +15,6 @@ import javafx.scene.text.TextFlow;
 
 public class Planet extends Space
 {
-	// production range of the planet
-	private static final int PRODMAX = 30, PRODMIN = 5;
-
 	// production per turn and ships
 	private int production;
 	private ShipInventory ships = new ShipInventory();
@@ -26,7 +23,7 @@ public class Planet extends Space
 
 	public Planet(Displacement pos)
 	{
-		this(pos, ThreadLocalRandom.current().nextInt(PRODMIN, PRODMAX + 1));
+		this(pos, ThreadLocalRandom.current().nextInt(5, ConfigurationManager.maxProduction));
 	}
 
 	public Planet(int x, int y, int production, String name, Player owner)

@@ -96,7 +96,7 @@ public class WindowManager extends Application
 
 		lm = new PlayerManager(); //							creates the object managing players
 		pm = new PlanetManagerUI(); //							create the planet grid with the selected x, y and density
-		tm = new TurnManagerUI(); // 								create the turn bar to take input
+		tm = new TurnManagerUI(); // 							create the turn bar to take input
 
 		pm.setup(lm, tm);
 		tm.setup(lm, pm);

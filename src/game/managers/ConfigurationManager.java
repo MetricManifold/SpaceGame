@@ -10,15 +10,19 @@ import game.entities.Ship;
 public class ConfigurationManager
 {
 	public static int shipStartCount = 10,
-		initialProduction = 10,
-		numPlayers = 2, playerMax = 14,
+		initialProduction = 10, maxProduction = 30,
+		cmaxProduction = 9999, cmaxShipStartCount = 9999999,
+		numPlayers = 2, maxPlayers = 14,
 		gridX = 25, gridY = 10, 
+		minGridX = 2, minGridY = 2,
 		maxGridX = 30, maxGridY = 30,
-		defGridX = 20, defGridY = 20;
+		defaultGridX = 20, defaultGridY = 20;
 
 	public static double planetDensity = 0.15,
 		neutralProdModifier = 0.50,
-		planetDefenderBonus = 1.10;
+		cminNeutralProdModifier = 0.00, cmaxNeutralProdModifier = 2.00,
+		planetDefenderBonus = 1.10, 
+		cminPlanetDefenderBonus = 0.00, cmaxPlanetDefenderBonus = 2.00;
 	
 	public static boolean neutralShipsVisible = false;
 	public static Class<? extends Ship> defaultShip = Destroyer.class;

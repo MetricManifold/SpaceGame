@@ -17,6 +17,7 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -26,18 +27,17 @@ import javafx.scene.shape.Line;
 public class PlanetManagerUI extends PlanetManager
 {
 	// static values for ui
-	private static final int PADH = 5, PADV = 5,
-			TILEH = 25, TILEV = 25,
-			NUM_P_BG = 10, NUM_B_BG = 4,
-			MARGIN = 5, TOPMARGIN = 2;
+	protected static final int PADH = 5, PADV = 5,
+		TILEH = 25, TILEV = 25,
+		NUM_P_BG = 10, NUM_B_BG = 4,
+		MARGIN = 5, TOPMARGIN = 2;
 
 	// planets and corresponding buttons
-	private Map<Space, Label> tiles;
-	private Map<Fleet, Line> lines;
+	protected Map<Space, Label> tiles;
+	protected Map<Fleet, Line> lines;
 
-	private Pane pane;
-	private TilePane tilePane;
-
+	protected Pane pane;
+	protected TilePane tilePane;
 	protected TurnManagerUI TMui;
 
 	public PlanetManagerUI()
@@ -128,7 +128,7 @@ public class PlanetManagerUI extends PlanetManager
 			tilePane.getChildren().add(l);
 
 			Planet p = planets.get(hash);
-			
+
 			// add a circle here to check the positioning given by the constructor
 
 			if (p != null)
@@ -213,6 +213,7 @@ public class PlanetManagerUI extends PlanetManager
 	 * @param player
 	 * @param p
 	 */
+	@Override
 	public void setPlanetOwner(Player player, Planet p)
 	{
 		// if owner is not null 
@@ -277,7 +278,7 @@ public class PlanetManagerUI extends PlanetManager
 				l.setStroke(Color.YELLOW);
 				l.setOpacity(0.8);
 				l.getStrokeDashArray().addAll(1d, 5d);
-				
+
 				System.out.printf("%f, %f\n", p.getPosition().getX(), p.getPosition().getY());
 				System.out.printf("%f, %f\n", p.getPosition().getWorldX(), p.getPosition().getWorldY());
 
@@ -297,6 +298,21 @@ public class PlanetManagerUI extends PlanetManager
 				lines.remove(f);
 			}
 		}
+	}
+
+	public Pane getMiniPane()
+	{
+		GridPane miniTilePane = new GridPane();
+		miniTilePane.setStyle("-fx-background-color: black;");
+		
+		for (Planet p : planets.values())
+		{
+			Label l = new Label();
+			l.getStyleClass().add(tiles.get(p).getStyle());
+			miniTilePane.add(l, (int) p.getPosition().getX(), (int) p.getPosition().getY());
+		}
+
+		return miniTilePane;
 	}
 
 	public static int getTileH()
