@@ -74,11 +74,11 @@ public class TurnManagerUI extends TurnManager
 	private String timeFormat = "%02d:%02d";
 
 	PlanetManagerUI PGui;
-	
-	public TurnManagerUI()
+
+	public TurnManagerUI(ConfigManager CM)
 	{
-		super();
-		
+		super(CM);
+
 		centerPane.getChildren().add(tblPlayer);
 		scrollList.setContent(centerPane);
 		pane.getChildren().addAll(turnBar, scrollList);
@@ -86,7 +86,7 @@ public class TurnManagerUI extends TurnManager
 		rightAlignBox.getChildren().addAll(gameTime);
 
 		enableSend(false);
-		makeHBoxUI();
+		makeUI();
 
 		System.out.println("finished toolbar");
 	}
@@ -94,7 +94,7 @@ public class TurnManagerUI extends TurnManager
 	/**
 	 * Create the UI for the turn bar
 	 */
-	public void makeHBoxUI()
+	public void makeUI()
 	{
 		// set text and disable sending		
 		btnNextTurn.setText("NEXT TURN");
@@ -150,9 +150,9 @@ public class TurnManagerUI extends TurnManager
 		scrollList.getStyleClass().addAll("scroll-list", "edge-to-edge");
 		scrollList.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 		scrollList.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-		
+
 		togglePlanetList();
-		
+
 		pane.setSpacing(3);
 
 	}
@@ -167,17 +167,16 @@ public class TurnManagerUI extends TurnManager
 	{
 		super.setup(pm, pg);
 		PGui = pg;
-		
+
 		pane.setMinWidth(MIN_WIDTH);
 		pane.setPrefWidth(pg.getSizeX());
 		pane.setMaxWidth(pg.getSizeX());
-		
+
 		updatePlayerLabel();
-		
+
 		btnNextTurn.setOnAction(event -> clickNextTurn());
 		lblPlayer.setOnMouseClicked(event -> togglePlanetList());
 		btnSendShips.setOnMouseClicked(event -> clickSend());
-		
 
 		Timeline oneSecond = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>()
 		{
@@ -246,7 +245,7 @@ public class TurnManagerUI extends TurnManager
 		{
 			// create a new fleet to send
 			int num = Integer.valueOf(tfShipNum.getText());
-			ShipGroup f = new ShipInventory(ConfigurationManager.defaultShip, num);
+			ShipGroup f = new ShipInventory(CM.defaultShip, num);
 
 			if (!PM.canSend(PM.getCurrentPlayer(), f))
 			{
@@ -289,7 +288,7 @@ public class TurnManagerUI extends TurnManager
 		v2.getChildren().remove(1, v2.getChildren().size());
 		v3.getChildren().remove(1, v3.getChildren().size());
 
-		List<Planet> planets = PM.getCurrentPlayer().getPlanets();
+		List<Planet> planets = PM.getCurrentPlayer().getPlanetList();
 
 		int sortColumnAbs = Math.abs(sortColumn);
 		int sortColumnSign = sortColumn / sortColumnAbs;
@@ -299,7 +298,7 @@ public class TurnManagerUI extends TurnManager
 		case 1:
 			Collections.sort(planets, (a, b) -> sortColumnSign * a.getName().compareToIgnoreCase(b.getName()));
 		case 2:
-			Collections.sort(planets, (a, b) -> sortColumnSign * (a.getProduction() - b.getProduction()));
+			Collections.sort(planets, (a, b) -> sortColumnSign * (a.getProduction().get(CM.defaultShip) - b.getProduction().get(CM.defaultShip)));
 		case 3:
 			Collections.sort(planets, (a, b) -> sortColumnSign * (a.getShipInventory().getCount() - b.getShipInventory().getCount()));
 		}
@@ -444,7 +443,7 @@ public class TurnManagerUI extends TurnManager
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void sendShips(int num) throws Exception
 	{

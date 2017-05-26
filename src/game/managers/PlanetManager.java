@@ -22,12 +22,14 @@ public class PlanetManager
 
 	protected PlayerManager PM;
 	protected TurnManager TM;
+	protected ConfigManager CM;
 
-	public PlanetManager()
+	public PlanetManager(ConfigManager CM)
 	{
-		this.x = ConfigurationManager.gridX;
-		this.y = ConfigurationManager.gridY;
-		this.density = ConfigurationManager.planetDensity;
+		this.CM = CM;
+		this.x = CM.gridX;
+		this.y = CM.gridY;
+		this.density = CM.planetDensity;
 		this.len = x * y;
 	}
 
@@ -57,7 +59,7 @@ public class PlanetManager
 			double prob = ThreadLocalRandom.current().nextDouble();
 			if (prob < density)
 			{
-				Planet p = new Planet(s);
+				Planet p = new Planet(s, CM);
 				planets.put(hashLocation(i % x, i / x), p);
 			}
 			else
@@ -73,7 +75,7 @@ public class PlanetManager
 	public void setStartPlanets()
 	{
 		// make a list of planets to choose from
-		int numPlayers = ConfigurationManager.numPlayers;
+		int numPlayers = CM.numPlayers;
 		Planet[] planetArray = getPlanetArray();
 
 		// make a list denoting each of the planets
@@ -87,12 +89,13 @@ public class PlanetManager
 			int pick = nums.remove(r);
 			Planet p = planetArray[pick];
 
-			setPlanetOwner(PM.getPlayer(numPlayers), p);
-			p.setProduction(ConfigurationManager.initialProduction);
-			p.addShips(ConfigurationManager.defaultShip, ConfigurationManager.shipStartCount);
+			p.setOwner(PM.getPlayer(numPlayers));
+			p.setProduction(CM.defaultShip, CM.initialProduction);
+			p.addShips(CM.defaultShip, CM.shipStartCount);
 		}
 
 		nums.forEach(n -> setPlanetOwner(PM.neutral, planetArray[n]));
+		if (!CM.neutralShipsVisible) nums.forEach(n -> planetArray[n].setDisplayShips(false));
 	}
 
 	/**
@@ -103,7 +106,7 @@ public class PlanetManager
 	 */
 	public void setPlanetOwner(Player player, Planet p)
 	{
-		player.addPlanet(p);
+		p.setOwner(player);
 	}
 
 	/**

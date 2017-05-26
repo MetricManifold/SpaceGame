@@ -1,6 +1,7 @@
 package game.ui;
 
-import game.managers.ConfigurationManager;
+import game.managers.ConfigManager;
+import game.managers.PlayerManager;
 import game.managers.SetupManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -65,7 +66,17 @@ public class SetupManagerUI extends SetupManager
 	private ObservableList<String> cbDshOptions = FXCollections.observableArrayList("Destroyer", "Fighter", "Bomber");
 	private ComboBox<String> cbDsh = new ComboBox<>(cbDshOptions);
 
-	public SetupManagerUI(PlanetManagerUI pg)
+	public SetupManagerUI()
+	{
+		CM = new ConfigManager();
+		PM = new PlayerManager(CM);
+		PG = new PlanetManagerUI(CM);
+		TM = new TurnManagerUI(CM);
+
+		makeUI();
+	}
+
+	public void makeUI()
 	{
 		mainPane.setCenter(tabPane);
 		mainPane.setRight(gridSettings);
@@ -73,7 +84,7 @@ public class SetupManagerUI extends SetupManager
 		gridSettings.setTop(gridFields);
 		gridSettings.setCenter(gridVisual);
 		gridFields.getChildren().addAll(labelGx, sGx, labelGy, sGy, labelPd, sPd);
-		gridVisual = pg.getMiniPane();
+		gridVisual = getPlanetManager().getMiniPane();
 
 		playerTab.setContent(playerSettings);
 		playerTab.setClosable(false);
@@ -100,38 +111,51 @@ public class SetupManagerUI extends SetupManager
 		labelSsc.setText("ship start count");
 
 		SpinnerValueFactory<Integer> factoryGx = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-			ConfigurationManager.minGridX, ConfigurationManager.maxGridX, ConfigurationManager.defaultGridX);
+			CM.minGridX, CM.maxGridX, CM.defaultGridX);
 		SpinnerValueFactory<Integer> factoryGy = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-			ConfigurationManager.minGridY, ConfigurationManager.maxGridY, ConfigurationManager.defaultGridY);
+			CM.minGridY, CM.maxGridY, CM.defaultGridY);
 		SpinnerValueFactory<Double> factoryPd = new SpinnerValueFactory.DoubleSpinnerValueFactory(
-			0.0, 1.0, ConfigurationManager.planetDensity, 0.05);
-		
+			0.0, 1.0, CM.planetDensity, 0.05);
+
 		//Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL
 
 		sGx.setValueFactory(factoryGx);
 		sGy.setValueFactory(factoryGy);
 		sPd.setValueFactory(factoryPd);
-		
+
 		SpinnerValueFactory<Double> factoryNpm = new SpinnerValueFactory.DoubleSpinnerValueFactory(
-			ConfigurationManager.cminNeutralProdModifier, ConfigurationManager.cmaxNeutralProdModifier, ConfigurationManager.neutralProdModifier, 0.05);
+			CM.cminNeutralProdModifier, CM.cmaxNeutralProdModifier, CM.neutralProdModifier, 0.05);
 		SpinnerValueFactory<Double> factoryPdb = new SpinnerValueFactory.DoubleSpinnerValueFactory(
-			ConfigurationManager.cminPlanetDefenderBonus, ConfigurationManager.cmaxPlanetDefenderBonus, ConfigurationManager.planetDefenderBonus, 0.05);
+			CM.cminPlanetDefenderBonus, CM.cmaxPlanetDefenderBonus, CM.planetDefenderBonus, 0.05);
 		SpinnerValueFactory<Integer> factoryIpr = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-			0, ConfigurationManager.cmaxProduction, ConfigurationManager.initialProduction);
+			0, CM.cmaxProduction, CM.initialProduction);
 		SpinnerValueFactory<Integer> factorySsc = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-			0, ConfigurationManager.cmaxShipStartCount, ConfigurationManager.shipStartCount);
+			0, CM.cmaxShipStartCount, CM.shipStartCount);
 
 		tfNpm.setValueFactory(factoryNpm);
 		tfPdb.setValueFactory(factoryPdb);
 		tfIpr.setValueFactory(factoryIpr);
 		tfSsc.setValueFactory(factorySsc);
-		rbNsv.setSelected(ConfigurationManager.neutralShipsVisible);
+		rbNsv.setSelected(CM.neutralShipsVisible);
 		cbDsh.setValue(cbDshOptions.get(0));
 	}
 
+	@Override
 	public void setup()
 	{
-		
+		super.setup();
+	}
+
+	@Override
+	public PlanetManagerUI getPlanetManager()
+	{
+		return (PlanetManagerUI) PG;
+	}
+
+	@Override
+	public TurnManagerUI getTurnManager()
+	{
+		return (TurnManagerUI) TM;
 	}
 
 }

@@ -1,6 +1,5 @@
 package game.ui;
 
-import game.managers.*;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -21,9 +20,7 @@ public class WindowManager extends Application
 	public static final String TITLE = "Starfare";
 	public static Scene scene, setup;
 
-	private PlanetManagerUI pm;
-	private TurnManagerUI tm;
-	private PlayerManager lm;
+	private SetupManagerUI SM;
 
 	private static final int SPLASH_WIDTH = 660, SPLASH_HEIGHT = 360, LOGO_WIDTH = SPLASH_WIDTH - 80;
 	private static Stage primaryStage;
@@ -94,16 +91,12 @@ public class WindowManager extends Application
 		vb.getStyleClass().add("vbox-main");
 		scene.getStylesheets().add("elements.css"); //			set the style sheet for the scene
 
-		lm = new PlayerManager(); //							creates the object managing players
-		pm = new PlanetManagerUI(); //							create the planet grid with the selected x, y and density
-		tm = new TurnManagerUI(); // 							create the turn bar to take input
-
-		pm.setup(lm, tm);
-		tm.setup(lm, pm);
+		SM = new SetupManagerUI();
+		SM.setup();
 
 		border.setCenter(vb);
 		border.getStyleClass().add("scene");
-		vb.getChildren().addAll(tm.getPane(), pm.getPane());
+		vb.getChildren().addAll(SM.getTurnManager().getPane(), SM.getPlanetManager().getPane());
 
 		primaryStage.setTitle(TITLE);
 		primaryStage.setScene(scene);

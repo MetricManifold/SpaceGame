@@ -95,17 +95,11 @@ public class Player
 	}
 
 	/**
-	 * give a planet to this player's control
+	 * return the list of owned planets
 	 * 
-	 * @param p
+	 * @return
 	 */
-	public void addPlanet(Planet p)
-	{
-		p.setOwner(this);
-		planets.add(p);
-	}
-
-	public List<Planet> getPlanets()
+	public List<Planet> getPlanetList()
 	{
 		return planets;
 	}
@@ -173,11 +167,11 @@ public class Player
 
 	/**
 	 * updates the state of this player
+	 * 
 	 * @param pg
 	 * @param tm
 	 * @param pm
 	 */
 	public void update(PlanetManager pg, TurnManager tm, PlayerManager pm)
-	{
-	}
+	{}
 }

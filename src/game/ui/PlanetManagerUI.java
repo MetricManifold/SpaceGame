@@ -40,9 +40,9 @@ public class PlanetManagerUI extends PlanetManager
 	protected TilePane tilePane;
 	protected TurnManagerUI TMui;
 
-	public PlanetManagerUI()
+	public PlanetManagerUI(ConfigManager cm)
 	{
-		super();
+		super(cm);
 
 		lines = new HashMap<Fleet, Line>();
 		tiles = new HashMap<Space, Label>();
@@ -52,13 +52,13 @@ public class PlanetManagerUI extends PlanetManager
 		this.sizeh = (TILEH + PADH) * x + MARGIN * 2 - PADH;
 		this.sizev = (TILEV + PADV) * y + MARGIN * 2 - PADV;
 
-		makeTilePaneUI();
+		makeUI();
 	}
 
 	/**
 	 * Sets the properties related to tilepane UI
 	 */
-	void makeTilePaneUI()
+	void makeUI()
 	{
 		VBox.setMargin(tilePane, new Insets(TOPMARGIN, 0, 0, 0));
 		pane.getChildren().add(tilePane);

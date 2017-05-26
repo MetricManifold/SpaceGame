@@ -9,7 +9,6 @@ import java.util.Set;
 import game.entities.Ship;
 import game.helpers.Displacement;
 import game.helpers.PointerDoubleMatrix;
-import game.managers.ConfigurationManager;
 import game.managers.PlanetManager;
 import game.players.Player;
 import game.tiles.Planet;
@@ -54,12 +53,12 @@ public class Fleet extends ShipGroup
 	{
 		return destination;
 	}
-	
+
 	public Displacement getDisplacement()
 	{
 		return displacement;
 	}
-	
+
 	/**
 	 * update the status of this fleet, including position if moving
 	 * 
@@ -144,7 +143,7 @@ public class Fleet extends ShipGroup
 		double iniHpB = defender.getTotalHealth();
 		double avgDmgA = -getTotalDamage() / defender.ships.keySet().size();
 		double avgDmgB = -defender.getTotalDamage() / ships.keySet().size() * defenderBonus;
-		
+
 		// damage, strength map and individual ship health
 		PointerDoubleMatrix d_p = new PointerDoubleMatrix(1, tn);
 		PointerDoubleMatrix m_p = new PointerDoubleMatrix(tn, tn);
@@ -158,7 +157,7 @@ public class Fleet extends ShipGroup
 		// matrix for healths		
 		PointerDoubleMatrix h_a = new PointerDoubleMatrix(1, tn);
 		PointerDoubleMatrix h_b = new PointerDoubleMatrix(1, tn);
-		
+
 		for (int i = 0; i < tn; i++)
 		{
 			Class<? extends Ship> t = allTypesList.get(i);
@@ -212,28 +211,28 @@ public class Fleet extends ShipGroup
 
 		defender.removeAll();
 		removeAll();
-		
+
 		for (int i = 0; i < tn; i++)
 		{
 			Class<? extends Ship> t = allTypesList.get(i);
 			Ship s = t.newInstance();
-			
+
 			if (h_a.get(0, i).v > 0)
 			{
 				add(t, (int) Math.ceil(h_a.get(0, i).v / s.health));
 			}
-			
+
 			if (h_b.get(0, i).v > 0)
 			{
 				defender.add(t, (int) Math.ceil(h_b.get(0, i).v / s.health));
 			}
 		}
-		
+
 	}
 
 	public void attack(Planet p) throws Exception
 	{
-		attack(p.getShipInventory(), ConfigurationManager.planetDefenderBonus);
+		attack(p.getShipInventory(), p.getDefenderBonus());
 	}
 
 }

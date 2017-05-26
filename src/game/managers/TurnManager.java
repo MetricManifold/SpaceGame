@@ -15,10 +15,12 @@ public class TurnManager
 {
 	protected PlanetManager PG;
 	protected PlayerManager PM;
+	protected ConfigManager CM;
 	protected ArrayList<Fleet> fleets;
 
-	public TurnManager()
+	public TurnManager(ConfigManager CM)
 	{
+		this.CM = CM;
 		fleets = new ArrayList<Fleet>();
 	}
 
@@ -52,11 +54,11 @@ public class TurnManager
 				// if owner is neutral, produce 75% total ships
 				if (p.getOwner() == PM.neutral)
 				{
-					p.addShips(ConfigurationManager.defaultShip, (int) (p.getProduction() * ConfigurationManager.neutralProdModifier));
+					p.addShips(CM.defaultShip, (int) (p.getProduction().get(CM.defaultShip) * CM.neutralProdModifier));
 				}
 				else
 				{
-					p.produceShips();
+					p.produceShips(CM.defaultShip);
 				}
 			}
 
@@ -98,7 +100,7 @@ public class TurnManager
 	public void sendShips(int num) throws Exception
 	{
 		Player p = PM.getCurrentPlayer();
-		Fleet f = new Fleet(ConfigurationManager.defaultShip, num, p);
+		Fleet f = new Fleet(CM.defaultShip, num, p);
 
 		if (PM.canSend(p, f))
 		{

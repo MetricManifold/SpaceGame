@@ -1,9 +1,7 @@
 package game.groups;
 
 import java.util.List;
-
 import game.entities.Ship;
-import game.managers.ConfigurationManager;
 
 public class ShipInventory extends ShipGroup
 {
@@ -11,6 +9,11 @@ public class ShipInventory extends ShipGroup
 	public ShipInventory()
 	{
 		super();
+	}
+	
+	public ShipInventory(ShipInventory s)
+	{
+		super(s);
 	}
 
 	public ShipInventory(Class<? extends Ship> type, int num)
@@ -21,11 +24,6 @@ public class ShipInventory extends ShipGroup
 	public ShipInventory(List<Ship> list)
 	{
 		super(list);
-	}
-
-	public void add(int production)
-	{
-		add(ConfigurationManager.defaultShip, production);
 	}
 
 	/**

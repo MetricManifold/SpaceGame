@@ -14,22 +14,25 @@ public class PlayerManager
 	private int playerIndex = 1;
 	private Player[] players;
 	public final Player neutral;
+	
+	protected ConfigManager CM;
 
 	public enum Controller
 	{
 		AI, HUMAN, NEUTRAL, HOSTILE
 	};
 
-	public PlayerManager()
+	public PlayerManager(ConfigManager CM)
 	{
-		int numPlayers = ConfigurationManager.numPlayers;
+		this.CM = CM;
+		int numPlayers = CM.numPlayers;
 
 		players = new Player[numPlayers];
-		neutral = new Player(0, ConfigurationManager.COLORS[0], Controller.NEUTRAL);
+		neutral = new Player(0, CM.COLORS[0], Controller.NEUTRAL);
 
 		for (int i = 0; i < numPlayers; i++)
 		{
-			players[i] = new Player(i, ConfigurationManager.COLORS[i], Controller.HUMAN);
+			players[i] = new Player(i, CM.COLORS[i], Controller.HUMAN);
 		}
 	}
 
@@ -37,7 +40,7 @@ public class PlayerManager
 	{
 		do
 		{
-			playerIndex = playerIndex % (ConfigurationManager.numPlayers - 1) + 1;
+			playerIndex = playerIndex % (CM.numPlayers - 1) + 1;
 		} while (!players[playerIndex].isAlive());
 	}
 
