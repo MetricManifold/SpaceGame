@@ -5,8 +5,11 @@ import game.managers.PlayerManager;
 import game.managers.SetupManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
@@ -21,7 +24,9 @@ import javafx.scene.layout.VBox;
 
 public class SetupManagerUI extends SetupManager
 {
-	private BorderPane mainPane = new BorderPane();
+	private Pane rootPane;
+	private BorderPane setupPane = new BorderPane();
+	private VBox gamePane = new VBox();
 	private TabPane tabPane = new TabPane();
 
 	/*
@@ -65,26 +70,37 @@ public class SetupManagerUI extends SetupManager
 	private RadioButton rbNsv = new RadioButton();
 	private ObservableList<String> cbDshOptions = FXCollections.observableArrayList("Destroyer", "Fighter", "Bomber");
 	private ComboBox<String> cbDsh = new ComboBox<>(cbDshOptions);
+	
+	private final int height = 30, spacing = 10;
 
-	public SetupManagerUI()
+	/*
+	 * start button
+	 */
+	private Button btnStart = new Button("Start");
+
+	public SetupManagerUI(Pane rootPane)
 	{
 		CM = new ConfigManager();
 		PM = new PlayerManager(CM);
 		PG = new PlanetManagerUI(CM);
 		TM = new TurnManagerUI(CM);
 
+		this.rootPane = rootPane;
 		makeUI();
 	}
 
 	public void makeUI()
 	{
-		mainPane.setCenter(tabPane);
-		mainPane.setRight(gridSettings);
+		setupPane.setCenter(tabPane);
+		setupPane.setRight(gridSettings);
+		setupPane.setBottom(btnStart);
+
+		btnStart.setOnMouseClicked(event -> startGame());
+		tabPane.getTabs().addAll(playerTab, advancedTab);
 
 		gridSettings.setTop(gridFields);
 		gridSettings.setCenter(gridVisual);
 		gridFields.getChildren().addAll(labelGx, sGx, labelGy, sGy, labelPd, sPd);
-		gridVisual = getPlanetManager().getMiniPane();
 
 		playerTab.setContent(playerSettings);
 		playerTab.setClosable(false);
@@ -93,13 +109,18 @@ public class SetupManagerUI extends SetupManager
 		playerView.setItems(playerList);
 
 		advancedTab.setContent(advancedSettings);
-		playerTab.setClosable(false);
-		playerTab.setText("advanced");
+		advancedTab.setClosable(false);
+		advancedTab.setText("advanced");
 
 		advancedSettings.getChildren().addAll(advancedColLeft, advancedColRight);
 		advancedColLeft.getChildren().addAll(labelNpm, labelPdb, labelNsv, labelDsh, labelIpr, labelSsc);
 		advancedColRight.getChildren().addAll(tfNpm, tfPdb, rbNsv, cbDsh, tfIpr, tfSsc);
 
+		advancedSettings.setSpacing(spacing);
+		advancedSettings.getStyleClass().add("advanced-settings");
+		advancedColLeft.setSpacing(spacing);
+		advancedColRight.setSpacing(spacing);
+		
 		labelGx.setText("x");
 		labelGy.setText("y");
 		labelPd.setText("density");
@@ -109,6 +130,13 @@ public class SetupManagerUI extends SetupManager
 		labelDsh.setText("default ship");
 		labelIpr.setText("initial production");
 		labelSsc.setText("ship start count");
+		
+		Control[] sizingElements = new Control[] { labelNpm, labelPdb, labelNsv, labelDsh, labelIpr, labelSsc, tfNpm, tfPdb, tfIpr, tfSsc, rbNsv, cbDsh };
+		for (Control n : sizingElements)
+		{
+			n.setMinHeight(height);
+			n.setMaxHeight(height);
+		}
 
 		SpinnerValueFactory<Integer> factoryGx = new SpinnerValueFactory.IntegerSpinnerValueFactory(
 			CM.minGridX, CM.maxGridX, CM.defaultGridX);
@@ -138,12 +166,22 @@ public class SetupManagerUI extends SetupManager
 		tfSsc.setValueFactory(factorySsc);
 		rbNsv.setSelected(CM.neutralShipsVisible);
 		cbDsh.setValue(cbDshOptions.get(0));
+
+		gamePane.setSpacing(3);
+		gamePane.setAlignment(Pos.CENTER);
+		gamePane.getStyleClass().add("vbox-main");
+		gamePane.getChildren().addAll(getTurnManager().getPane(), getPlanetManager().getPane());
+
+		rootPane.getStyleClass().add("scene");
 	}
 
 	@Override
 	public void setup()
 	{
 		super.setup();
+		
+		rootPane.getChildren().add(setupPane);
+		gridVisual = getPlanetManager().getMiniPane();
 	}
 
 	@Override
@@ -158,4 +196,22 @@ public class SetupManagerUI extends SetupManager
 		return (TurnManagerUI) TM;
 	}
 
+	public Pane getGamePane()
+	{
+		return gamePane;
+	}
+
+	public Pane getSetupPane()
+	{
+		return setupPane;
+	}
+
+	@Override
+	public void startGame()
+	{
+		super.startGame();
+
+		rootPane.getChildren().remove(setupPane);
+		rootPane.getChildren().add(gamePane);
+	}
 }

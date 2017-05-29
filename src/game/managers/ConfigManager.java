@@ -19,7 +19,7 @@ public class ConfigManager
 		defaultGridX = 20, defaultGridY = 20;
 
 	public double planetDensity = 0.15,
-		neutralProdModifier = 0.50,
+		neutralProdModifier = 0.70,
 		cminNeutralProdModifier = 0.00, cmaxNeutralProdModifier = 2.00,
 		planetDefenderBonus = 1.10,
 		cminPlanetDefenderBonus = 0.00, cmaxPlanetDefenderBonus = 2.00;

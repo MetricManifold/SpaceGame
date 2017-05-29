@@ -14,8 +14,8 @@ import game.tiles.Space;
 public class PlanetManager
 {
 	// planets and corresponding buttons
-	protected Map<Integer, Planet> planets = new HashMap<Integer, Planet>();
-	protected Map<Integer, Space> spaces = new HashMap<Integer, Space>();
+	protected Map<Integer, Planet> planets;
+	protected Map<Integer, Space> spaces;
 
 	protected int sizeh, sizev, x, y, len;
 	protected double density;
@@ -27,10 +27,6 @@ public class PlanetManager
 	public PlanetManager(ConfigManager CM)
 	{
 		this.CM = CM;
-		this.x = CM.gridX;
-		this.y = CM.gridY;
-		this.density = CM.planetDensity;
-		this.len = x * y;
 	}
 
 	/**
@@ -38,6 +34,11 @@ public class PlanetManager
 	 */
 	public void setup(PlayerManager pm, TurnManager tm)
 	{
+		this.x = CM.gridX;
+		this.y = CM.gridY;
+		this.density = CM.planetDensity;
+		this.len = x * y;
+		
 		TM = tm;
 		PM = pm;
 
@@ -50,6 +51,9 @@ public class PlanetManager
 	 */
 	public void spawnPlanets()
 	{
+		planets = new HashMap<Integer, Planet>();
+		spaces = new HashMap<Integer, Space>();
+		
 		for (int i = 0; i < len; i++)
 		{
 			// create the necessary elements
@@ -89,7 +93,7 @@ public class PlanetManager
 			int pick = nums.remove(r);
 			Planet p = planetArray[pick];
 
-			p.setOwner(PM.getPlayer(numPlayers));
+			setPlanetOwner(PM.getPlayer(numPlayers), p);
 			p.setProduction(CM.defaultShip, CM.initialProduction);
 			p.addShips(CM.defaultShip, CM.shipStartCount);
 		}
@@ -150,5 +154,6 @@ public class PlanetManager
 	{
 		return sizev;
 	}
+
 
 }

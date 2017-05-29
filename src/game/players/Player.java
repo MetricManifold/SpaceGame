@@ -1,7 +1,7 @@
 package game.players;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import game.managers.PlanetManager;
 import game.managers.PlayerManager;
@@ -12,7 +12,7 @@ import game.tiles.Space;
 public class Player
 {
 	private Planet origin, destination;
-	private List<Planet> planets = new ArrayList<Planet>();
+	private Set<Planet> planets = new HashSet<Planet>();
 	private int num;
 	private String color;
 	private boolean alive = true;
@@ -99,13 +99,23 @@ public class Player
 	 * 
 	 * @return
 	 */
-	public List<Planet> getPlanetList()
+	public Set<Planet> getPlanetSet()
 	{
-		return planets;
+		return new HashSet<>(planets);
 	}
 
 	/**
-	 * removes a planet from this player's control
+	 * add a planet to this player's planet set
+	 * 
+	 * @param p
+	 */
+	public void addPlanet(Planet p)
+	{
+		planets.add(p);
+	}
+
+	/**
+	 * removes a planet from this player's planet set
 	 * 
 	 * @param p
 	 */

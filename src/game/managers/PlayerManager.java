@@ -41,7 +41,7 @@ public class PlayerManager
 		do
 		{
 			playerIndex = playerIndex % (CM.numPlayers - 1) + 1;
-		} while (!players[playerIndex].isAlive());
+		} while (!players[playerIndex].isAlive() && getNumPlayersOfType(Controller.HUMAN) > 0);
 	}
 
 	/**
@@ -75,5 +75,19 @@ public class PlayerManager
 	public Player getPlayer(int index)
 	{
 		return players[index];
+	}
+	
+	public int getNumPlayersOfType(Controller c)
+	{
+		int num = 0;
+		for (Player p : players)
+		{
+			if (p.getController() == c)
+			{
+				num++;
+			}
+		}
+		
+		return num;
 	}
 }

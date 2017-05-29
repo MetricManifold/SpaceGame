@@ -21,7 +21,6 @@ public class TurnManager
 	public TurnManager(ConfigManager CM)
 	{
 		this.CM = CM;
-		fleets = new ArrayList<Fleet>();
 	}
 
 	/**
@@ -34,6 +33,7 @@ public class TurnManager
 	{
 		PM = pm;
 		PG = pg;
+		fleets = new ArrayList<Fleet>();
 	}
 
 	/**

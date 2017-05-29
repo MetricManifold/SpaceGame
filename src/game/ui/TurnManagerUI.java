@@ -1,6 +1,8 @@
 package game.ui;
 
 import game.managers.*;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -58,7 +60,7 @@ public class TurnManagerUI extends TurnManager
 	 * elements associated with the player label and planet list
 	 */
 	private BorderPane tblPlayer = new BorderPane();
-	private boolean planetListVisible = true;
+	private boolean planetListVisible = false;
 	private VBox v1 = new VBox();
 	private VBox v2 = new VBox();
 	private VBox v3 = new VBox();
@@ -96,7 +98,6 @@ public class TurnManagerUI extends TurnManager
 	 */
 	public void makeUI()
 	{
-		// set text and disable sending		
 		btnNextTurn.setText("NEXT TURN");
 		btnNextTurn.getStyleClass().add("turn-bar-button");
 
@@ -118,7 +119,7 @@ public class TurnManagerUI extends TurnManager
 		rightAlignBox.setAlignment(Pos.CENTER_RIGHT);
 		centerPane.prefWidthProperty().bind(pane.widthProperty());
 		HBox.setHgrow(rightAlignBox, Priority.ALWAYS);
-		StackPane.setAlignment(tblPlayer, Pos.CENTER);
+		//StackPane.setAlignment(tblPlayer, Pos.CENTER);
 
 		v1.setAlignment(Pos.CENTER_LEFT);
 		v2.setAlignment(Pos.CENTER_RIGHT);
@@ -163,14 +164,15 @@ public class TurnManagerUI extends TurnManager
 	 * @param pm
 	 * @param pg
 	 */
-	public void setup(PlayerManager pm, PlanetManagerUI pg)
+	@Override
+	public void setup(PlayerManager pm, PlanetManager pg)
 	{
 		super.setup(pm, pg);
-		PGui = pg;
+		PGui = (PlanetManagerUI) pg;
 
 		pane.setMinWidth(MIN_WIDTH);
-		pane.setPrefWidth(pg.getSizeX());
-		pane.setMaxWidth(pg.getSizeX());
+		pane.prefWidthProperty().bind(PGui.pane.widthProperty());
+		pane.maxWidthProperty().bind(PGui.pane.widthProperty());
 
 		updatePlayerLabel();
 
@@ -288,7 +290,7 @@ public class TurnManagerUI extends TurnManager
 		v2.getChildren().remove(1, v2.getChildren().size());
 		v3.getChildren().remove(1, v3.getChildren().size());
 
-		List<Planet> planets = PM.getCurrentPlayer().getPlanetList();
+		List<Planet> planets = new ArrayList<>(PM.getCurrentPlayer().getPlanetSet());
 
 		int sortColumnAbs = Math.abs(sortColumn);
 		int sortColumnSign = sortColumn / sortColumnAbs;
@@ -306,7 +308,7 @@ public class TurnManagerUI extends TurnManager
 		for (Planet p : planets)
 		{
 			Text n = new Text(p.getName());
-			Text c = new Text(String.valueOf(p.getProduction()));
+			Text c = new Text(String.valueOf(p.getProduction().get(CM.defaultShip)));
 			Text t = new Text(String.valueOf(p.getShipInventory().getCount()));
 
 			n.getStyleClass().add("tooltip-list");

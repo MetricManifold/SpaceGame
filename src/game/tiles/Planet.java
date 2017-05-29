@@ -18,12 +18,13 @@ import javafx.scene.text.TextFlow;
 public class Planet extends Space
 {
 	// production per turn and ships
-	private Map<Class<? extends Ship>, Integer> production;
-	private ShipInventory ships;
-	private String name;
-	private Player owner;
-	boolean displayShips = true;
-	private double defenderBonus;
+	protected Map<Class<? extends Ship>, Integer> production;
+	protected ShipInventory ships;
+	protected String name;
+	protected Player owner;
+	protected boolean displayShips = true;
+	protected double defenderBonus;
+	protected Class<? extends Ship> defaultShip;
 
 	public Planet(Displacement pos, ConfigManager cm)
 	{
@@ -32,8 +33,9 @@ public class Planet extends Space
 		this.production = new HashMap<>();
 		this.ships = new ShipInventory();
 		this.owner = null;
+		this.defaultShip = cm.defaultShip;
 		
-		production.put(cm.defaultShip, ThreadLocalRandom.current().nextInt(cm.minProduction, cm.maxProduction));
+		production.put(defaultShip, ThreadLocalRandom.current().nextInt(cm.minProduction, cm.maxProduction));
 	}
 
 	public Planet(Space s, ConfigManager cm)
@@ -101,7 +103,7 @@ public class Planet extends Space
 	public Tooltip getTooltip()
 	{
 		String strNumShips = (owner.getNum() == 0 && !displayShips) ? "?" : String.valueOf(getShipCount());
-		String strStats = String.format("Name:\t%s\nShips:\t%s\nIndustry:\t%d\nOwner:\t", getName(), strNumShips, getProduction());
+		String strStats = String.format("Name:\t%s\nShips:\t%s\nIndustry:\t%d\nOwner:\t", getName(), strNumShips, getProduction().get(defaultShip));
 
 		// create text
 		Text stats = new Text(strStats);
@@ -144,7 +146,7 @@ public class Planet extends Space
 		}
 		
 		this.owner = owner;
-		owner.getPlanetList().add(this);
+		owner.addPlanet(this);
 	}
 
 	/**

@@ -2,14 +2,13 @@ package game.ui;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Pane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -18,13 +17,14 @@ import javafx.util.Duration;
 public class WindowManager extends Application
 {
 	public static final String TITLE = "Starfare";
-	public static Scene scene, setup;
+	public Scene scene;
 
 	private SetupManagerUI SM;
 
 	private static final int SPLASH_WIDTH = 660, SPLASH_HEIGHT = 360, LOGO_WIDTH = SPLASH_WIDTH - 80;
-	private static Stage primaryStage;
-	private static BorderPane splashPane;
+	private Stage primaryStage;
+	private BorderPane splashPane;
+	private Pane mainPane;
 
 	@Override
 	public void init()
@@ -46,10 +46,12 @@ public class WindowManager extends Application
 	{
 		showSplash(initStage);
 
-		PauseTransition pause = new PauseTransition(Duration.seconds(2));
+		PauseTransition pause = new PauseTransition(Duration.seconds(1));
+		startGame();
+		
 		pause.setOnFinished(event -> {
-			startGame();
 			initStage.hide();
+			primaryStage.show();
 		});
 		pause.play();
 	}
@@ -66,6 +68,7 @@ public class WindowManager extends Application
 		initStage.initStyle(StageStyle.UNDECORATED);
 		final Rectangle2D bounds = Screen.getPrimary().getBounds();
 
+		initStage.setTitle(TITLE);
 		initStage.setScene(splash);
 		initStage.setX(bounds.getMinX() + bounds.getWidth() / 2 - SPLASH_WIDTH / 2);
 		initStage.setY(bounds.getMinY() + bounds.getHeight() / 2 - SPLASH_HEIGHT / 2);
@@ -78,29 +81,16 @@ public class WindowManager extends Application
 	private void startGame()
 	{
 		primaryStage = new Stage(StageStyle.DECORATED);
-
-		BorderPane border = new BorderPane(); //				layout the game in a border pane
-		BorderPane border2 = new BorderPane();
-		VBox vb = new VBox(); //								create the box for the grid and turnbar
-
-		scene = new Scene(border); //							create the scene
-		setup = new Scene(border2);
-
-		vb.setSpacing(3);
-		vb.setAlignment(Pos.CENTER);
-		vb.getStyleClass().add("vbox-main");
-		scene.getStylesheets().add("elements.css"); //			set the style sheet for the scene
-
-		SM = new SetupManagerUI();
+		mainPane = new Pane();
+		
+		scene = new Scene(mainPane);
+		scene.getStylesheets().add("elements.css");
+		
+		SM = new SetupManagerUI(mainPane);
 		SM.setup();
-
-		border.setCenter(vb);
-		border.getStyleClass().add("scene");
-		vb.getChildren().addAll(SM.getTurnManager().getPane(), SM.getPlanetManager().getPane());
-
+		
 		primaryStage.setTitle(TITLE);
 		primaryStage.setScene(scene);
-		primaryStage.show();
 
 		System.out.println("game started");
 	}
@@ -114,15 +104,5 @@ public class WindowManager extends Application
 	{
 		launch(args);
 	}
-
-	/**
-	 * swaps the current scene
-	 * 
-	 * @param scene
-	 */
-	public void swapScene(Scene scene)
-	{
-		primaryStage.setScene(scene);
-	}
-
+	
 }

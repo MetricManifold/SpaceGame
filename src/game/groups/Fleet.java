@@ -49,11 +49,21 @@ public class Fleet extends ShipGroup
 		this.owner = owner;
 	}
 
+	/**
+	 * returns the destination planet
+	 * 
+	 * @return
+	 */
 	public Planet getDestination()
 	{
 		return destination;
 	}
 
+	/**
+	 * returns the movement vector remaining to the destination
+	 * 
+	 * @return
+	 */
 	public Displacement getDisplacement()
 	{
 		return displacement;

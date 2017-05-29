@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import game.managers.*;
 import game.groups.Fleet;
 import game.helpers.Displacement;
+import game.helpers.GfxHelper;
 import game.players.Player;
 import game.tiles.Planet;
 import game.tiles.Space;
@@ -23,6 +24,9 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 
 public class PlanetManagerUI extends PlanetManager
 {
@@ -34,23 +38,19 @@ public class PlanetManagerUI extends PlanetManager
 
 	// planets and corresponding buttons
 	protected Map<Space, Label> tiles;
-	protected Map<Fleet, Line> lines;
+	protected Map<Fleet, Path> paths;
 
-	protected Pane pane;
+	protected Pane pane, bgPane;
 	protected TilePane tilePane;
 	protected TurnManagerUI TMui;
 
-	public PlanetManagerUI(ConfigManager cm)
+	public PlanetManagerUI(ConfigManager CM)
 	{
-		super(cm);
+		super(CM);
 
-		lines = new HashMap<Fleet, Line>();
-		tiles = new HashMap<Space, Label>();
 		pane = new Pane();
+		bgPane = new Pane();
 		tilePane = new TilePane(Orientation.HORIZONTAL);
-
-		this.sizeh = (TILEH + PADH) * x + MARGIN * 2 - PADH;
-		this.sizev = (TILEV + PADV) * y + MARGIN * 2 - PADV;
 
 		makeUI();
 	}
@@ -61,7 +61,7 @@ public class PlanetManagerUI extends PlanetManager
 	void makeUI()
 	{
 		VBox.setMargin(tilePane, new Insets(TOPMARGIN, 0, 0, 0));
-		pane.getChildren().add(tilePane);
+		pane.getChildren().addAll(bgPane, tilePane);
 
 		tilePane.setHgap(PADH);
 		tilePane.setVgap(PADV);
@@ -69,25 +69,34 @@ public class PlanetManagerUI extends PlanetManager
 		tilePane.setPrefTileWidth(TILEH);
 		tilePane.setPrefTileHeight(TILEV);
 
-		tilePane.setPrefColumns(x);
-		tilePane.setPrefRows(y);
-
-		tilePane.setMaxSize(sizeh, sizev);
 		tilePane.setPadding(new Insets(MARGIN, MARGIN, MARGIN, MARGIN));
 		tilePane.setAlignment(Pos.BASELINE_CENTER);
-
+		
 		String bgSelect = String.format("planet-grid%d", ThreadLocalRandom.current().nextInt(NUM_B_BG) + 1);
-		tilePane.getStyleClass().addAll("planet-grid", bgSelect);
+		bgPane.getStyleClass().addAll("planet-grid", bgSelect);
 	}
 
 	/**
 	 * Sets the mouse event associated with the tilepane to find all the grid locations
 	 */
-	public void setup(PlayerManager pm, TurnManagerUI tm)
+	@Override
+	public void setup(PlayerManager pm, TurnManager tm)
 	{
+		sizeh = (TILEH + PADH) * x + MARGIN * 2 - PADH;
+		sizev = (TILEV + PADV) * y + MARGIN * 2 - PADV;
+		paths = new HashMap<Fleet, Path>();
+		tiles = new HashMap<Space, Label>();
+		TMui = (TurnManagerUI) tm;
+		
 		super.setup(pm, tm);
-		TMui = tm;
 
+		
+		tilePane.setPrefColumns(x);
+		tilePane.setPrefRows(y);
+		tilePane.setMaxSize(sizeh, sizev);
+		bgPane.setPrefSize(sizeh, sizev);
+		pane.setMaxWidth(sizeh);
+		
 		tilePane.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
 			@Override
@@ -117,6 +126,7 @@ public class PlanetManagerUI extends PlanetManager
 	public void spawnPlanets()
 	{
 		super.spawnPlanets();
+		tilePane.getChildren().clear();
 
 		for (int i = 0; i < len; i++)
 		{
@@ -240,9 +250,9 @@ public class PlanetManagerUI extends PlanetManager
 			@Override
 			public void handle(MouseEvent event)
 			{
-				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX(), l.getLayoutBounds().getMaxY());
+				Point2D pnt = l.localToScreen(l.getLayoutBounds().getMaxX(), l.getLayoutBounds().getMinY());
 				p.getTooltip().show(l, pnt.getX() + 10, pnt.getY());
-				addFleetPaths(p);
+				showFleetPaths(p);
 			}
 		});
 
@@ -253,49 +263,55 @@ public class PlanetManagerUI extends PlanetManager
 			public void handle(MouseEvent event)
 			{
 				p.getTooltip().hide();
-				removeFleetPaths(p);
+				hideFleetPaths(p);
 			}
 		});
 	}
 
 	/**
-	 * shows lines for active fleets
+	 * shows lines for active fleets at the given planet
 	 * 
 	 * @param f
 	 * @param o
 	 * @param d
 	 */
-	public void addFleetPaths(Planet p)
+	public void showFleetPaths(Planet p)
 	{
 		for (Fleet f : TM.getFleets())
 		{
-			if (f.getDestination() == p && !lines.containsKey(f))
+			if (f.getDestination() == p && !paths.containsKey(f))
 			{
 				Displacement d = p.getPosition();
 				Displacement e = f.getDisplacement();
-				Line l = new Line(d.getWorldX(), d.getWorldY(), d.getWorldX() - e.getWorldX(), d.getWorldY() - e.getWorldY());
-				l.setStrokeWidth(2);
-				l.setStroke(Color.YELLOW);
-				l.setOpacity(0.8);
-				l.getStrokeDashArray().addAll(1d, 5d);
+				Line l = new Line(d.getWorldX(), d.getWorldY(), d.subtract(e).getWorldX(), d.subtract(e).getWorldY());
+				Path a = GfxHelper.makeArrowHeadLinear(l, 0);
+				
+				a.getElements().add(new MoveTo(l.getStartX(), l.getStartY()));
+				a.getElements().add(new LineTo(l.getEndX(), l.getEndY()));
+				a.setStrokeWidth(2);
+				a.setStroke(Color.WHITE);
+				a.setSmooth(true);
 
-				System.out.printf("%f, %f\n", p.getPosition().getX(), p.getPosition().getY());
-				System.out.printf("%f, %f\n", p.getPosition().getWorldX(), p.getPosition().getWorldY());
-
-				lines.put(f, l);
-				pane.getChildren().add(l);
+				paths.put(f, a);
+				pane.getChildren().add(a);
+				//pane.getChildren().add(1, a);
 			}
 		}
 	}
 
-	public void removeFleetPaths(Planet p)
+	/**
+	 * hide all active fleets for the given planet
+	 * 
+	 * @param p
+	 */
+	public void hideFleetPaths(Planet p)
 	{
 		for (Fleet f : TM.getFleets())
 		{
 			if (f.getDestination() == p)
 			{
-				pane.getChildren().remove(lines.get(f));
-				lines.remove(f);
+				pane.getChildren().remove(paths.get(f));
+				paths.remove(f);
 			}
 		}
 	}
@@ -304,7 +320,7 @@ public class PlanetManagerUI extends PlanetManager
 	{
 		GridPane miniTilePane = new GridPane();
 		miniTilePane.setStyle("-fx-background-color: black;");
-		
+
 		for (Planet p : planets.values())
 		{
 			Label l = new Label();

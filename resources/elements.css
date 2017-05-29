@@ -1,5 +1,19 @@
+.advanced-settings {
+	-fx-background-color: white;
+	-fx-padding: 15;
+}
+
+
+
+
+
+
+
+
+
+
+
 .scene {
-	-fx-background-color: black;
 	-fx-padding: 2px;
 	-fx-background-image: url("backgroundmain.jpg");
 	-fx-background-opacity: 0.3;
@@ -126,7 +140,6 @@
 .turn-bar {
 	-fx-background-color: #0c4422;
 	-fx-padding: 5;
-	-fx-alignment: center;
 	-fx-effect: innershadow(gaussian, #051c0a, 12, 0.2, 0, 0);
 }
 
@@ -229,15 +242,15 @@
 	-fx-background-color: #10260e;
 }
 
-.turn-bar-button:action {
+.turn-bar-button:pressed {
 	-fx-background-insets: 0 1 1 0, 1 0 0 1, 1;
 	-fx-background-color: #557752;
 }
-
+/*
 .turn-bar-button:focused {
 	-fx-background-insets: 0, 1, 2;
 	-fx-border-color: lightblue;
-}
+}*/
 
 
 /* PLAYER COLORS */

@@ -43,4 +43,9 @@ public class SetupManager
 		return CM;
 	}
 
+	public void startGame()
+	{
+		PG.setup(PM, TM);
+	}
+
 }
