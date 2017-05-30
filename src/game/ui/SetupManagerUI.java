@@ -1,5 +1,7 @@
 package game.ui;
 
+import javax.swing.GroupLayout.Alignment;
+
 import game.managers.ConfigManager;
 import game.managers.PlayerManager;
 import game.managers.SetupManager;
@@ -63,14 +65,14 @@ public class SetupManagerUI extends SetupManager
 		labelDsh = new Label(),
 		labelIpr = new Label(),
 		labelSsc = new Label();
-	private Spinner<Double> tfNpm = new Spinner<>(),
-		tfPdb = new Spinner<>();
-	private Spinner<Integer> tfIpr = new Spinner<>(),
-		tfSsc = new Spinner<>();
+	private Spinner<Double> sNpm = new Spinner<>(),
+		sPdb = new Spinner<>();
+	private Spinner<Integer> sIpr = new Spinner<>(),
+		sSsc = new Spinner<>();
 	private RadioButton rbNsv = new RadioButton();
 	private ObservableList<String> cbDshOptions = FXCollections.observableArrayList("Destroyer", "Fighter", "Bomber");
 	private ComboBox<String> cbDsh = new ComboBox<>(cbDshOptions);
-	
+
 	private final int height = 30, spacing = 10;
 
 	/*
@@ -91,16 +93,18 @@ public class SetupManagerUI extends SetupManager
 
 	public void makeUI()
 	{
-		setupPane.setCenter(tabPane);
+		setupPane.setLeft(tabPane);
 		setupPane.setRight(gridSettings);
 		setupPane.setBottom(btnStart);
 
 		btnStart.setOnMouseClicked(event -> startGame());
+		btnStart.setMinHeight(height);
 		tabPane.getTabs().addAll(playerTab, advancedTab);
 
 		gridSettings.setTop(gridFields);
 		gridSettings.setCenter(gridVisual);
 		gridFields.getChildren().addAll(labelGx, sGx, labelGy, sGy, labelPd, sPd);
+		gridFields.setSpacing(spacing);
 
 		playerTab.setContent(playerSettings);
 		playerTab.setClosable(false);
@@ -114,13 +118,13 @@ public class SetupManagerUI extends SetupManager
 
 		advancedSettings.getChildren().addAll(advancedColLeft, advancedColRight);
 		advancedColLeft.getChildren().addAll(labelNpm, labelPdb, labelNsv, labelDsh, labelIpr, labelSsc);
-		advancedColRight.getChildren().addAll(tfNpm, tfPdb, rbNsv, cbDsh, tfIpr, tfSsc);
+		advancedColRight.getChildren().addAll(sNpm, sPdb, rbNsv, cbDsh, sIpr, sSsc);
 
 		advancedSettings.setSpacing(spacing);
 		advancedSettings.getStyleClass().add("advanced-settings");
 		advancedColLeft.setSpacing(spacing);
 		advancedColRight.setSpacing(spacing);
-		
+
 		labelGx.setText("x");
 		labelGy.setText("y");
 		labelPd.setText("density");
@@ -130,12 +134,24 @@ public class SetupManagerUI extends SetupManager
 		labelDsh.setText("default ship");
 		labelIpr.setText("initial production");
 		labelSsc.setText("ship start count");
-		
-		Control[] sizingElements = new Control[] { labelNpm, labelPdb, labelNsv, labelDsh, labelIpr, labelSsc, tfNpm, tfPdb, tfIpr, tfSsc, rbNsv, cbDsh };
+
+		Control[] sizingElements = new Control[] {
+			labelNpm, labelPdb, labelNsv, labelDsh, labelIpr,
+			labelSsc, sNpm, sPdb, sIpr, sSsc, rbNsv, cbDsh,
+			labelGx, labelGy, labelPd, sGx, sGy, sPd };
+
 		for (Control n : sizingElements)
 		{
 			n.setMinHeight(height);
 			n.setMaxHeight(height);
+		}
+
+		Control[] spinnerElements = new Control[] {
+			sGx, sGy, sPd, sNpm, sPdb, sIpr, sSsc };
+		
+		for (Control n : spinnerElements)
+		{
+			n.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		}
 
 		SpinnerValueFactory<Integer> factoryGx = new SpinnerValueFactory.IntegerSpinnerValueFactory(
@@ -144,8 +160,6 @@ public class SetupManagerUI extends SetupManager
 			CM.minGridY, CM.maxGridY, CM.defaultGridY);
 		SpinnerValueFactory<Double> factoryPd = new SpinnerValueFactory.DoubleSpinnerValueFactory(
 			0.0, 1.0, CM.planetDensity, 0.05);
-
-		//Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL
 
 		sGx.setValueFactory(factoryGx);
 		sGy.setValueFactory(factoryGy);
@@ -160,10 +174,10 @@ public class SetupManagerUI extends SetupManager
 		SpinnerValueFactory<Integer> factorySsc = new SpinnerValueFactory.IntegerSpinnerValueFactory(
 			0, CM.cmaxShipStartCount, CM.shipStartCount);
 
-		tfNpm.setValueFactory(factoryNpm);
-		tfPdb.setValueFactory(factoryPdb);
-		tfIpr.setValueFactory(factoryIpr);
-		tfSsc.setValueFactory(factorySsc);
+		sNpm.setValueFactory(factoryNpm);
+		sPdb.setValueFactory(factoryPdb);
+		sIpr.setValueFactory(factoryIpr);
+		sSsc.setValueFactory(factorySsc);
 		rbNsv.setSelected(CM.neutralShipsVisible);
 		cbDsh.setValue(cbDshOptions.get(0));
 
@@ -179,7 +193,7 @@ public class SetupManagerUI extends SetupManager
 	public void setup()
 	{
 		super.setup();
-		
+
 		rootPane.getChildren().add(setupPane);
 		gridVisual = getPlanetManager().getMiniPane();
 	}
