@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
+import game.managers.PlayerManager.Controller;
 import game.players.Player;
 import game.tiles.Planet;
 import game.tiles.Space;
@@ -27,6 +28,10 @@ public class PlanetManager
 	public PlanetManager(ConfigManager CM)
 	{
 		this.CM = CM;
+		this.x = CM.gridX;
+		this.y = CM.gridY;
+		this.density = CM.planetDensity;
+		this.len = x * y;
 	}
 
 	/**
@@ -34,10 +39,6 @@ public class PlanetManager
 	 */
 	public void setup(PlayerManager pm, TurnManager tm)
 	{
-		this.x = CM.gridX;
-		this.y = CM.gridY;
-		this.density = CM.planetDensity;
-		this.len = x * y;
 		
 		TM = tm;
 		PM = pm;
@@ -45,7 +46,7 @@ public class PlanetManager
 		spawnPlanets();
 		setStartPlanets();
 	}
-
+	
 	/**
 	 * puts planets in the grid and associates them with buttons
 	 */
@@ -79,21 +80,20 @@ public class PlanetManager
 	public void setStartPlanets()
 	{
 		// make a list of planets to choose from
-		int numPlayers = CM.numPlayers;
 		Planet[] planetArray = getPlanetArray();
 
 		// make a list denoting each of the planets
 		List<Integer> nums = new ArrayList<>();
 		IntStream.range(0, planets.size()).forEach(i -> nums.add(i));
 
-		while (numPlayers-- > 0)
+		for (int i = 0; i < CM.numHumanPlayers; i++)
 		{
 			// pick a random value from the planet array
 			int r = ThreadLocalRandom.current().nextInt(nums.size());
 			int pick = nums.remove(r);
 			Planet p = planetArray[pick];
 
-			setPlanetOwner(PM.getPlayer(numPlayers), p);
+			setPlanetOwner(PM.getPlayersOfType(Controller.HUMAN)[i], p);
 			p.setProduction(CM.defaultShip, CM.initialProduction);
 			p.addShips(CM.defaultShip, CM.shipStartCount);
 		}

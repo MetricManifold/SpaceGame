@@ -3,6 +3,15 @@
 	-fx-padding: 15;
 }
 
+.grid-settings {
+	-fx-background-color: lightgray;
+	-fx-background-radius: 10px;
+}
+
+.tab-pane {
+	-fx-background-radius: 10px;
+	-fx-background-color: lightgray;
+}
 
 
 

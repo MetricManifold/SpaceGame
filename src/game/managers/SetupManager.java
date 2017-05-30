@@ -11,16 +11,15 @@ public class SetupManager
 	public SetupManager()
 	{
 		CM = new ConfigManager();
-
-		PM = new PlayerManager(CM);
-		PG = new PlanetManager(CM);
-		TM = new TurnManager(CM);
 	}
 
 	public void setup()
 	{
+		PM = new PlayerManager(CM);
+		PG = new PlanetManager(CM);
+		TM = new TurnManager(CM);
+		
 		PG.setup(PM, TM);
-		TM.setup(PM, PG);
 	}
 	
 	public PlayerManager getPlayerManager()
@@ -45,7 +44,13 @@ public class SetupManager
 
 	public void startGame()
 	{
-		PG.setup(PM, TM);
+		setup();
+		TM.setup(PM, PG);
 	}
 
+	public void populatePlayers()
+	{
+		
+	}
+	
 }

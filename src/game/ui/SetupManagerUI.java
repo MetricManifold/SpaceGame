@@ -1,12 +1,15 @@
 package game.ui;
 
-import javax.swing.GroupLayout.Alignment;
-
+import java.util.ArrayList;
 import game.managers.ConfigManager;
 import game.managers.PlayerManager;
+import game.managers.PlayerManager.Controller;
 import game.managers.SetupManager;
+import game.managers.ConfigManager.ShipType;
+import game.players.Player;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -26,7 +29,7 @@ import javafx.scene.layout.VBox;
 
 public class SetupManagerUI extends SetupManager
 {
-	private Pane rootPane;
+	private BorderPane rootPane;
 	private BorderPane setupPane = new BorderPane();
 	private VBox gamePane = new VBox();
 	private TabPane tabPane = new TabPane();
@@ -70,22 +73,20 @@ public class SetupManagerUI extends SetupManager
 	private Spinner<Integer> sIpr = new Spinner<>(),
 		sSsc = new Spinner<>();
 	private RadioButton rbNsv = new RadioButton();
-	private ObservableList<String> cbDshOptions = FXCollections.observableArrayList("Destroyer", "Fighter", "Bomber");
-	private ComboBox<String> cbDsh = new ComboBox<>(cbDshOptions);
+	private ObservableList<ShipType> cbDshOptions = FXCollections.observableArrayList(ShipType.DESTROYER, ShipType.FIGHTER, ShipType.BOMBER);
+	private ComboBox<ShipType> cbDsh = new ComboBox<>(cbDshOptions);
 
-	private final int height = 30, spacing = 10;
+	private static final int HEIGHT = 30, SPACING = 10, PADDING = 10;
 
 	/*
 	 * start button
 	 */
+	private VBox bottomBox = new VBox();
 	private Button btnStart = new Button("Start");
 
-	public SetupManagerUI(Pane rootPane)
+	public SetupManagerUI(BorderPane rootPane)
 	{
 		CM = new ConfigManager();
-		PM = new PlayerManager(CM);
-		PG = new PlanetManagerUI(CM);
-		TM = new TurnManagerUI(CM);
 
 		this.rootPane = rootPane;
 		makeUI();
@@ -93,18 +94,29 @@ public class SetupManagerUI extends SetupManager
 
 	public void makeUI()
 	{
+		Insets pad = new Insets(PADDING, PADDING, PADDING, PADDING);
+		
 		setupPane.setLeft(tabPane);
 		setupPane.setRight(gridSettings);
-		setupPane.setBottom(btnStart);
+		setupPane.setBottom(bottomBox);
+		setupPane.setPadding(pad);
 
-		btnStart.setOnMouseClicked(event -> startGame());
-		btnStart.setMinHeight(height);
+		tabPane.setPadding(pad);
+		gridSettings.setPadding(pad);
+		bottomBox.setPadding(pad);
+		
+		btnStart.setOnMouseClicked(e -> startGame());
+		btnStart.setMinHeight(HEIGHT);
+		bottomBox.getChildren().add(btnStart);
+		
 		tabPane.getTabs().addAll(playerTab, advancedTab);
+		tabPane.getStyleClass().add("tab-pane");
 
 		gridSettings.setTop(gridFields);
 		gridSettings.setCenter(gridVisual);
+		gridSettings.getStyleClass().add("grid-settings");
 		gridFields.getChildren().addAll(labelGx, sGx, labelGy, sGy, labelPd, sPd);
-		gridFields.setSpacing(spacing);
+		gridFields.setSpacing(SPACING);
 
 		playerTab.setContent(playerSettings);
 		playerTab.setClosable(false);
@@ -117,13 +129,13 @@ public class SetupManagerUI extends SetupManager
 		advancedTab.setText("advanced");
 
 		advancedSettings.getChildren().addAll(advancedColLeft, advancedColRight);
+		advancedSettings.setSpacing(SPACING);
+		advancedSettings.getStyleClass().add("advanced-settings");
+		
 		advancedColLeft.getChildren().addAll(labelNpm, labelPdb, labelNsv, labelDsh, labelIpr, labelSsc);
 		advancedColRight.getChildren().addAll(sNpm, sPdb, rbNsv, cbDsh, sIpr, sSsc);
-
-		advancedSettings.setSpacing(spacing);
-		advancedSettings.getStyleClass().add("advanced-settings");
-		advancedColLeft.setSpacing(spacing);
-		advancedColRight.setSpacing(spacing);
+		advancedColLeft.setSpacing(SPACING);
+		advancedColRight.setSpacing(SPACING);
 
 		labelGx.setText("x");
 		labelGy.setText("y");
@@ -142,22 +154,22 @@ public class SetupManagerUI extends SetupManager
 
 		for (Control n : sizingElements)
 		{
-			n.setMinHeight(height);
-			n.setMaxHeight(height);
+			n.setMinHeight(HEIGHT);
+			n.setMaxHeight(HEIGHT);
 		}
 
 		Control[] spinnerElements = new Control[] {
 			sGx, sGy, sPd, sNpm, sPdb, sIpr, sSsc };
-		
+
 		for (Control n : spinnerElements)
 		{
 			n.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		}
 
 		SpinnerValueFactory<Integer> factoryGx = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-			CM.minGridX, CM.maxGridX, CM.defaultGridX);
+			CM.minGridX, CM.maxGridX, CM.gridX);
 		SpinnerValueFactory<Integer> factoryGy = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-			CM.minGridY, CM.maxGridY, CM.defaultGridY);
+			CM.minGridY, CM.maxGridY, CM.gridY);
 		SpinnerValueFactory<Double> factoryPd = new SpinnerValueFactory.DoubleSpinnerValueFactory(
 			0.0, 1.0, CM.planetDensity, 0.05);
 
@@ -179,12 +191,11 @@ public class SetupManagerUI extends SetupManager
 		sIpr.setValueFactory(factoryIpr);
 		sSsc.setValueFactory(factorySsc);
 		rbNsv.setSelected(CM.neutralShipsVisible);
-		cbDsh.setValue(cbDshOptions.get(0));
+		cbDsh.setValue(CM.defaultShip);
 
 		gamePane.setSpacing(3);
 		gamePane.setAlignment(Pos.CENTER);
 		gamePane.getStyleClass().add("vbox-main");
-		gamePane.getChildren().addAll(getTurnManager().getPane(), getPlanetManager().getPane());
 
 		rootPane.getStyleClass().add("scene");
 	}
@@ -192,10 +203,17 @@ public class SetupManagerUI extends SetupManager
 	@Override
 	public void setup()
 	{
-		super.setup();
+		PM = new PlayerManager(CM);
+		PG = new PlanetManagerUI(CM);
+		TM = new TurnManagerUI(CM);
+		
+		PG.setup(PM, TM);
 
-		rootPane.getChildren().add(setupPane);
+		playerList = FXCollections.observableList(new ArrayList<Node>());
+		rootPane.setCenter(setupPane);
 		gridVisual = getPlanetManager().getMiniPane();
+
+		populatePlayers();
 	}
 
 	@Override
@@ -223,9 +241,33 @@ public class SetupManagerUI extends SetupManager
 	@Override
 	public void startGame()
 	{
-		super.startGame();
+		CM.gridX = sGx.getValue();
+		CM.gridY = sGy.getValue();
+		CM.planetDensity = sPd.getValue();
+		CM.neutralProdModifier = sNpm.getValue();
+		CM.planetDefenderBonus = sPdb.getValue();
+		CM.initialProduction = sIpr.getValue();
+		CM.shipStartCount = sSsc.getValue();
+		CM.neutralShipsVisible = rbNsv.isSelected();
+		CM.defaultShip = cbDsh.getValue();
 
-		rootPane.getChildren().remove(setupPane);
-		rootPane.getChildren().add(gamePane);
+		super.startGame();
+		
+		gamePane.getChildren().addAll(getTurnManager().getPane(), getPlanetManager().getPane());
+		rootPane.setCenter(gamePane);
 	}
+
+	@Override
+	public void populatePlayers()
+	{
+		playerList.clear();
+		
+		super.populatePlayers();
+		for (Player p : PM.getPlayersOfType(Controller.HUMAN))
+		{
+			Label lbl = new Label(p.getName());
+			playerList.add(lbl);
+		}
+	}
+
 }

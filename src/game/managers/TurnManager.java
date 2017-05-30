@@ -39,8 +39,6 @@ public class TurnManager
 	/**
 	 * activate the next turn
 	 * 
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
 	 */
 	public void nextTurn()
 	{
@@ -95,9 +93,8 @@ public class TurnManager
 	 * send the given number of ships
 	 * 
 	 * @param num
-	 * @throws Exception
 	 */
-	public void sendShips(int num) throws Exception
+	public void sendShips(int num)
 	{
 		Player p = PM.getCurrentPlayer();
 		Fleet f = new Fleet(CM.defaultShip, num, p);
@@ -109,7 +106,7 @@ public class TurnManager
 				Planet o = p.getOrigin();
 				Planet d = p.getDestination();
 
-				o.getShipInventory().remove(f);
+				o.getShipInventory().remove(CM.defaultShip, num);
 				f.send(o, d);
 				fleets.add(f);
 			}

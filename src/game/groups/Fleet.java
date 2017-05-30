@@ -9,6 +9,7 @@ import java.util.Set;
 import game.entities.Ship;
 import game.helpers.Displacement;
 import game.helpers.PointerDoubleMatrix;
+import game.managers.ConfigManager.ShipType;
 import game.managers.PlanetManager;
 import game.players.Player;
 import game.tiles.Planet;
@@ -31,7 +32,7 @@ public class Fleet extends ShipGroup
 		this.owner = owner;
 	}
 
-	public Fleet(Class<? extends Ship> type, int num, Player owner)
+	public Fleet(ShipType type, int num, Player owner)
 	{
 		super(type, num);
 		this.owner = owner;
@@ -74,8 +75,6 @@ public class Fleet extends ShipGroup
 	 * 
 	 * @param pm
 	 * @throws Exception
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
 	 */
 	public void update(PlanetManager pm) throws Exception
 	{
@@ -139,14 +138,12 @@ public class Fleet extends ShipGroup
 	 * 
 	 * @param defender
 	 * @param defenderBonus
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
 	 */
 	public void attack(ShipGroup defender, double defenderBonus) throws Exception
 	{
-		Set<Class<? extends Ship>> allTypes = new HashSet<>(ships.keySet());
+		Set<ShipType> allTypes = new HashSet<>(ships.keySet());
 		allTypes.addAll(defender.ships.keySet());
-		List<Class<? extends Ship>> allTypesList = new ArrayList<>(allTypes);
+		List<ShipType> allTypesList = new ArrayList<>(allTypes);
 		int tn = allTypesList.size();
 
 		double iniHpA = getTotalHealth();
@@ -170,8 +167,8 @@ public class Fleet extends ShipGroup
 
 		for (int i = 0; i < tn; i++)
 		{
-			Class<? extends Ship> t = allTypesList.get(i);
-			Ship s = t.newInstance();
+			ShipType t = allTypesList.get(i);
+			Ship s = t.getInstance();
 
 			h_a.set(0, i, getCount(t) * s.health);
 			h_b.set(0, i, defender.getCount(t) * s.health);
@@ -224,8 +221,8 @@ public class Fleet extends ShipGroup
 
 		for (int i = 0; i < tn; i++)
 		{
-			Class<? extends Ship> t = allTypesList.get(i);
-			Ship s = t.newInstance();
+			ShipType t = allTypesList.get(i);
+			Ship s = t.getInstance();
 
 			if (h_a.get(0, i).v > 0)
 			{

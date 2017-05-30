@@ -1,7 +1,7 @@
 package test.groups;
 
-import game.entities.Destroyer;
 import game.groups.*;
+import game.managers.ConfigManager.ShipType;
 import game.managers.PlayerManager.Controller;
 import game.players.Player;
 import junit.framework.TestCase;
@@ -21,8 +21,8 @@ public class TestFleet extends TestCase
 	
 	public void testAttack() throws Exception
 	{
-		attacker.add(Destroyer.class, 10000);
-		defender.add(Destroyer.class, 10000);
+		attacker.add(ShipType.DESTROYER, 10000);
+		defender.add(ShipType.DESTROYER, 10000);
 		attacker.attack(defender, 1.12);
 		
 		boolean success = true;

@@ -8,7 +8,6 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -24,7 +23,7 @@ public class WindowManager extends Application
 	private static final int SPLASH_WIDTH = 660, SPLASH_HEIGHT = 360, LOGO_WIDTH = SPLASH_WIDTH - 80;
 	private Stage primaryStage;
 	private BorderPane splashPane;
-	private Pane mainPane;
+	private BorderPane mainPane;
 
 	@Override
 	public void init()
@@ -42,7 +41,7 @@ public class WindowManager extends Application
 	}
 
 	@Override
-	public void start(final Stage initStage) throws Exception
+	public void start(final Stage initStage)
 	{
 		showSplash(initStage);
 
@@ -60,9 +59,8 @@ public class WindowManager extends Application
 	 * show the splash screen on startup
 	 * 
 	 * @param initStage
-	 * @throws Exception
 	 */
-	private void showSplash(Stage initStage) throws Exception
+	private void showSplash(Stage initStage)
 	{
 		Scene splash = new Scene(splashPane);
 		initStage.initStyle(StageStyle.UNDECORATED);
@@ -81,7 +79,7 @@ public class WindowManager extends Application
 	private void startGame()
 	{
 		primaryStage = new Stage(StageStyle.DECORATED);
-		mainPane = new Pane();
+		mainPane = new BorderPane();
 		
 		scene = new Scene(mainPane);
 		scene.getStylesheets().add("elements.css");

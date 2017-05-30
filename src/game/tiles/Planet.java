@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import game.entities.Ship;
 import game.groups.Fleet;
 import game.groups.ShipInventory;
 import game.helpers.Displacement;
 import game.managers.ConfigManager;
+import game.managers.ConfigManager.ShipType;
 import game.players.Player;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
@@ -18,13 +18,13 @@ import javafx.scene.text.TextFlow;
 public class Planet extends Space
 {
 	// production per turn and ships
-	protected Map<Class<? extends Ship>, Integer> production;
+	protected Map<ShipType, Integer> production;
 	protected ShipInventory ships;
 	protected String name;
 	protected Player owner;
 	protected boolean displayShips = true;
 	protected double defenderBonus;
-	protected Class<? extends Ship> defaultShip;
+	protected ShipType defaultShip;
 
 	public Planet(Displacement pos, ConfigManager cm)
 	{
@@ -34,6 +34,7 @@ public class Planet extends Space
 		this.ships = new ShipInventory();
 		this.owner = null;
 		this.defaultShip = cm.defaultShip;
+		this.defenderBonus = cm.planetDefenderBonus;
 		
 		production.put(defaultShip, ThreadLocalRandom.current().nextInt(cm.minProduction, cm.maxProduction));
 	}
@@ -48,7 +49,7 @@ public class Planet extends Space
 	 * 
 	 * @return
 	 */
-	public Map<Class<? extends Ship>, Integer> getProduction()
+	public Map<ShipType, Integer> getProduction()
 	{
 		return production;
 	}
@@ -81,7 +82,7 @@ public class Planet extends Space
 	 * @param num
 	 *            number of ships
 	 */
-	public void addShips(Class<? extends Ship> type, int num)
+	public void addShips(ShipType type, int num)
 	{
 		ships.add(type, num);
 	}
@@ -91,7 +92,7 @@ public class Planet extends Space
 	 * 
 	 * @param type
 	 */
-	public void produceShips(Class<? extends Ship> type)
+	public void produceShips(ShipType type)
 	{
 		ships.add(type, production.get(type));
 	}
@@ -140,9 +141,9 @@ public class Planet extends Space
 	 */
 	public void setOwner(Player owner)
 	{
-		if (owner != null)
+		if (this.owner != null)
 		{
-			owner.removePlanet(this);
+			this.owner.removePlanet(this);
 		}
 		
 		this.owner = owner;
@@ -164,7 +165,7 @@ public class Planet extends Space
 	 * 
 	 * @param production
 	 */
-	public void setProduction(Class<? extends Ship> type, int production)
+	public void setProduction(ShipType type, int production)
 	{
 		this.production.put(type, production);
 	}

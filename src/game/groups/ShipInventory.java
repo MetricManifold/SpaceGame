@@ -2,6 +2,7 @@ package game.groups;
 
 import java.util.List;
 import game.entities.Ship;
+import game.managers.ConfigManager.ShipType;
 
 public class ShipInventory extends ShipGroup
 {
@@ -16,7 +17,7 @@ public class ShipInventory extends ShipGroup
 		super(s);
 	}
 
-	public ShipInventory(Class<? extends Ship> type, int num)
+	public ShipInventory(ShipType type, int num)
 	{
 		super(type, num);
 	}
@@ -32,7 +33,7 @@ public class ShipInventory extends ShipGroup
 	 * @param type
 	 * @return
 	 */
-	public ShipInventory getAll(Class<? extends Ship> type)
+	public ShipInventory getAll(ShipType type)
 	{
 		return new ShipInventory(ships.get(type));
 	}

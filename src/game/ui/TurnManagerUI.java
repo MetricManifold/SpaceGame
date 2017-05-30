@@ -89,8 +89,6 @@ public class TurnManagerUI extends TurnManager
 
 		enableSend(false);
 		makeUI();
-
-		System.out.println("finished toolbar");
 	}
 
 	/**
@@ -171,8 +169,8 @@ public class TurnManagerUI extends TurnManager
 		PGui = (PlanetManagerUI) pg;
 
 		pane.setMinWidth(MIN_WIDTH);
-		pane.prefWidthProperty().bind(PGui.pane.widthProperty());
-		pane.maxWidthProperty().bind(PGui.pane.widthProperty());
+		pane.setPrefWidth(pg.getSizeX());
+		pane.setMaxWidth(pg.getSizeX());
 
 		updatePlayerLabel();
 
@@ -447,7 +445,7 @@ public class TurnManagerUI extends TurnManager
 	}
 
 	@Override
-	public void sendShips(int num) throws Exception
+	public void sendShips(int num)
 	{
 		super.sendShips(num);
 		updatePlayerPlanetList();

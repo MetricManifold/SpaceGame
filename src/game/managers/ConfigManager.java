@@ -4,15 +4,74 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import game.entities.Bomber;
 import game.entities.Destroyer;
+import game.entities.Fighter;
 import game.entities.Ship;
 
 public class ConfigManager
 {
+	public enum ShipType
+	{
+		GENERIC(), DESTROYER(Destroyer.class), FIGHTER(Fighter.class), BOMBER(Bomber.class);
+
+		public Class<? extends Ship> type;
+		public String name;
+		private Ship instance = null;
+
+		ShipType()
+		{
+			type = null;
+			name = null;
+		}
+
+		ShipType(Class<? extends Ship> type)
+		{
+			this.type = type;
+
+			if (type == Destroyer.class)
+				name = "Destroyer";
+			else if (type == Fighter.class)
+				name = "Fighter";
+			else if (type == Bomber.class)
+				name = "Bomber";
+		}
+
+		@Override
+		public String toString()
+		{
+			return name;
+		}
+
+		public Ship getInstance()
+		{
+			if (instance == null)
+			{
+				try
+				{
+					if (type == null)
+					{
+						instance = null;
+					}
+					else
+					{
+						instance = type.newInstance();
+					}
+				}
+				catch (InstantiationException | IllegalAccessException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			return instance;
+		}
+
+	};
+
 	public int shipStartCount = 10,
 		initialProduction = 10, maxProduction = 30, minProduction = 5,
 		cmaxProduction = 9999, cmaxShipStartCount = 9999999,
-		numPlayers = 2, maxPlayers = 14,
+		numHumanPlayers = 1, maxHumanPlayers = 14,
 		gridX = 25, gridY = 10,
 		minGridX = 2, minGridY = 2,
 		maxGridX = 30, maxGridY = 30,
@@ -25,16 +84,15 @@ public class ConfigManager
 		cminPlanetDefenderBonus = 0.00, cmaxPlanetDefenderBonus = 2.00;
 
 	public boolean neutralShipsVisible = false;
-	public Class<? extends Ship> defaultShip = Destroyer.class;
+	public ShipType defaultShip = ShipType.DESTROYER;
 
 	public final String[] COLORS = {
 		"white", "red", "blue", "orange", "teal", "purple",
 		"pink", "gray", "yellow", "darkblue", "green",
 		"lightgreen", "lightblue", "brown" };
 
-	public final String[] 
-		NAMES_PRE = { "Bara-", "Qual'", "Ban'Da-", "Ki'", "Muan'",
-			"El ", "Governorate of ", "Em ", "Fex-", "Ruins of " },
+	public final String[] NAMES_PRE = { "Bara-", "Qual'", "Ban'Da-", "Ki'", "Muan'",
+		"El ", "Governorate of ", "Em ", "Fex-", "Ruins of " },
 		NAMES = { "Tor", "Zora", "Selenium", "Utrazym", "Tooh", "Hok", "Ytvanix", "Xerxes",
 			"Rossya", "Beluvky", "Keztelim", "Ferenz", "Zork", "Zelenium", "Hercules",
 			"Uttica", "Calaman", "Kataman", "Waldin", "Soris", "Xirix", "Ethnor", "Lesnos",

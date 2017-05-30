@@ -1,5 +1,9 @@
 package game.managers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import game.groups.ShipGroup;
 import game.players.Player;
 
@@ -14,7 +18,7 @@ public class PlayerManager
 	private int playerIndex = 1;
 	private Player[] players;
 	public final Player neutral;
-	
+
 	protected ConfigManager CM;
 
 	public enum Controller
@@ -25,12 +29,13 @@ public class PlayerManager
 	public PlayerManager(ConfigManager CM)
 	{
 		this.CM = CM;
-		int numPlayers = CM.numPlayers;
+		int numPlayers = CM.numHumanPlayers + 1;
 
 		players = new Player[numPlayers];
 		neutral = new Player(0, CM.COLORS[0], Controller.NEUTRAL);
 
-		for (int i = 0; i < numPlayers; i++)
+		players[0] = neutral;
+		for (int i = 1; i < numPlayers; i++)
 		{
 			players[i] = new Player(i, CM.COLORS[i], Controller.HUMAN);
 		}
@@ -40,7 +45,7 @@ public class PlayerManager
 	{
 		do
 		{
-			playerIndex = playerIndex % (CM.numPlayers - 1) + 1;
+			playerIndex = playerIndex % getNumPlayersOfType(Controller.HUMAN) + 1;
 		} while (!players[playerIndex].isAlive() && getNumPlayersOfType(Controller.HUMAN) > 0);
 	}
 
@@ -76,7 +81,7 @@ public class PlayerManager
 	{
 		return players[index];
 	}
-	
+
 	public int getNumPlayersOfType(Controller c)
 	{
 		int num = 0;
@@ -87,7 +92,28 @@ public class PlayerManager
 				num++;
 			}
 		}
-		
+
 		return num;
 	}
+
+	public Player[] getPlayersOfType(Controller c)
+	{
+		List<Player> list = new ArrayList<>(Arrays.asList(players));
+		list.removeIf(p -> p.getController() != c);
+
+		return list.toArray(new Player[] {});
+	}
+	
+	public Player[] getPlayers()
+	{
+		return players;
+	}
 }
+
+
+
+
+
+
+
+
