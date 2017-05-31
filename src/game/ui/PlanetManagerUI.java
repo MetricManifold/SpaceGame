@@ -36,22 +36,21 @@ public class PlanetManagerUI extends PlanetManager
 		NUM_P_BG = 10, NUM_B_BG = 4,
 		MARGIN = 5, TOPMARGIN = 2;
 
+	protected static double MINI_SCALE = 0.6;
+	protected double zoom;
+
 	// planets and corresponding buttons
 	protected Map<Space, Label> tiles;
 	protected Map<Fleet, Path> paths;
 
 	protected Pane pane, bgPane;
+	protected GridPane miniPane;
 	protected TilePane tilePane;
 	protected TurnManagerUI TMui;
 
 	public PlanetManagerUI(ConfigManager CM)
 	{
 		super(CM);
-
-		pane = new Pane();
-		bgPane = new Pane();
-		tilePane = new TilePane(Orientation.HORIZONTAL);
-
 		makeUI();
 	}
 
@@ -60,18 +59,19 @@ public class PlanetManagerUI extends PlanetManager
 	 */
 	void makeUI()
 	{
+
 		VBox.setMargin(tilePane, new Insets(TOPMARGIN, 0, 0, 0));
 		pane.getChildren().addAll(bgPane, tilePane);
 
-		tilePane.setHgap(PADH);
-		tilePane.setVgap(PADV);
+		tilePane.setHgap(getPadH());
+		tilePane.setVgap(getPadV());
 
-		tilePane.setPrefTileWidth(TILEH);
-		tilePane.setPrefTileHeight(TILEV);
+		tilePane.setPrefTileWidth(getTileH());
+		tilePane.setPrefTileHeight(getTileV());
 
 		tilePane.setPadding(new Insets(MARGIN, MARGIN, MARGIN, MARGIN));
 		tilePane.setAlignment(Pos.BASELINE_CENTER);
-		
+
 		String bgSelect = String.format("planet-grid%d", ThreadLocalRandom.current().nextInt(NUM_B_BG) + 1);
 		bgPane.getStyleClass().addAll("planet-grid", bgSelect);
 	}
@@ -82,41 +82,63 @@ public class PlanetManagerUI extends PlanetManager
 	@Override
 	public void setup(PlayerManager pm, TurnManager tm)
 	{
-		sizeh = (TILEH + PADH) * x + MARGIN * 2 - PADH;
-		sizev = (TILEV + PADV) * y + MARGIN * 2 - PADV;
-		paths = new HashMap<Fleet, Path>();
-		tiles = new HashMap<Space, Label>();
 		TMui = (TurnManagerUI) tm;
-		
 		super.setup(pm, tm);
 
-		
-		tilePane.setPrefColumns(x);
-		tilePane.setPrefRows(y);
-		tilePane.setMaxSize(sizeh, sizev);
-		bgPane.setPrefSize(sizeh, sizev);
-		pane.setMaxWidth(sizeh);
-		
 		tilePane.setOnMouseClicked(new EventHandler<MouseEvent>()
 		{
 			@Override
 			public void handle(MouseEvent event)
 			{
-				double sx = (event.getX() - MARGIN) / (TILEH + PADH); // 	normalized selected x
-				double sy = (event.getY() - MARGIN) / (TILEV + PADV); // 	normalized selected y
-				int ix = (int) sx; //										integer distance x
-				int iy = (int) sy; //										integer distance y
-				double dx = sx - ix; //										fractional distance x
-				double dy = sy - iy; // 									fractional distance y
+				double sx = (event.getX() - MARGIN) / (getTileH() + getPadH()); // 	normalized selected x
+				double sy = (event.getY() - MARGIN) / (getTileV() + getPadV()); // 	normalized selected y
+				int ix = (int) sx; //		integer distance x
+				int iy = (int) sy; //		integer distance y
+				double dx = sx - ix; //		fractional distance x
+				double dy = sy - iy; // 	fractional distance y
 
 				// check if selection is before padding
-				if (dx < (TILEH + PADH) / PADH && dy < (TILEV + PADV) / PADV)
+				if (dx < (getTileH() + getPadH()) / getPadH() && dy < (getTileV() + getPadV()) / getPadV())
 				{
 					Planet p = planets.get(hashLocation(ix, iy));
 					handleClickPlanet(p);
 				}
 			}
 		});
+	}
+
+	@Override
+	public void reset()
+	{
+		super.reset();
+		updateMiniPane();
+	}
+
+	@Override
+	protected void initialize()
+	{
+		super.initialize();
+
+		if (tilePane == null)
+		{
+			bgPane = new Pane();
+			pane = new Pane();
+			tilePane = new TilePane(Orientation.HORIZONTAL);
+		}
+		else
+		{
+			tilePane.getChildren().clear();
+		}
+
+		zoom = 1.00;
+		paths = new HashMap<Fleet, Path>();
+		tiles = new HashMap<Space, Label>();
+
+		tilePane.setPrefColumns(x);
+		tilePane.setPrefRows(y);
+		tilePane.setMaxSize(getSizeX(), getSizeY());
+		bgPane.setPrefSize(getSizeX(), getSizeY());
+		pane.setMaxWidth(getSizeX());
 	}
 
 	/**
@@ -133,8 +155,8 @@ public class PlanetManagerUI extends PlanetManager
 			Label l = new Label();
 			int hash = hashLocation(i % x, i / x);
 
-			l.setMinSize(TILEH, TILEV);
-			l.setMaxSize(TILEH, TILEV);
+			l.setMinSize(getTileH(), getTileV());
+			l.setMaxSize(getTileH(), getTileV());
 			tilePane.getChildren().add(l);
 
 			Planet p = planets.get(hash);
@@ -283,9 +305,9 @@ public class PlanetManagerUI extends PlanetManager
 			{
 				Displacement d = p.getPosition();
 				Displacement e = f.getDisplacement();
-				Line l = new Line(d.getWorldX(), d.getWorldY(), d.subtract(e).getWorldX(), d.subtract(e).getWorldY());
+				Line l = new Line(d.getWorldX(this), d.getWorldY(this), d.subtract(e).getWorldX(this), d.subtract(e).getWorldY(this));
 				Path a = GfxHelper.makeArrowHeadLinear(l, 0);
-				
+
 				a.getElements().add(new MoveTo(l.getStartX(), l.getStartY()));
 				a.getElements().add(new LineTo(l.getEndX(), l.getEndY()));
 				a.setStrokeWidth(2);
@@ -294,7 +316,6 @@ public class PlanetManagerUI extends PlanetManager
 
 				paths.put(f, a);
 				pane.getChildren().add(a);
-				//pane.getChildren().add(1, a);
 			}
 		}
 	}
@@ -316,44 +337,94 @@ public class PlanetManagerUI extends PlanetManager
 		}
 	}
 
+	public void setZoom(double newZoom)
+	{
+		zoom = newZoom;
+	}
+
 	public Pane getMiniPane()
 	{
-		GridPane miniTilePane = new GridPane();
-		miniTilePane.setStyle("-fx-background-color: black;");
+		if (miniPane == null)
+		{
+			miniPane = new GridPane();
+			miniPane.getStyleClass().add("mini-grid");
+			updateMiniPane();
+
+		}
+
+		return miniPane;
+	}
+
+	protected void updateMiniPane()
+	{
+		if (miniPane == null)
+		{
+			getMiniPane();
+		}
+
+		miniPane.getChildren().clear();
+
+		double pad = MARGIN;
+		miniPane.setMaxSize(getSizeX() * MINI_SCALE, getSizeY() * MINI_SCALE);
+		miniPane.setMinSize(getSizeX() * MINI_SCALE, getSizeY() * MINI_SCALE);
+		miniPane.setHgap(getPadH() * MINI_SCALE);
+		miniPane.setVgap(getPadV() * MINI_SCALE);
+		miniPane.setPadding(new Insets(pad, pad, pad, pad));
 
 		for (Planet p : planets.values())
 		{
 			Label l = new Label();
-			l.getStyleClass().add(tiles.get(p).getStyle());
-			miniTilePane.add(l, (int) p.getPosition().getX(), (int) p.getPosition().getY());
+			l.getStyleClass().addAll("space-button", p.getOwner().getColor());
+			l.setMinSize(getTileH() * MINI_SCALE, getTileV() * MINI_SCALE);
+			l.setMaxSize(getTileH() * MINI_SCALE, getTileV() * MINI_SCALE);
+
+			miniPane.add(l, (int) p.getPosition().getX(), (int) p.getPosition().getY());
 		}
-
-		return miniTilePane;
 	}
 
-	public static int getTileH()
+	public double getTileH()
 	{
-		return TILEH;
+		return TILEH * zoom;
 	}
 
-	public static int getTileV()
+	public double getTileV()
 	{
-		return TILEV;
+		return TILEV * zoom;
 	}
 
-	public static int getPadH()
+	public double getPadH()
 	{
-		return PADH;
+		return PADH * zoom;
 	}
 
-	public static int getPadV()
+	public double getPadV()
 	{
-		return PADV;
+		return PADV * zoom;
 	}
 
-	public static int getMargin()
+	public double getMargin()
 	{
 		return MARGIN;
+	}
+
+	public double getSizeX()
+	{
+		return ((TILEH + PADH) * x + MARGIN * 2 - PADH) * zoom;
+	}
+
+	public double getSizeY()
+	{
+		return ((TILEV + PADV) * y + MARGIN * 2 - PADV) * zoom;
+	}
+
+	public static void setMiniScale(double miniScale)
+	{
+		MINI_SCALE = miniScale;
+	}
+
+	public static double getMiniScale()
+	{
+		return MINI_SCALE;
 	}
 
 	public Map<Space, Label> getTiles()
@@ -365,5 +436,4 @@ public class PlanetManagerUI extends PlanetManager
 	{
 		return pane;
 	}
-
 }

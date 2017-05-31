@@ -6,6 +6,7 @@ import java.util.Set;
 import game.managers.PlanetManager;
 import game.managers.PlayerManager;
 import game.managers.TurnManager;
+import game.managers.PlayerManager.Controller;
 import game.tiles.Planet;
 import game.tiles.Space;
 
@@ -16,19 +17,24 @@ public class Player
 	private int num;
 	private String color;
 	private boolean alive = true;
-	private PlayerManager.Controller controller;
+	private Controller controller;
 
-	public Player(int num, String color, PlayerManager.Controller controller)
+	protected Player(int num, String color, Controller controller)
 	{
 		this.num = num;
 		this.color = color;
-		this.controller = controller;
+		this.controller = Controller.HUMAN;
 
 		origin = null;
 		destination = null;
 	}
 
-	public PlayerManager.Controller getController()
+	public Player(int num, String color)
+	{
+		this(num, color, Controller.HUMAN);
+	}
+
+	public Controller getController()
 	{
 		return controller;
 	}

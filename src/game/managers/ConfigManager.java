@@ -11,7 +11,15 @@ import game.entities.Ship;
 
 public class ConfigManager
 {
-	public enum ShipType
+	public interface Type<T>
+	{
+		@Override
+		public String toString();
+
+		public T getInstance();
+	}
+
+	public enum ShipType implements Type<Ship>
 	{
 		GENERIC(), DESTROYER(Destroyer.class), FIGHTER(Fighter.class), BOMBER(Bomber.class);
 
@@ -69,11 +77,15 @@ public class ConfigManager
 	};
 
 	public int shipStartCount = 10,
-		initialProduction = 10, maxProduction = 30, minProduction = 5,
-		cmaxProduction = 9999, cmaxShipStartCount = 9999999,
-		numHumanPlayers = 1, maxHumanPlayers = 14,
-		gridX = 25, gridY = 10,
-		minGridX = 2, minGridY = 2,
+		initialProduction = 10, 
+		maxProduction = 30, 
+		minProduction = 5,
+		cmaxProduction = 9999, 
+		cmaxShipStartCount = 9999999,
+		numHumanPlayers = 1, 
+		maxHumanPlayers = 14,
+		gridX = 15, gridY = 15,
+		minGridX = 4, minGridY = 4,
 		maxGridX = 30, maxGridY = 30,
 		defaultGridX = 20, defaultGridY = 20;
 
@@ -140,6 +152,11 @@ public class ConfigManager
 
 		pickedNames.add(name);
 		return name;
+	}
+	
+	public void clearNames()
+	{
+		pickedNames.clear();
 	}
 
 }

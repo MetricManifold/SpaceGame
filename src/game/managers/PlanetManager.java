@@ -18,7 +18,7 @@ public class PlanetManager
 	protected Map<Integer, Planet> planets;
 	protected Map<Integer, Space> spaces;
 
-	protected int sizeh, sizev, x, y, len;
+	protected int x, y, len;
 	protected double density;
 
 	protected PlayerManager PM;
@@ -28,10 +28,7 @@ public class PlanetManager
 	public PlanetManager(ConfigManager CM)
 	{
 		this.CM = CM;
-		this.x = CM.gridX;
-		this.y = CM.gridY;
-		this.density = CM.planetDensity;
-		this.len = x * y;
+		initialize();
 	}
 
 	/**
@@ -39,14 +36,37 @@ public class PlanetManager
 	 */
 	public void setup(PlayerManager pm, TurnManager tm)
 	{
-		
 		TM = tm;
 		PM = pm;
 
 		spawnPlanets();
 		setStartPlanets();
 	}
-	
+
+	/**
+	 * resets the player manager, initializes then resets the turn manager
+	 */
+	public void reset()
+	{
+		initialize();
+		PM.reset();
+		CM.clearNames();
+
+		spawnPlanets();
+		setStartPlanets();
+	}
+
+	/**
+	 * initialization activity for this manager to set variables and create planets
+	 */
+	protected void initialize()
+	{
+		this.x = CM.gridX;
+		this.y = CM.gridY;
+		this.density = CM.planetDensity;
+		this.len = x * y;
+	}
+
 	/**
 	 * puts planets in the grid and associates them with buttons
 	 */
@@ -54,24 +74,27 @@ public class PlanetManager
 	{
 		planets = new HashMap<Integer, Planet>();
 		spaces = new HashMap<Integer, Space>();
-		
-		for (int i = 0; i < len; i++)
-		{
-			// create the necessary elements
-			Space s = new Space(i % x, i / x);
 
-			// choose whether to create a planet or empty space
-			double prob = ThreadLocalRandom.current().nextDouble();
-			if (prob < density)
+		do
+		{
+			for (int i = 0; i < len; i++)
 			{
-				Planet p = new Planet(s, CM);
-				planets.put(hashLocation(i % x, i / x), p);
+				// create the necessary elements
+				Space s = new Space(i % x, i / x);
+
+				// choose whether to create a planet or empty space
+				double prob = ThreadLocalRandom.current().nextDouble();
+				if (prob < density)
+				{
+					Planet p = new Planet(s, CM);
+					planets.put(hashLocation(i % x, i / x), p);
+				}
+				else
+				{
+					spaces.put(hashLocation(i % x, i / x), s);
+				}
 			}
-			else
-			{
-				spaces.put(hashLocation(i % x, i / x), s);
-			}
-		}
+		} while (planets.size() < PM.numPlayers);
 	}
 
 	/**
@@ -134,26 +157,5 @@ public class PlanetManager
 	{
 		return planets.values().toArray(new Planet[planets.size()]);
 	}
-
-	/**
-	 * return the width in tiles of the grid
-	 * 
-	 * @return
-	 */
-	public int getSizeX()
-	{
-		return sizeh;
-	}
-
-	/**
-	 * return the height in tiles of the grid.
-	 * 
-	 * @return
-	 */
-	public int getSizeY()
-	{
-		return sizev;
-	}
-
 
 }

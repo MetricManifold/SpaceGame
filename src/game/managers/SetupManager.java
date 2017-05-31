@@ -44,7 +44,6 @@ public class SetupManager
 
 	public void startGame()
 	{
-		setup();
 		TM.setup(PM, PG);
 	}
 

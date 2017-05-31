@@ -51,15 +51,15 @@ public class Displacement
 		return y;
 	}
 
-	public double getWorldX()
+	public double getWorldX(PlanetManagerUI pg)
 	{
-		double t = PlanetManagerUI.getMargin() + (0.5 * PlanetManagerUI.getTileH()) + (PlanetManagerUI.getTileH() + PlanetManagerUI.getPadH()) * x;
+		double t = pg.getMargin() + (0.5 * pg.getTileH()) + (pg.getTileH() + pg.getPadH()) * x;
 		return t;
 	}
 
-	public double getWorldY()
+	public double getWorldY(PlanetManagerUI pg)
 	{
-		double t = PlanetManagerUI.getMargin() + (0.5 * PlanetManagerUI.getTileV()) + (PlanetManagerUI.getTileV() + PlanetManagerUI.getPadV()) * y; 
+		double t = pg.getMargin() + (0.5 * pg.getTileV()) + (pg.getTileV() + pg.getPadV()) * y; 
 		return t;
 	}
 }

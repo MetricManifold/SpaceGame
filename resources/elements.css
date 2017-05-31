@@ -19,9 +19,6 @@
 
 
 
-
-
-
 .scene {
 	-fx-padding: 2px;
 	-fx-background-image: url("backgroundmain.jpg");
@@ -54,6 +51,10 @@
 
 .planet-grid4 {
 	-fx-background-image: url("background4.jpg");
+}
+
+.mini-grid {
+	-fx-background-color: rgba(18, 34, 58, 1.0);
 }
 
 

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import game.groups.ShipGroup;
+import game.players.Neutral;
 import game.players.Player;
 
 /**
@@ -15,9 +16,10 @@ import game.players.Player;
  */
 public class PlayerManager
 {
-	private int playerIndex = 1;
+	private int playerIndex;
 	private Player[] players;
 	public final Player neutral;
+	public int numPlayers;
 
 	protected ConfigManager CM;
 
@@ -29,23 +31,44 @@ public class PlayerManager
 	public PlayerManager(ConfigManager CM)
 	{
 		this.CM = CM;
-		int numPlayers = CM.numHumanPlayers + 1;
+		neutral = new Neutral(0, CM.COLORS[0]);
+
+		initialize();
+	}
+	
+	/**
+	 * resets this manager to initial conditions
+	 */
+	public void reset()
+	{
+		initialize();
+	}
+
+	/**
+	 * setup activity for this manager
+	 */
+	protected void initialize()
+	{
+		numPlayers = CM.numHumanPlayers + 1;
 
 		players = new Player[numPlayers];
-		neutral = new Player(0, CM.COLORS[0], Controller.NEUTRAL);
-
 		players[0] = neutral;
+		playerIndex = 1;
+		
 		for (int i = 1; i < numPlayers; i++)
 		{
-			players[i] = new Player(i, CM.COLORS[i], Controller.HUMAN);
+			players[i] = new Player(i, CM.COLORS[i]);
 		}
 	}
 
+	/**
+	 * move player index to the next human player
+	 */
 	public void nextPlayer()
 	{
 		do
 		{
-			playerIndex = playerIndex % getNumPlayersOfType(Controller.HUMAN) + 1;
+			playerIndex = playerIndex % numPlayers;
 		} while (!players[playerIndex].isAlive() && getNumPlayersOfType(Controller.HUMAN) > 0);
 	}
 

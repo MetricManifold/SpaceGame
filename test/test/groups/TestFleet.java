@@ -2,7 +2,6 @@ package test.groups;
 
 import game.groups.*;
 import game.managers.ConfigManager.ShipType;
-import game.managers.PlayerManager.Controller;
 import game.players.Player;
 import junit.framework.TestCase;
 
@@ -14,7 +13,7 @@ public class TestFleet extends TestCase
 	
 	protected void setUp()
 	{
-		player = new Player(0, "attacking player", Controller.AI);
+		player = new Player(0, "attacking player");
 		attacker = new Fleet(player);
 		defender = new ShipInventory();
 	}

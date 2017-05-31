@@ -75,8 +75,6 @@ public class TurnManagerUI extends TurnManager
 	private int totalSeconds = 0;
 	private String timeFormat = "%02d:%02d";
 
-	PlanetManagerUI PGui;
-
 	public TurnManagerUI(ConfigManager CM)
 	{
 		super(CM);
@@ -166,11 +164,10 @@ public class TurnManagerUI extends TurnManager
 	public void setup(PlayerManager pm, PlanetManager pg)
 	{
 		super.setup(pm, pg);
-		PGui = (PlanetManagerUI) pg;
 
 		pane.setMinWidth(MIN_WIDTH);
-		pane.setPrefWidth(pg.getSizeX());
-		pane.setMaxWidth(pg.getSizeX());
+		pane.setPrefWidth(getPlanetManagerUI().getSizeX());
+		pane.setMaxWidth(getPlanetManagerUI().getSizeX());
 
 		updatePlayerLabel();
 
@@ -214,14 +211,28 @@ public class TurnManagerUI extends TurnManager
 				}
 			}
 		});
+	}
+	
+	@Override
+	public void reset()
+	{
+		super.reset();
 
+		pane.setPrefWidth(getPlanetManagerUI().getSizeX());
+		pane.setMaxWidth(getPlanetManagerUI().getSizeX());
+	}
+	
+	@Override
+	public void initialize()
+	{
+		super.initialize();
 	}
 
 	public void clickNextTurn()
 	{
 		try
 		{
-			PGui.clearSelection(PM.getCurrentPlayer().getOrigin(), PM.getCurrentPlayer().getDestination());
+			getPlanetManagerUI().clearSelection(PM.getCurrentPlayer().getOrigin(), PM.getCurrentPlayer().getDestination());
 			nextTurn();
 
 			updatePlayerLabel();
@@ -335,7 +346,7 @@ public class TurnManagerUI extends TurnManager
 			@Override
 			public void handle(MouseEvent event)
 			{
-				PGui.getTiles().get(p).getStyleClass().add("space-button-illuminate");
+				getPlanetManagerUI().getTiles().get(p).getStyleClass().add("space-button-illuminate");
 			}
 		});
 
@@ -344,7 +355,7 @@ public class TurnManagerUI extends TurnManager
 			@Override
 			public void handle(MouseEvent event)
 			{
-				PGui.getTiles().get(p).getStyleClass().remove("space-button-illuminate");
+				getPlanetManagerUI().getTiles().get(p).getStyleClass().remove("space-button-illuminate");
 			}
 		});
 
@@ -353,7 +364,7 @@ public class TurnManagerUI extends TurnManager
 			@Override
 			public void handle(MouseEvent event)
 			{
-				PGui.handleClickPlanet(p);
+				getPlanetManagerUI().handleClickPlanet(p);
 			}
 		});
 	}
@@ -434,7 +445,7 @@ public class TurnManagerUI extends TurnManager
 				sendShips(num);
 
 				enableSend(false);
-				PGui.clearSelection(PM.getCurrentPlayer().getOrigin(), PM.getCurrentPlayer().getDestination());
+				getPlanetManagerUI().clearSelection(PM.getCurrentPlayer().getOrigin(), PM.getCurrentPlayer().getDestination());
 				PM.getCurrentPlayer().clearSelection();
 			}
 		}
@@ -449,6 +460,11 @@ public class TurnManagerUI extends TurnManager
 	{
 		super.sendShips(num);
 		updatePlayerPlanetList();
+	}
+	
+	public PlanetManagerUI getPlanetManagerUI()
+	{
+		return (PlanetManagerUI) PG;
 	}
 
 }
