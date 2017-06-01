@@ -1,13 +1,16 @@
 package game.managers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import game.entities.Bomber;
 import game.entities.Destroyer;
 import game.entities.Fighter;
 import game.entities.Ship;
+import game.players.Player;
 
 public class ConfigManager
 {
@@ -77,6 +80,7 @@ public class ConfigManager
 	};
 
 	public int shipStartCount = 10,
+		planetStartCount = 1,
 		initialProduction = 10, 
 		maxProduction = 30, 
 		minProduction = 5,
@@ -90,13 +94,14 @@ public class ConfigManager
 		defaultGridX = 20, defaultGridY = 20;
 
 	public double planetDensity = 0.15,
-		neutralProdModifier = 0.70,
+		neutralProdModifier = 0.50,
 		cminNeutralProdModifier = 0.00, cmaxNeutralProdModifier = 2.00,
 		planetDefenderBonus = 1.10,
 		cminPlanetDefenderBonus = 0.00, cmaxPlanetDefenderBonus = 2.00;
 
 	public boolean neutralShipsVisible = false;
 	public ShipType defaultShip = ShipType.DESTROYER;
+	public Map<Player, Integer> planetStartCountMap = new HashMap<>();
 
 	public final String[] COLORS = {
 		"white", "red", "blue", "orange", "teal", "purple",

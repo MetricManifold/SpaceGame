@@ -108,7 +108,7 @@ public class GfxHelper
 	 */
 	private static Point2D evalLinearDt(Line c, float t)
 	{
-		Point2D p = new Point2D((c.getEndY() - c.getStartY()) * t + c.getStartY(), ((c.getEndX() - c.getStartX()) * t + c.getStartX()));
+		Point2D p = new Point2D((c.getEndY() - c.getStartY()) * t + c.getStartY(), -((c.getEndX() - c.getStartX()) * t + c.getStartX()));
 		return p;
 	}
 }

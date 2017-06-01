@@ -2,6 +2,7 @@ package game.managers;
 
 import java.util.ArrayList;
 import game.groups.Fleet;
+import game.managers.PlayerManager.Controller;
 import game.players.Player;
 import game.tiles.Planet;
 
@@ -21,7 +22,7 @@ public class TurnManager
 	public TurnManager(ConfigManager CM)
 	{
 		this.CM = CM;
-		loadConfiguration();
+		fleets = new ArrayList<Fleet>();
 	}
 
 	/**
@@ -38,12 +39,11 @@ public class TurnManager
 	
 	public void reset()
 	{
-		loadConfiguration();
+		fleets = new ArrayList<Fleet>();
 	}
 	
 	protected void loadConfiguration()
 	{
-		fleets = new ArrayList<Fleet>();
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class TurnManager
 			for (Planet p : PG.getPlanetArray())
 			{
 				// if owner is neutral, produce 75% total ships
-				if (p.getOwner() == PM.neutral)
+				if (p.getOwner().getController() == Controller.NEUTRAL)
 				{
 					p.addShips(CM.defaultShip, (int) (p.getProduction().get(CM.defaultShip) * CM.neutralProdModifier));
 				}

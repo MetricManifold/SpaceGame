@@ -13,15 +13,29 @@
 	-fx-background-color: lightgray;
 }
 
+.combo-box-popup1 > .list-view {
+	-fx-pref-width: 45;
+}
 
+.combo-box1 {
+	-fx-border-width: 1px;
+	-fx-border-color: black;
+	-fx-border-radius: 50%;
+}
 
+.combo-box1 .arrow-button {
+	-fx-opacity: 0.0;
+	-fx-cursor: hand;
+}
 
-
-
+/*
+	MAIN NODES
+*/
 
 .scene {
 	-fx-padding: 2px;
 	-fx-background-image: url("backgroundmain.jpg");
+	-fx-background-position: center;
 	-fx-background-opacity: 0.3;
 }
 

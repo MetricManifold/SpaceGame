@@ -17,8 +17,8 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -36,16 +36,14 @@ public class PlanetManagerUI extends PlanetManager
 		NUM_P_BG = 10, NUM_B_BG = 4,
 		MARGIN = 5, TOPMARGIN = 2;
 
-	protected static double MINI_SCALE = 0.6;
-	protected double zoom;
+	protected double zoom = 1.00;
 
 	// planets and corresponding buttons
 	protected Map<Space, Label> tiles;
 	protected Map<Fleet, Path> paths;
 
 	protected Pane pane, bgPane;
-	protected GridPane miniPane;
-	protected TilePane tilePane;
+	protected TilePane tilePane, miniPane;
 	protected TurnManagerUI TMui;
 
 	public PlanetManagerUI(ConfigManager CM)
@@ -55,13 +53,7 @@ public class PlanetManagerUI extends PlanetManager
 		bgPane = new Pane();
 		pane = new Pane();
 		tilePane = new TilePane(Orientation.HORIZONTAL);
-		
-		tilePane.setPrefColumns(x);
-		tilePane.setPrefRows(y);
-		tilePane.setMaxSize(getSizeX(), getSizeY());
-		bgPane.setPrefSize(getSizeX(), getSizeY());
-		pane.setMaxWidth(getSizeX());
-		
+
 		makeUI();
 	}
 
@@ -70,17 +62,14 @@ public class PlanetManagerUI extends PlanetManager
 	 */
 	void makeUI()
 	{
+		tilePane.setPrefColumns(x);
+		tilePane.setPrefRows(y);
+		tilePane.setMaxSize(getSizeX(), getSizeY());
+		bgPane.setPrefSize(getSizeX(), getSizeY());
+		pane.setMaxWidth(getSizeX());
 
 		VBox.setMargin(tilePane, new Insets(TOPMARGIN, 0, 0, 0));
 		pane.getChildren().addAll(bgPane, tilePane);
-
-		tilePane.setHgap(getPadH());
-		tilePane.setVgap(getPadV());
-
-		tilePane.setPrefTileWidth(getTileH());
-		tilePane.setPrefTileHeight(getTileV());
-
-		tilePane.setPadding(new Insets(MARGIN, MARGIN, MARGIN, MARGIN));
 		tilePane.setAlignment(Pos.BASELINE_CENTER);
 
 		String bgSelect = String.format("planet-grid%d", ThreadLocalRandom.current().nextInt(NUM_B_BG) + 1);
@@ -95,41 +84,34 @@ public class PlanetManagerUI extends PlanetManager
 	{
 		TMui = (TurnManagerUI) tm;
 		super.setup(pm, tm);
+		redrawGrid();
 
-		tilePane.setOnMouseClicked(new EventHandler<MouseEvent>()
-		{
-			@Override
-			public void handle(MouseEvent event)
+		tilePane.setOnMouseClicked(e -> {
+			double sx = (e.getX() - getMargin()) / (getTileH() + getPadH()); // 	normalized selected x
+			double sy = (e.getY() - getMargin()) / (getTileV() + getPadV()); // 	normalized selected y
+			int ix = (int) sx; //		integer distance x
+			int iy = (int) sy; //		integer distance y
+			double dx = sx - ix; //		fractional distance x
+			double dy = sy - iy; // 	fractional distance y
+
+			// check if selection is before padding
+			if (dx < (getTileH() + getPadH()) / getPadH() && dy < (getTileV() + getPadV()) / getPadV())
 			{
-				double sx = (event.getX() - MARGIN) / (getTileH() + getPadH()); // 	normalized selected x
-				double sy = (event.getY() - MARGIN) / (getTileV() + getPadV()); // 	normalized selected y
-				int ix = (int) sx; //		integer distance x
-				int iy = (int) sy; //		integer distance y
-				double dx = sx - ix; //		fractional distance x
-				double dy = sy - iy; // 	fractional distance y
-
-				// check if selection is before padding
-				if (dx < (getTileH() + getPadH()) / getPadH() && dy < (getTileV() + getPadV()) / getPadV())
-				{
-					Planet p = planets.get(hashLocation(iy * x + ix));
-					handleClickPlanet(p);
-				}
+				Planet p = planets.get(hashLocation(iy * x + ix));
+				handleClickPlanet(p);
 			}
 		});
+		tilePane.setOnMouseDragged(e -> handleDrag(e));
+		tilePane.setOnScroll(e -> handleZoom(e.getDeltaY()));
+		WindowManager.getScene().setOnKeyReleased(e -> handleZoom(e.getCode()));
 	}
-	
+
 	@Override
 	public void reset()
 	{
 		super.reset();
 
-		tilePane.getChildren().clear();
-		tilePane.setPrefColumns(x);
-		tilePane.setPrefRows(y);
-		tilePane.setMaxSize(getSizeX(), getSizeY());
-		bgPane.setPrefSize(getSizeX(), getSizeY());
-		pane.setMaxWidth(getSizeX());
-		
+		redrawGrid();
 		updateMiniPane();
 	}
 
@@ -137,8 +119,7 @@ public class PlanetManagerUI extends PlanetManager
 	protected void loadConfiguration()
 	{
 		super.loadConfiguration();
-		
-		zoom = 1.00;
+
 		paths = new HashMap<Fleet, Path>();
 		tiles = new HashMap<Space, Label>();
 	}
@@ -156,14 +137,8 @@ public class PlanetManagerUI extends PlanetManager
 		{
 			Label l = new Label();
 			int hash = hashLocation(i);
-
-			l.setMinSize(getTileH(), getTileV());
-			l.setMaxSize(getTileH(), getTileV());
 			tilePane.getChildren().add(l);
-
 			Planet p = planets.get(hash);
-
-			// add a circle here to check the positioning given by the constructor
 
 			if (p != null)
 			{
@@ -178,6 +153,26 @@ public class PlanetManagerUI extends PlanetManager
 				l.getStyleClass().add("space-button");
 				tiles.put(spaces.get(hash), l);
 			}
+		}
+	}
+
+	public void redrawGrid()
+	{
+		for (Label l : tiles.values())
+		{
+			l.setMinSize(getTileH(), getTileV());
+			l.setMaxSize(getTileH(), getTileV());
+
+			tilePane.setPadding(new Insets(getMargin(), getMargin(), getMargin(), getMargin()));
+			tilePane.setPrefColumns(x);
+			tilePane.setPrefRows(y);
+			tilePane.setMaxSize(getSizeX(), getSizeY());
+			tilePane.setMinSize(getSizeX(), getSizeY());
+			tilePane.setHgap(getPadH());
+			tilePane.setVgap(getPadV());
+
+			bgPane.setPrefSize(getSizeX(), getSizeY());
+			pane.setMaxWidth(getSizeX());
 		}
 	}
 
@@ -294,9 +289,7 @@ public class PlanetManagerUI extends PlanetManager
 	/**
 	 * shows lines for active fleets at the given planet
 	 * 
-	 * @param f
-	 * @param o
-	 * @param d
+	 * @param p
 	 */
 	public void showFleetPaths(Planet p)
 	{
@@ -343,11 +336,49 @@ public class PlanetManagerUI extends PlanetManager
 		zoom = newZoom;
 	}
 
+	public double getZoom()
+	{
+		return zoom;
+	}
+
+	public void handleZoom(KeyCode k)
+	{
+		if (k == KeyCode.MINUS && zoom > 0.5)
+		{
+			zoom -= 0.1;
+			redrawGrid();
+		}
+		else if (k == KeyCode.EQUALS && zoom < 1.5)
+		{
+			zoom += 0.1;
+			redrawGrid();
+		}
+	}
+
+	public void handleZoom(Double delta)
+	{
+		if (delta < 0 && zoom > 0.5)
+		{
+			zoom -= 0.1;
+			redrawGrid();
+		}
+		else if (delta > 0 && zoom < 1.5)
+		{
+			zoom += 0.1;
+			redrawGrid();
+		}
+	}
+
+	public void handleDrag(MouseEvent e)
+	{
+
+	}
+
 	public Pane getMiniPane()
 	{
 		if (miniPane == null)
 		{
-			miniPane = new GridPane();
+			miniPane = new TilePane();
 			miniPane.getStyleClass().add("mini-grid");
 			updateMiniPane();
 
@@ -365,67 +396,69 @@ public class PlanetManagerUI extends PlanetManager
 
 		miniPane.getChildren().clear();
 
-		double pad = MARGIN;
-		miniPane.setMaxSize(getSizeX() * MINI_SCALE, getSizeY() * MINI_SCALE);
-		miniPane.setMinSize(getSizeX() * MINI_SCALE, getSizeY() * MINI_SCALE);
-		miniPane.setHgap(getPadH() * MINI_SCALE);
-		miniPane.setVgap(getPadV() * MINI_SCALE);
+		double pad = getMargin();
+		miniPane.setMaxSize(getSizeX(), getSizeY());
+		miniPane.setMinSize(getSizeX(), getSizeY());
+		miniPane.setHgap(getPadH());
+		miniPane.setVgap(getPadV());
+		miniPane.setPrefColumns(x);
+		miniPane.setPrefRows(y);
 		miniPane.setPadding(new Insets(pad, pad, pad, pad));
 
-		for (Planet p : planets.values())
+		for (int i = 0; i < len; i++)
 		{
 			Label l = new Label();
-			l.getStyleClass().addAll("space-button", p.getOwner().getColor());
-			l.setMinSize(getTileH() * MINI_SCALE, getTileV() * MINI_SCALE);
-			l.setMaxSize(getTileH() * MINI_SCALE, getTileV() * MINI_SCALE);
+			l.setMinSize(getTileH(), getTileV());
+			l.setMaxSize(getTileH(), getTileV());
 
-			miniPane.add(l, (int) p.getPosition().getX(), (int) p.getPosition().getY());
+			int hash = hashLocation(i);
+			miniPane.getChildren().add(l);
+			Planet p = planets.get(hash);
+
+			if (p != null)
+			{
+				l.getStyleClass().addAll("space-button", p.getOwner().getColor());
+			}
+			else
+			{
+				l.getStyleClass().add("space-button");
+			}
 		}
 	}
 
-	public double getTileH()
+	public int getTileH()
 	{
-		return TILEH * zoom;
+		return (int) (TILEH * zoom);
 	}
 
-	public double getTileV()
+	public int getTileV()
 	{
-		return TILEV * zoom;
+		return (int) (TILEV * zoom);
 	}
 
-	public double getPadH()
+	public int getPadH()
 	{
-		return PADH * zoom;
+		return (int) (PADH * zoom);
 	}
 
-	public double getPadV()
+	public int getPadV()
 	{
-		return PADV * zoom;
+		return (int) (PADV * zoom);
 	}
 
-	public double getMargin()
+	public int getMargin()
 	{
-		return MARGIN;
+		return (int) (MARGIN * zoom);
 	}
 
-	public double getSizeX()
+	public int getSizeX()
 	{
-		return ((TILEH + PADH) * x + MARGIN * 2 - PADH) * zoom;
+		return (getTileH() + getPadH()) * x + getMargin() * 2 - getPadH();
 	}
 
-	public double getSizeY()
+	public int getSizeY()
 	{
-		return ((TILEV + PADV) * y + MARGIN * 2 - PADV) * zoom;
-	}
-
-	public static void setMiniScale(double miniScale)
-	{
-		MINI_SCALE = miniScale;
-	}
-
-	public static double getMiniScale()
-	{
-		return MINI_SCALE;
+		return (getTileV() + getPadV()) * y + getMargin() * 2 - getPadV();
 	}
 
 	public Map<Space, Label> getTiles()

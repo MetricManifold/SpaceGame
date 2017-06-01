@@ -16,7 +16,7 @@ import javafx.util.Duration;
 public class WindowManager extends Application
 {
 	public static final String TITLE = "Starfare";
-	public Scene scene;
+	private static Scene scene;
 
 	private SetupManagerUI SM;
 
@@ -80,16 +80,15 @@ public class WindowManager extends Application
 	{
 		primaryStage = new Stage(StageStyle.DECORATED);
 		mainPane = new BorderPane();
+		SM = new SetupManagerUI(mainPane);
 		
 		scene = new Scene(mainPane);
 		scene.getStylesheets().add("elements.css");
 		
-		SM = new SetupManagerUI(mainPane);
-		SM.setup();
-		
 		primaryStage.setTitle(TITLE);
 		primaryStage.setScene(scene);
 
+		SM.setup();
 		System.out.println("game started");
 	}
 
@@ -101,6 +100,14 @@ public class WindowManager extends Application
 	public static void main(String[] args)
 	{
 		launch(args);
+	}
+	
+	/**
+	 * 
+	 */
+	public static Scene getScene()
+	{
+		return scene;
 	}
 	
 }

@@ -6,6 +6,7 @@ public class SetupManager
 	protected PlayerManager PM;
 	protected PlanetManager PG;
 	protected TurnManager TM;
+	protected MusicManager MM;
 	protected ConfigManager CM;
 
 	public SetupManager()
@@ -18,6 +19,7 @@ public class SetupManager
 		PM = new PlayerManager(CM);
 		PG = new PlanetManager(CM);
 		TM = new TurnManager(CM);
+		MM = new MusicManager(CM);
 		
 		PG.setup(PM, TM);
 	}
@@ -45,6 +47,7 @@ public class SetupManager
 	public void startGame()
 	{
 		TM.setup(PM, PG);
+		MM.setup();
 	}
 
 	public void populatePlayers()

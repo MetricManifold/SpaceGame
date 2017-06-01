@@ -26,17 +26,17 @@ public class Planet extends Space
 	protected double defenderBonus;
 	protected ShipType defaultShip;
 
-	public Planet(Displacement pos, ConfigManager cm)
+	public Planet(Displacement pos, ConfigManager CM)
 	{
 		super(pos);
-		this.name = cm.getPlanetName();
+		this.name = CM.getPlanetName();
 		this.production = new HashMap<>();
 		this.ships = new ShipInventory();
 		this.owner = null;
-		this.defaultShip = cm.defaultShip;
-		this.defenderBonus = cm.planetDefenderBonus;
+		this.defaultShip = CM.defaultShip;
+		this.defenderBonus = CM.planetDefenderBonus;
 		
-		production.put(defaultShip, ThreadLocalRandom.current().nextInt(cm.minProduction, cm.maxProduction));
+		production.put(defaultShip, ThreadLocalRandom.current().nextInt(CM.minProduction, CM.maxProduction));
 	}
 
 	public Planet(Space s, ConfigManager cm)
@@ -178,6 +178,21 @@ public class Planet extends Space
 	public double getDefenderBonus()
 	{
 		return defenderBonus;
+	}
+	
+	public void setDefenderBonus(double newDefenderBonus)
+	{
+		defenderBonus = newDefenderBonus;
+	}
+	
+	public void setDefaultShip(ShipType newDefaultShip)
+	{
+		defaultShip = newDefaultShip;
+	}
+	
+	public ShipType getDefaultShip()
+	{
+		return defaultShip;
 	}
 
 }

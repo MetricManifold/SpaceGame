@@ -15,7 +15,7 @@ public class Player
 	private Planet origin, destination;
 	private Set<Planet> planets = new HashSet<Planet>();
 	private int num;
-	private String color;
+	private String color, name;
 	private boolean alive = true;
 	private Controller controller;
 
@@ -23,7 +23,8 @@ public class Player
 	{
 		this.num = num;
 		this.color = color;
-		this.controller = Controller.HUMAN;
+		this.controller = controller;
+		this.name = "Player " + Integer.valueOf(num);
 
 		origin = null;
 		destination = null;
@@ -168,7 +169,12 @@ public class Player
 	 */
 	public String getName()
 	{
-		return "Player " + Integer.valueOf(num);
+		return name;
+	}
+	
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 	/**

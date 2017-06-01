@@ -49,6 +49,7 @@ public class PlanetManager
 	public void reset()
 	{
 		loadConfiguration();
+		updateConfiguration();
 		
 		PM.reset();
 		CM.clearNames();
@@ -66,6 +67,25 @@ public class PlanetManager
 		this.y = CM.gridY;
 		this.density = CM.planetDensity;
 		this.len = x * y;
+	}
+
+	public void updateConfiguration()
+	{
+		for (Planet p : planets.values())
+		{
+			if (p.getOwner().getController() == Controller.NEUTRAL)
+			{
+				p.setDisplayShips(CM.neutralShipsVisible);
+				p.setDefenderBonus(CM.planetDefenderBonus);
+			}
+			else
+			{
+				p.setProduction(CM.defaultShip, CM.initialProduction);
+				p.getShipInventory().removeAll();
+				p.addShips(CM.defaultShip, CM.shipStartCount);
+				p.setDefaultShip(CM.defaultShip);
+			}
+		}
 	}
 
 	/**
@@ -110,7 +130,7 @@ public class PlanetManager
 		List<Integer> nums = new ArrayList<>();
 		IntStream.range(0, planets.size()).forEach(i -> nums.add(i));
 
-		for (int i = CM.numHumanPlayers; i < PM.numPlayers; i++)
+		for (int i = 0; i < PM.getNumPlayersOfType(Controller.HUMAN); i++)
 		{
 			// pick a random value from the planet array
 			int r = ThreadLocalRandom.current().nextInt(nums.size());
@@ -148,7 +168,7 @@ public class PlanetManager
 	{
 		int a = index % x;
 		int b = index / x;
-		return a + a * b;
+		return a + x * b;
 	}
 
 	/**

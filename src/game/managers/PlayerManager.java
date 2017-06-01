@@ -25,13 +25,27 @@ public class PlayerManager
 
 	public enum Controller
 	{
-		AI, HUMAN, NEUTRAL, HOSTILE
+		AI("AI"), HUMAN("Human"), NEUTRAL("Neutral"), HOSTILE("Hostile");
+		
+		String name;
+		
+		Controller(String name)
+		{
+			this.name = name;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
 	};
 
 	public PlayerManager(ConfigManager CM)
 	{
 		this.CM = CM;
 		neutral = new Neutral(0, CM.COLORS[0]);
+		neutral.setName(Controller.NEUTRAL.toString());
 
 		makePlayerList();
 	}
@@ -58,6 +72,7 @@ public class PlayerManager
 		for (int i = 1; i < numPlayers; i++)
 		{
 			players[i] = new Player(i, CM.COLORS[i]);
+			CM.planetStartCountMap.put(players[i], CM.planetStartCount);
 		}
 	}
 
