@@ -28,7 +28,7 @@ public class PlanetManager
 	public PlanetManager(ConfigManager CM)
 	{
 		this.CM = CM;
-		initialize();
+		loadConfiguration();
 	}
 
 	/**
@@ -48,7 +48,8 @@ public class PlanetManager
 	 */
 	public void reset()
 	{
-		initialize();
+		loadConfiguration();
+		
 		PM.reset();
 		CM.clearNames();
 
@@ -59,7 +60,7 @@ public class PlanetManager
 	/**
 	 * initialization activity for this manager to set variables and create planets
 	 */
-	protected void initialize()
+	protected void loadConfiguration()
 	{
 		this.x = CM.gridX;
 		this.y = CM.gridY;
@@ -87,11 +88,11 @@ public class PlanetManager
 				if (prob < density)
 				{
 					Planet p = new Planet(s, CM);
-					planets.put(hashLocation(i % x, i / x), p);
+					planets.put(hashLocation(i), p);
 				}
 				else
 				{
-					spaces.put(hashLocation(i % x, i / x), s);
+					spaces.put(hashLocation(i), s);
 				}
 			}
 		} while (planets.size() < PM.numPlayers);
@@ -109,7 +110,7 @@ public class PlanetManager
 		List<Integer> nums = new ArrayList<>();
 		IntStream.range(0, planets.size()).forEach(i -> nums.add(i));
 
-		for (int i = 0; i < CM.numHumanPlayers; i++)
+		for (int i = CM.numHumanPlayers; i < PM.numPlayers; i++)
 		{
 			// pick a random value from the planet array
 			int r = ThreadLocalRandom.current().nextInt(nums.size());
@@ -143,9 +144,11 @@ public class PlanetManager
 	 * @param y
 	 * @return
 	 */
-	protected int hashLocation(int x, int y)
+	protected int hashLocation(int index)
 	{
-		return x + this.x * y;
+		int a = index % x;
+		int b = index / x;
+		return a + a * b;
 	}
 
 	/**

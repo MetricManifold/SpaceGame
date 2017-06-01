@@ -33,7 +33,7 @@ public class PlayerManager
 		this.CM = CM;
 		neutral = new Neutral(0, CM.COLORS[0]);
 
-		initialize();
+		makePlayerList();
 	}
 	
 	/**
@@ -41,13 +41,13 @@ public class PlayerManager
 	 */
 	public void reset()
 	{
-		initialize();
+		makePlayerList();
 	}
 
 	/**
 	 * setup activity for this manager
 	 */
-	protected void initialize()
+	protected void makePlayerList()
 	{
 		numPlayers = CM.numHumanPlayers + 1;
 

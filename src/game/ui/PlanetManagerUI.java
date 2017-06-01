@@ -51,6 +51,17 @@ public class PlanetManagerUI extends PlanetManager
 	public PlanetManagerUI(ConfigManager CM)
 	{
 		super(CM);
+
+		bgPane = new Pane();
+		pane = new Pane();
+		tilePane = new TilePane(Orientation.HORIZONTAL);
+		
+		tilePane.setPrefColumns(x);
+		tilePane.setPrefRows(y);
+		tilePane.setMaxSize(getSizeX(), getSizeY());
+		bgPane.setPrefSize(getSizeX(), getSizeY());
+		pane.setMaxWidth(getSizeX());
+		
 		makeUI();
 	}
 
@@ -100,45 +111,36 @@ public class PlanetManagerUI extends PlanetManager
 				// check if selection is before padding
 				if (dx < (getTileH() + getPadH()) / getPadH() && dy < (getTileV() + getPadV()) / getPadV())
 				{
-					Planet p = planets.get(hashLocation(ix, iy));
+					Planet p = planets.get(hashLocation(iy * x + ix));
 					handleClickPlanet(p);
 				}
 			}
 		});
 	}
-
+	
 	@Override
 	public void reset()
 	{
 		super.reset();
-		updateMiniPane();
-	}
 
-	@Override
-	protected void initialize()
-	{
-		super.initialize();
-
-		if (tilePane == null)
-		{
-			bgPane = new Pane();
-			pane = new Pane();
-			tilePane = new TilePane(Orientation.HORIZONTAL);
-		}
-		else
-		{
-			tilePane.getChildren().clear();
-		}
-
-		zoom = 1.00;
-		paths = new HashMap<Fleet, Path>();
-		tiles = new HashMap<Space, Label>();
-
+		tilePane.getChildren().clear();
 		tilePane.setPrefColumns(x);
 		tilePane.setPrefRows(y);
 		tilePane.setMaxSize(getSizeX(), getSizeY());
 		bgPane.setPrefSize(getSizeX(), getSizeY());
 		pane.setMaxWidth(getSizeX());
+		
+		updateMiniPane();
+	}
+
+	@Override
+	protected void loadConfiguration()
+	{
+		super.loadConfiguration();
+		
+		zoom = 1.00;
+		paths = new HashMap<Fleet, Path>();
+		tiles = new HashMap<Space, Label>();
 	}
 
 	/**
@@ -153,7 +155,7 @@ public class PlanetManagerUI extends PlanetManager
 		for (int i = 0; i < len; i++)
 		{
 			Label l = new Label();
-			int hash = hashLocation(i % x, i / x);
+			int hash = hashLocation(i);
 
 			l.setMinSize(getTileH(), getTileV());
 			l.setMaxSize(getTileH(), getTileV());
@@ -248,7 +250,6 @@ public class PlanetManagerUI extends PlanetManager
 	@Override
 	public void setPlanetOwner(Player player, Planet p)
 	{
-		// if owner is not null 
 		if (p.getOwner() != null)
 		{
 			tiles.get(p).getStyleClass().remove(p.getOwner().getColor());

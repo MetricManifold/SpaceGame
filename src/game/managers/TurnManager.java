@@ -21,7 +21,7 @@ public class TurnManager
 	public TurnManager(ConfigManager CM)
 	{
 		this.CM = CM;
-		initialize();
+		loadConfiguration();
 	}
 
 	/**
@@ -38,10 +38,10 @@ public class TurnManager
 	
 	public void reset()
 	{
-		initialize();
+		loadConfiguration();
 	}
 	
-	protected void initialize()
+	protected void loadConfiguration()
 	{
 		fleets = new ArrayList<Fleet>();
 	}

@@ -115,7 +115,6 @@ public class TurnManagerUI extends TurnManager
 		rightAlignBox.setAlignment(Pos.CENTER_RIGHT);
 		centerPane.prefWidthProperty().bind(pane.widthProperty());
 		HBox.setHgrow(rightAlignBox, Priority.ALWAYS);
-		//StackPane.setAlignment(tblPlayer, Pos.CENTER);
 
 		v1.setAlignment(Pos.CENTER_LEFT);
 		v2.setAlignment(Pos.CENTER_RIGHT);
@@ -223,9 +222,9 @@ public class TurnManagerUI extends TurnManager
 	}
 	
 	@Override
-	public void initialize()
+	public void loadConfiguration()
 	{
-		super.initialize();
+		super.loadConfiguration();
 	}
 
 	public void clickNextTurn()

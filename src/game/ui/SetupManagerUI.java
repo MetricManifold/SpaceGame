@@ -252,7 +252,6 @@ public class SetupManagerUI extends SetupManager
 		CM.gridY = sGy.getValue();
 		CM.planetDensity = sPd.getValue();
 		
-		
 		PG.reset();
 	}
 	
@@ -297,6 +296,8 @@ public class SetupManagerUI extends SetupManager
 		
 		gamePane.getChildren().addAll(getTurnManager().getPane(), getPlanetManager().getPane());
 		rootPane.setCenter(gamePane);
+
+		PG.reset();
 	}
 
 	@Override
