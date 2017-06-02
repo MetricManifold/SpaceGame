@@ -50,7 +50,7 @@ public class SetupManager
 		MM.setup();
 	}
 
-	public void populatePlayers()
+	public void populatePlayerList()
 	{
 		
 	}

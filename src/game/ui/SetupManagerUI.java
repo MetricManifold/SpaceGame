@@ -2,6 +2,7 @@ package game.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map.Entry;
 
 import game.managers.ConfigManager;
 import game.managers.MusicManager;
@@ -258,18 +259,18 @@ public class SetupManagerUI extends SetupManager
 		btnStart.setOnMouseClicked(e -> startGame());
 		btnRefresh.setOnMouseClicked(e -> refreshGrid());
 
-		populatePlayers();
+		populatePlayerList();
 	}
 
 	public void refreshGrid()
 	{
 		int thresholdx = CM.defaultGridX;
 		int thresholdy = CM.defaultGridY;
-		if (CM.gridY == thresholdy && sGy.getValue() > thresholdy && CM.gridX <= thresholdy || CM.gridX == thresholdx && sGx.getValue() > thresholdx && CM.gridY <= thresholdy)
+		if (CM.gridY <= thresholdy && sGy.getValue() > thresholdy && CM.gridX <= thresholdx || CM.gridX <= thresholdx && sGx.getValue() > thresholdx && CM.gridY <= thresholdy)
 		{
 			getPlanetManager().setZoom(getPlanetManager().getZoom() - 0.2);
 		}
-		else if (CM.gridY > thresholdy && sGy.getValue() <= thresholdy && CM.gridX >= thresholdy || CM.gridX > thresholdx && sGx.getValue() <= thresholdx && CM.gridY >= thresholdy)
+		else if (CM.gridY > thresholdy && sGy.getValue() <= thresholdy && CM.gridX <= thresholdx || CM.gridX > thresholdx && sGx.getValue() <= thresholdx && CM.gridY <= thresholdy)
 		{
 			getPlanetManager().setZoom(getPlanetManager().getZoom() + 0.2);
 		}
@@ -279,12 +280,6 @@ public class SetupManagerUI extends SetupManager
 		CM.planetDensity = sPd.getValue();
 
 		PG.reset();
-	}
-
-	public void refreshPlayers()
-	{
-		refreshGrid();
-		populatePlayers();
 	}
 
 	@Override
@@ -327,39 +322,56 @@ public class SetupManagerUI extends SetupManager
 		super.startGame();
 
 		getPlanetManager().redrawGrid();
-		getPlanetManager().updateConfiguration();
+		getPlanetManager().reloadConfiguration();
 	}
 
 	@Override
-	public void populatePlayers()
+	public void populatePlayerList()
 	{
 		playerList.clear();
 
-		int height = 30;
-		int nmWidth = 100;
-		int clrSize = 25;
-		int clrMiniSize = 10;
 		int spacing = 10;
 		int padding = 5;
 
-		super.populatePlayers();
+		int width = 300, height = 40;
+		int nmWidth = 90;
+		int spnWidth = 70;
+		int clrWidth = 40;
+
+		super.populatePlayerList();
 		for (Player p : PM.getPlayersOfType(Controller.HUMAN))
 		{
 			HBox box = new HBox();
 			TextField nm = new TextField(p.getName());
 			ComboBox<String> clr = new ComboBox<>();
 			ComboBox<Controller> ctrl = new ComboBox<>(cbCtrlOptions);
+			Spinner<Integer> stn = new Spinner<>();
+			SpinnerValueFactory<Integer> factoryStn = new SpinnerValueFactory.IntegerSpinnerValueFactory(
+				CM.minStartPlanets, CM.maxStartPlanets, CM.planetStartCount);
 
-			nm.setMaxSize(nmWidth, height);
-			nm.setMinSize(nmWidth, height);
-
-			ctrl.setMaxSize(nmWidth, height);
-			ctrl.setMinSize(nmWidth, height);
+			nm.setMaxWidth(nmWidth);
+			stn.setValueFactory(factoryStn);
+			stn.setMaxWidth(spnWidth);
 			ctrl.setValue(p.getController());
+			clr.getStyleClass().add("color-box");
+			clr.setItems(cbClrOptions);
+			clr.setMinWidth(clrWidth);
+			clr.setMaxWidth(clrWidth);
 
-			clr.setMaxSize(clrSize, clrSize);
-			clr.setMinSize(clrSize, clrSize);
-			clr.valueProperty().addListener(e -> clr.setBackground(new Background(new BackgroundFill(Color.valueOf(clr.getValue()), new CornerRadii(height / 2), Insets.EMPTY))));
+			clr.valueProperty().addListener(e -> {
+				for (Player v : PM.getPlayers())
+				{
+					if (v.getColor() == clr.getValue())
+					{
+						clr.setValue(p.getColor());
+					}
+				}
+				
+				clr.setBackground(new Background(new BackgroundFill(Color.valueOf(clr.getValue()), CornerRadii.EMPTY, Insets.EMPTY)));
+				p.setColor(clr.getValue());
+				getPlanetManager().redrawGrid();
+
+			});
 			clr.setCellFactory(new Callback<ListView<String>, ListCell<String>>()
 			{
 				@Override
@@ -367,11 +379,11 @@ public class SetupManagerUI extends SetupManager
 				{
 					return new ListCell<String>()
 					{
+						int clrSize = 20;
 						private final Circle c;
 						{
 							setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-							setMaxWidth(45);
-							c = new Circle(clrMiniSize);
+							c = new Circle(clrSize / 2);
 						}
 
 						@Override
@@ -392,13 +404,38 @@ public class SetupManagerUI extends SetupManager
 					};
 				}
 			});
-			clr.getStyleClass().add("combo-box1");
-			clr.setItems(cbClrOptions);
-			clr.setValue(cbClrOptions.get(p.getNum()));
 
+			/*
+			 * impose constraints on the number of starting planets
+			 */
+			stn.valueProperty().addListener(e -> {
+				int numPlanets = PG.getPlanetArray().length;
+				int startCountSum = 0;
+
+				// defines ratio of neutral planets to player start planets
+				double weight = 1.5;
+
+				// sum count of starting planets, excludes current player
+				for (Entry<Player, Integer> n : CM.planetStartCountMap.entrySet())
+				{
+					if (n.getKey() != p) startCountSum += n.getValue();
+				}
+
+				// condition for changing the starting count
+				if ((int) (numPlanets / weight) < stn.getValue() + startCountSum)
+				{
+					int val = (int) (numPlanets / weight) - startCountSum;
+					factoryStn.setValue(val);
+				}
+
+				CM.planetStartCountMap.put(p, stn.getValue());
+				PG.reset();
+			});
+
+			clr.setValue(cbClrOptions.get(p.getNum()));
+			box.setPrefSize(width, height);
 			box.setSpacing(spacing);
 			box.setAlignment(Pos.CENTER_LEFT);
-			box.getChildren().addAll(nm, clr, ctrl);
 			box.setPadding(new Insets(padding, padding, padding, padding));
 
 			nm.setOnAction(e -> {
@@ -409,6 +446,7 @@ public class SetupManagerUI extends SetupManager
 				if (e.getCode() == KeyCode.ESCAPE) nm.setText(p.getName());
 			});
 
+			box.getChildren().addAll(nm, ctrl, clr, stn);
 			playerList.add(box);
 		}
 	}

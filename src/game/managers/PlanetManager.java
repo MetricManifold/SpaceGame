@@ -48,11 +48,9 @@ public class PlanetManager
 	 */
 	public void reset()
 	{
-		loadConfiguration();
-		updateConfiguration();
-		
-		PM.reset();
-		CM.clearNames();
+		reloadConfiguration();
+
+		CM.clearPlanetNames();
 
 		spawnPlanets();
 		setStartPlanets();
@@ -69,8 +67,9 @@ public class PlanetManager
 		this.len = x * y;
 	}
 
-	public void updateConfiguration()
+	public void reloadConfiguration()
 	{
+		loadConfiguration();
 		for (Planet p : planets.values())
 		{
 			if (p.getOwner().getController() == Controller.NEUTRAL)
@@ -132,14 +131,17 @@ public class PlanetManager
 
 		for (int i = 0; i < PM.getNumPlayersOfType(Controller.HUMAN); i++)
 		{
-			// pick a random value from the planet array
-			int r = ThreadLocalRandom.current().nextInt(nums.size());
-			int pick = nums.remove(r);
-			Planet p = planetArray[pick];
+			Player v = PM.getPlayersOfType(Controller.HUMAN)[i];
+			for (int j = 0; j < CM.planetStartCountMap.get(v); j++)
+			{
+				int r = ThreadLocalRandom.current().nextInt(nums.size());
+				int pick = nums.remove(r);
+				Planet p = planetArray[pick];
 
-			setPlanetOwner(PM.getPlayersOfType(Controller.HUMAN)[i], p);
-			p.setProduction(CM.defaultShip, CM.initialProduction);
-			p.addShips(CM.defaultShip, CM.shipStartCount);
+				setPlanetOwner(v, p);
+				p.setProduction(CM.defaultShip, CM.initialProduction);
+				p.addShips(CM.defaultShip, CM.shipStartCount);
+			}
 		}
 
 		nums.forEach(n -> setPlanetOwner(PM.neutral, planetArray[n]));
@@ -179,6 +181,16 @@ public class PlanetManager
 	public Planet[] getPlanetArray()
 	{
 		return planets.values().toArray(new Planet[planets.size()]);
+	}
+
+	public int getX()
+	{
+		return x;
+	}
+
+	public int getY()
+	{
+		return y;
 	}
 
 }

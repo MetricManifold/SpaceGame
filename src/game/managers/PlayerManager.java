@@ -26,14 +26,14 @@ public class PlayerManager
 	public enum Controller
 	{
 		AI("AI"), HUMAN("Human"), NEUTRAL("Neutral"), HOSTILE("Hostile");
-		
+
 		String name;
-		
+
 		Controller(String name)
 		{
 			this.name = name;
 		}
-		
+
 		@Override
 		public String toString()
 		{
@@ -49,14 +49,6 @@ public class PlayerManager
 
 		makePlayerList();
 	}
-	
-	/**
-	 * resets this manager to initial conditions
-	 */
-	public void reset()
-	{
-		makePlayerList();
-	}
 
 	/**
 	 * setup activity for this manager
@@ -68,7 +60,7 @@ public class PlayerManager
 		players = new Player[numPlayers];
 		players[0] = neutral;
 		playerIndex = 1;
-		
+
 		for (int i = 1; i < numPlayers; i++)
 		{
 			players[i] = new Player(i, CM.COLORS[i]);
@@ -95,6 +87,18 @@ public class PlayerManager
 	public Player getCurrentPlayer()
 	{
 		return players[playerIndex];
+	}
+
+	public void setCurrentPlayer(int playerIndex)
+	{
+		if (playerIndex >= numPlayers)
+		{
+			this.playerIndex = numPlayers - 1;
+		}
+		else
+		{
+			this.playerIndex = playerIndex;
+		}
 	}
 
 	/**
@@ -138,20 +142,11 @@ public class PlayerManager
 	{
 		List<Player> list = new ArrayList<>(Arrays.asList(players));
 		list.removeIf(p -> p.getController() != c);
-
 		return list.toArray(new Player[] {});
 	}
-	
+
 	public Player[] getPlayers()
 	{
 		return players;
 	}
 }
-
-
-
-
-
-
-
-

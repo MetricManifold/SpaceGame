@@ -219,14 +219,9 @@ public class TurnManagerUI extends TurnManager
 
 		pane.setPrefWidth(getPlanetManagerUI().getSizeX());
 		pane.setMaxWidth(getPlanetManagerUI().getSizeX());
+		totalSeconds = 0;
 	}
 	
-	@Override
-	public void loadConfiguration()
-	{
-		super.loadConfiguration();
-	}
-
 	public void clickNextTurn()
 	{
 		try

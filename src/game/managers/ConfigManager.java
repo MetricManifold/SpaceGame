@@ -84,6 +84,8 @@ public class ConfigManager
 		initialProduction = 10, 
 		maxProduction = 30, 
 		minProduction = 5,
+		maxStartPlanets = 10,
+		minStartPlanets = 1,
 		cmaxProduction = 9999, 
 		cmaxShipStartCount = 9999999,
 		numHumanPlayers = 1, 
@@ -159,7 +161,7 @@ public class ConfigManager
 		return name;
 	}
 	
-	public void clearNames()
+	public void clearPlanetNames()
 	{
 		pickedNames.clear();
 	}

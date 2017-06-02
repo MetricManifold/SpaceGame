@@ -40,12 +40,9 @@ public class TurnManager
 	public void reset()
 	{
 		fleets = new ArrayList<Fleet>();
+		PM.setCurrentPlayer(1);
 	}
 	
-	protected void loadConfiguration()
-	{
-	}
-
 	/**
 	 * activate the next turn
 	 * 

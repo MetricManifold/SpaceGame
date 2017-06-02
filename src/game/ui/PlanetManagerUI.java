@@ -110,9 +110,7 @@ public class PlanetManagerUI extends PlanetManager
 	public void reset()
 	{
 		super.reset();
-
 		redrawGrid();
-		updateMiniPane();
 	}
 
 	@Override
@@ -158,22 +156,29 @@ public class PlanetManagerUI extends PlanetManager
 
 	public void redrawGrid()
 	{
+		tilePane.setPadding(new Insets(getMargin(), getMargin(), getMargin(), getMargin()));
+		tilePane.setPrefColumns(x);
+		tilePane.setPrefRows(y);
+		tilePane.setMaxSize(getSizeX(), getSizeY());
+		tilePane.setMinSize(getSizeX(), getSizeY());
+		tilePane.setHgap(getPadH());
+		tilePane.setVgap(getPadV());
+
+		bgPane.setPrefSize(getSizeX(), getSizeY());
+		pane.setMaxWidth(getSizeX());
+
+		for (Planet p : planets.values())
+		{
+			setPlanetOwner(p.getOwner(), p);
+		}
+		
 		for (Label l : tiles.values())
 		{
 			l.setMinSize(getTileH(), getTileV());
 			l.setMaxSize(getTileH(), getTileV());
-
-			tilePane.setPadding(new Insets(getMargin(), getMargin(), getMargin(), getMargin()));
-			tilePane.setPrefColumns(x);
-			tilePane.setPrefRows(y);
-			tilePane.setMaxSize(getSizeX(), getSizeY());
-			tilePane.setMinSize(getSizeX(), getSizeY());
-			tilePane.setHgap(getPadH());
-			tilePane.setVgap(getPadV());
-
-			bgPane.setPrefSize(getSizeX(), getSizeY());
-			pane.setMaxWidth(getSizeX());
 		}
+		
+		updateMiniPane();
 	}
 
 	/**
@@ -334,6 +339,7 @@ public class PlanetManagerUI extends PlanetManager
 	public void setZoom(double newZoom)
 	{
 		zoom = newZoom;
+		redrawGrid();
 	}
 
 	public double getZoom()
@@ -387,7 +393,7 @@ public class PlanetManagerUI extends PlanetManager
 		return miniPane;
 	}
 
-	protected void updateMiniPane()
+	private void updateMiniPane()
 	{
 		if (miniPane == null)
 		{
