@@ -39,7 +39,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Callback;
 
 public class SetupManagerUI extends SetupManager
@@ -358,7 +357,6 @@ public class SetupManagerUI extends SetupManager
 			ctrl.setMinSize(nmWidth, height);
 			ctrl.setValue(p.getController());
 
-			//clr.getStyleClass().add("player-color");
 			clr.setMaxSize(clrSize, clrSize);
 			clr.setMinSize(clrSize, clrSize);
 			clr.valueProperty().addListener(e -> clr.setBackground(new Background(new BackgroundFill(Color.valueOf(clr.getValue()), new CornerRadii(height / 2), Insets.EMPTY))));
