@@ -18,10 +18,10 @@ import javafx.scene.text.TextFlow;
 public class Planet extends Space
 {
 	// production per turn and ships
-	protected Map<ShipType, Integer> production;
-	protected ShipInventory ships;
+	protected Map<ShipType, Integer> production = new HashMap<>();
+	protected ShipInventory ships = new ShipInventory();
 	protected String name;
-	protected Player owner;
+	protected Player owner = null;
 	protected boolean displayShips = true;
 	protected double defenderBonus;
 	protected ShipType defaultShip;
@@ -30,9 +30,6 @@ public class Planet extends Space
 	{
 		super(pos);
 		this.name = CM.getPlanetName();
-		this.production = new HashMap<>();
-		this.ships = new ShipInventory();
-		this.owner = null;
 		this.defaultShip = CM.defaultShip;
 		this.defenderBonus = CM.planetDefenderBonus;
 		

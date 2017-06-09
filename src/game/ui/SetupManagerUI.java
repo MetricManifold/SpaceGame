@@ -11,6 +11,7 @@ import game.managers.PlayerManager.Controller;
 import game.managers.SetupManager;
 import game.managers.ConfigManager.ShipType;
 import game.players.Player;
+import game.tiles.Planet;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -280,6 +281,7 @@ public class SetupManagerUI extends SetupManager
 		CM.planetDensity = sPd.getValue();
 
 		PG.reset();
+
 	}
 
 	@Override
@@ -321,8 +323,24 @@ public class SetupManagerUI extends SetupManager
 
 		super.startGame();
 
-		getPlanetManager().redrawGrid();
-		getPlanetManager().reloadConfiguration();
+		getPlanetManager().drawGrid();
+
+		for (Planet p : PG.getPlanetArray())
+		{
+			if (p.getOwner().getController() == Controller.NEUTRAL)
+			{
+				p.setDisplayShips(CM.neutralShipsVisible);
+				p.setDefenderBonus(CM.planetDefenderBonus);
+			}
+			else
+			{
+				p.setProduction(CM.defaultShip, CM.initialProduction);
+				p.getShipInventory().removeAll();
+				p.addShips(CM.defaultShip, CM.shipStartCount);
+				p.setDefaultShip(CM.defaultShip);
+			}
+		}
+		
 	}
 
 	@Override
@@ -366,10 +384,10 @@ public class SetupManagerUI extends SetupManager
 						clr.setValue(p.getColor());
 					}
 				}
-				
+
 				clr.setBackground(new Background(new BackgroundFill(Color.valueOf(clr.getValue()), CornerRadii.EMPTY, Insets.EMPTY)));
 				p.setColor(clr.getValue());
-				getPlanetManager().redrawGrid();
+				getPlanetManager().drawGrid();
 
 			});
 			clr.setCellFactory(new Callback<ListView<String>, ListCell<String>>()
@@ -408,12 +426,12 @@ public class SetupManagerUI extends SetupManager
 			/*
 			 * impose constraints on the number of starting planets
 			 */
-			stn.valueProperty().addListener(e -> {
-				int numPlanets = PG.getPlanetArray().length;
+			Runnable stnHandle = () -> {
+				int numPlanets = PG.getPlanetArray().size();
 				int startCountSum = 0;
 
 				// defines ratio of neutral planets to player start planets
-				double weight = 1.5;
+				double weight = 1.2;
 
 				// sum count of starting planets, excludes current player
 				for (Entry<Player, Integer> n : CM.planetStartCountMap.entrySet())
@@ -425,12 +443,14 @@ public class SetupManagerUI extends SetupManager
 				if ((int) (numPlanets / weight) < stn.getValue() + startCountSum)
 				{
 					int val = (int) (numPlanets / weight) - startCountSum;
-					factoryStn.setValue(val);
+					//factoryStn.setValue(val);
 				}
 
 				CM.planetStartCountMap.put(p, stn.getValue());
 				PG.reset();
-			});
+			};
+			stn.valueProperty().addListener(e -> stnHandle.run());
+			//stn.setOnMouseClicked(e -> stnHandle.run());
 
 			clr.setValue(cbClrOptions.get(p.getNum()));
 			box.setPrefSize(width, height);

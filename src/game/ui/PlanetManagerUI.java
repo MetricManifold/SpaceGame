@@ -50,9 +50,11 @@ public class PlanetManagerUI extends PlanetManager
 	{
 		super(CM);
 
+		tiles = new HashMap<Space, Label>();
 		bgPane = new Pane();
 		pane = new Pane();
 		tilePane = new TilePane(Orientation.HORIZONTAL);
+		paths = new HashMap<Fleet, Path>();
 
 		makeUI();
 	}
@@ -84,8 +86,7 @@ public class PlanetManagerUI extends PlanetManager
 	{
 		TMui = (TurnManagerUI) tm;
 		super.setup(pm, tm);
-		redrawGrid();
-
+		
 		tilePane.setOnMouseClicked(e -> {
 			double sx = (e.getX() - getMargin()) / (getTileH() + getPadH()); // 	normalized selected x
 			double sy = (e.getY() - getMargin()) / (getTileV() + getPadV()); // 	normalized selected y
@@ -104,13 +105,17 @@ public class PlanetManagerUI extends PlanetManager
 		tilePane.setOnMouseDragged(e -> handleDrag(e));
 		tilePane.setOnScroll(e -> handleZoom(e.getDeltaY()));
 		WindowManager.getScene().setOnKeyReleased(e -> handleZoom(e.getCode()));
+
+		drawGrid();
+
 	}
 
 	@Override
 	public void reset()
 	{
 		super.reset();
-		redrawGrid();
+		paths = new HashMap<Fleet, Path>();
+		drawGrid();
 	}
 
 	@Override
@@ -118,8 +123,6 @@ public class PlanetManagerUI extends PlanetManager
 	{
 		super.loadConfiguration();
 
-		paths = new HashMap<Fleet, Path>();
-		tiles = new HashMap<Space, Label>();
 	}
 
 	/**
@@ -129,6 +132,7 @@ public class PlanetManagerUI extends PlanetManager
 	public void spawnPlanets()
 	{
 		super.spawnPlanets();
+
 		tilePane.getChildren().clear();
 
 		for (int i = 0; i < len; i++)
@@ -152,9 +156,10 @@ public class PlanetManagerUI extends PlanetManager
 				tiles.put(spaces.get(hash), l);
 			}
 		}
+
 	}
 
-	public void redrawGrid()
+	public void drawGrid()
 	{
 		tilePane.setPadding(new Insets(getMargin(), getMargin(), getMargin(), getMargin()));
 		tilePane.setPrefColumns(x);
@@ -171,13 +176,13 @@ public class PlanetManagerUI extends PlanetManager
 		{
 			setPlanetOwner(p.getOwner(), p);
 		}
-		
+
 		for (Label l : tiles.values())
 		{
 			l.setMinSize(getTileH(), getTileV());
 			l.setMaxSize(getTileH(), getTileV());
 		}
-		
+
 		updateMiniPane();
 	}
 
@@ -254,7 +259,7 @@ public class PlanetManagerUI extends PlanetManager
 		{
 			tiles.get(p).getStyleClass().remove(p.getOwner().getColor());
 		}
-
+		
 		super.setPlanetOwner(player, p);
 		tiles.get(p).getStyleClass().add(player.getColor());
 	}
@@ -339,7 +344,7 @@ public class PlanetManagerUI extends PlanetManager
 	public void setZoom(double newZoom)
 	{
 		zoom = newZoom;
-		redrawGrid();
+		drawGrid();
 	}
 
 	public double getZoom()
@@ -352,12 +357,12 @@ public class PlanetManagerUI extends PlanetManager
 		if (k == KeyCode.MINUS && zoom > 0.5)
 		{
 			zoom -= 0.1;
-			redrawGrid();
+			drawGrid();
 		}
 		else if (k == KeyCode.EQUALS && zoom < 1.5)
 		{
 			zoom += 0.1;
-			redrawGrid();
+			drawGrid();
 		}
 	}
 
@@ -366,12 +371,12 @@ public class PlanetManagerUI extends PlanetManager
 		if (delta < 0 && zoom > 0.5)
 		{
 			zoom -= 0.1;
-			redrawGrid();
+			drawGrid();
 		}
 		else if (delta > 0 && zoom < 1.5)
 		{
 			zoom += 0.1;
-			redrawGrid();
+			drawGrid();
 		}
 	}
 
@@ -399,37 +404,40 @@ public class PlanetManagerUI extends PlanetManager
 		{
 			getMiniPane();
 		}
-
-		miniPane.getChildren().clear();
-
-		double pad = getMargin();
-		miniPane.setMaxSize(getSizeX(), getSizeY());
-		miniPane.setMinSize(getSizeX(), getSizeY());
-		miniPane.setHgap(getPadH());
-		miniPane.setVgap(getPadV());
-		miniPane.setPrefColumns(x);
-		miniPane.setPrefRows(y);
-		miniPane.setPadding(new Insets(pad, pad, pad, pad));
-
-		for (int i = 0; i < len; i++)
+		else
 		{
-			Label l = new Label();
-			l.setMinSize(getTileH(), getTileV());
-			l.setMaxSize(getTileH(), getTileV());
+			miniPane.getChildren().clear();
 
-			int hash = hashLocation(i);
-			miniPane.getChildren().add(l);
-			Planet p = planets.get(hash);
+			double pad = getMargin();
+			miniPane.setMaxSize(getSizeX(), getSizeY());
+			miniPane.setMinSize(getSizeX(), getSizeY());
+			miniPane.setHgap(getPadH());
+			miniPane.setVgap(getPadV());
+			miniPane.setPrefColumns(x);
+			miniPane.setPrefRows(y);
+			miniPane.setPadding(new Insets(pad, pad, pad, pad));
 
-			if (p != null)
+			for (int i = 0; i < len; i++)
 			{
-				l.getStyleClass().addAll("space-button", p.getOwner().getColor());
-			}
-			else
-			{
-				l.getStyleClass().add("space-button");
+				Label l = new Label();
+				l.setMinSize(getTileH(), getTileV());
+				l.setMaxSize(getTileH(), getTileV());
+
+				int hash = hashLocation(i);
+				miniPane.getChildren().add(l);
+				Planet p = planets.get(hash);
+
+				if (p != null)
+				{
+					l.getStyleClass().addAll("space-button", p.getOwner().getColor());
+				}
+				else
+				{
+					l.getStyleClass().add("space-button");
+				}
 			}
 		}
+
 	}
 
 	public int getTileH()

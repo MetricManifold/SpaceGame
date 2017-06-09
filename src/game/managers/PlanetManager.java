@@ -2,10 +2,9 @@ package game.managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.IntStream;
 
 import game.managers.PlayerManager.Controller;
 import game.players.Player;
@@ -48,10 +47,8 @@ public class PlanetManager
 	 */
 	public void reset()
 	{
-		reloadConfiguration();
-
+		loadConfiguration();
 		CM.clearPlanetNames();
-
 		spawnPlanets();
 		setStartPlanets();
 	}
@@ -65,27 +62,9 @@ public class PlanetManager
 		this.y = CM.gridY;
 		this.density = CM.planetDensity;
 		this.len = x * y;
+	
 	}
-
-	public void reloadConfiguration()
-	{
-		loadConfiguration();
-		for (Planet p : planets.values())
-		{
-			if (p.getOwner().getController() == Controller.NEUTRAL)
-			{
-				p.setDisplayShips(CM.neutralShipsVisible);
-				p.setDefenderBonus(CM.planetDefenderBonus);
-			}
-			else
-			{
-				p.setProduction(CM.defaultShip, CM.initialProduction);
-				p.getShipInventory().removeAll();
-				p.addShips(CM.defaultShip, CM.shipStartCount);
-				p.setDefaultShip(CM.defaultShip);
-			}
-		}
-	}
+	
 
 	/**
 	 * puts planets in the grid and associates them with buttons
@@ -95,26 +74,27 @@ public class PlanetManager
 		planets = new HashMap<Integer, Planet>();
 		spaces = new HashMap<Integer, Space>();
 
-		do
+		int startCountSum = 0;
+		for (Entry<Player, Integer> n : CM.planetStartCountMap.entrySet())
+		{
+			startCountSum += n.getValue();
+		}
+		
+		while (planets.size() < startCountSum)
 		{
 			for (int i = 0; i < len; i++)
 			{
-				// create the necessary elements
 				Space s = new Space(i % x, i / x);
+				spaces.put(hashLocation(i), s);
 
-				// choose whether to create a planet or empty space
-				double prob = ThreadLocalRandom.current().nextDouble();
-				if (prob < density)
+				if (ThreadLocalRandom.current().nextDouble() < density)
 				{
 					Planet p = new Planet(s, CM);
 					planets.put(hashLocation(i), p);
 				}
-				else
-				{
-					spaces.put(hashLocation(i), s);
-				}
+				
 			}
-		} while (planets.size() < PM.numPlayers);
+		}
 	}
 
 	/**
@@ -123,20 +103,15 @@ public class PlanetManager
 	public void setStartPlanets()
 	{
 		// make a list of planets to choose from
-		Planet[] planetArray = getPlanetArray();
-
-		// make a list denoting each of the planets
-		List<Integer> nums = new ArrayList<>();
-		IntStream.range(0, planets.size()).forEach(i -> nums.add(i));
+		ArrayList<Planet> planetArray = getPlanetArray();
 
 		for (int i = 0; i < PM.getNumPlayersOfType(Controller.HUMAN); i++)
 		{
 			Player v = PM.getPlayersOfType(Controller.HUMAN)[i];
 			for (int j = 0; j < CM.planetStartCountMap.get(v); j++)
 			{
-				int r = ThreadLocalRandom.current().nextInt(nums.size());
-				int pick = nums.remove(r);
-				Planet p = planetArray[pick];
+				int r = ThreadLocalRandom.current().nextInt(planetArray.size());
+				Planet p = planetArray.remove(r);
 
 				setPlanetOwner(v, p);
 				p.setProduction(CM.defaultShip, CM.initialProduction);
@@ -144,8 +119,8 @@ public class PlanetManager
 			}
 		}
 
-		nums.forEach(n -> setPlanetOwner(PM.neutral, planetArray[n]));
-		if (!CM.neutralShipsVisible) nums.forEach(n -> planetArray[n].setDisplayShips(false));
+		planetArray.forEach(p -> setPlanetOwner(PM.neutral, p));
+		if (!CM.neutralShipsVisible) planetArray.forEach(p -> p.setDisplayShips(false));
 	}
 
 	/**
@@ -178,9 +153,9 @@ public class PlanetManager
 	 * 
 	 * @return
 	 */
-	public Planet[] getPlanetArray()
+	public ArrayList<Planet> getPlanetArray()
 	{
-		return planets.values().toArray(new Planet[planets.size()]);
+		return new ArrayList<Planet>(planets.values());
 	}
 
 	public int getX()
@@ -192,5 +167,4 @@ public class PlanetManager
 	{
 		return y;
 	}
-
 }

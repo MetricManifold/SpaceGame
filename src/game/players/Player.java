@@ -119,6 +119,7 @@ public class Player
 	public void addPlanet(Planet p)
 	{
 		planets.add(p);
+		alive = true;
 	}
 
 	/**

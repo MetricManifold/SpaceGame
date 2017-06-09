@@ -73,10 +73,33 @@ public class PlayerManager
 	 */
 	public void nextPlayer()
 	{
+		int numAlive = 0;
+		Player pAlive = null;
+
+		// check victory conditions
+		for (Player p : players)
+		{
+			if (p.isAlive())
+			{
+				numAlive++;
+				pAlive = p;
+			}
+		}
+
+		if (numAlive == 1)
+		{
+			victory(pAlive);
+		}
+
 		do
 		{
 			playerIndex = playerIndex % numPlayers;
 		} while (!players[playerIndex].isAlive() && getNumPlayersOfType(Controller.HUMAN) > 0);
+	}
+
+	public void victory(Player p)
+	{
+
 	}
 
 	/**
