@@ -1,26 +1,43 @@
 package game.players;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import game.managers.PlanetManager;
+import game.managers.PlayerManager;
+import game.managers.TurnManager;
+import game.managers.PlayerManager.Controller;
 import game.tiles.Planet;
 import game.tiles.Space;
 
 public class Player
 {
 	private Planet origin, destination;
-	private List<Planet> planets = new ArrayList<Planet>();
+	private Set<Planet> planets = new HashSet<Planet>();
 	private int num;
-	private String color;
+	private String color, name;
 	private boolean alive = true;
+	private Controller controller;
 
-	public Player(int num, String color)
+	protected Player(int num, String color, Controller controller)
 	{
 		this.num = num;
 		this.color = color;
+		this.controller = controller;
+		this.name = "Player " + Integer.valueOf(num);
 
 		origin = null;
 		destination = null;
+	}
+
+	public Player(int num, String color)
+	{
+		this(num, color, Controller.HUMAN);
+	}
+
+	public Controller getController()
+	{
+		return controller;
 	}
 
 	public void setDestination(Planet destination)
@@ -85,23 +102,28 @@ public class Player
 	}
 
 	/**
-	 * give a planet to this player's control
+	 * return the list of owned planets
+	 * 
+	 * @return
+	 */
+	public Set<Planet> getPlanetSet()
+	{
+		return new HashSet<>(planets);
+	}
+
+	/**
+	 * add a planet to this player's planet set
 	 * 
 	 * @param p
 	 */
 	public void addPlanet(Planet p)
 	{
-		p.setOwner(this);
 		planets.add(p);
-	}
-	
-	public List<Planet> getPlanets()
-	{
-		return planets;
+		alive = true;
 	}
 
 	/**
-	 * removes a planet from this player's control
+	 * removes a planet from this player's planet set
 	 * 
 	 * @param p
 	 */
@@ -148,7 +170,12 @@ public class Player
 	 */
 	public String getName()
 	{
-		return "Player " + Integer.valueOf(num);
+		return name;
+	}
+	
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 	/**
@@ -160,4 +187,14 @@ public class Player
 	{
 		return alive;
 	}
+
+	/**
+	 * updates the state of this player
+	 * 
+	 * @param pg
+	 * @param tm
+	 * @param pm
+	 */
+	public void update(PlanetManager pg, TurnManager tm, PlayerManager pm)
+	{}
 }

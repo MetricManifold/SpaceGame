@@ -9,14 +9,14 @@ import java.util.Set;
 import game.entities.Ship;
 import game.helpers.Displacement;
 import game.helpers.PointerDoubleMatrix;
-import game.managers.ConfigurationManager;
+import game.managers.ConfigManager.ShipType;
 import game.managers.PlanetManager;
 import game.players.Player;
 import game.tiles.Planet;
 
 public class Fleet extends ShipGroup
 {
-	private Displacement path = null;
+	private Displacement displacement = null;
 	private Planet destination = null;
 	private float speed = Integer.MAX_VALUE;
 	private Player owner;
@@ -32,7 +32,7 @@ public class Fleet extends ShipGroup
 		this.owner = owner;
 	}
 
-	public Fleet(Class<? extends Ship> type, int num, Player owner)
+	public Fleet(ShipType type, int num, Player owner)
 	{
 		super(type, num);
 		this.owner = owner;
@@ -51,18 +51,36 @@ public class Fleet extends ShipGroup
 	}
 
 	/**
+	 * returns the destination planet
+	 * 
+	 * @return
+	 */
+	public Planet getDestination()
+	{
+		return destination;
+	}
+
+	/**
+	 * returns the movement vector remaining to the destination
+	 * 
+	 * @return
+	 */
+	public Displacement getDisplacement()
+	{
+		return displacement;
+	}
+
+	/**
 	 * update the status of this fleet, including position if moving
 	 * 
 	 * @param pm
 	 * @throws Exception
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
 	 */
 	public void update(PlanetManager pm) throws Exception
 	{
-		if (path != null)
+		if (displacement != null)
 		{
-			if (path.subtract(speed).length() < speed)
+			if (displacement.subtract(speed).length() < speed)
 			{
 				if (owner != destination.getOwner())
 				{
@@ -85,12 +103,12 @@ public class Fleet extends ShipGroup
 					destination.addShips(this);
 				}
 
-				path = null;
+				displacement = null;
 				destination = null;
 			}
 			else
 			{
-				path = path.subtract(speed);
+				displacement = displacement.subtract(speed);
 			}
 		}
 	}
@@ -103,12 +121,8 @@ public class Fleet extends ShipGroup
 	 */
 	public void send(Planet origin, Planet dest)
 	{
-		// set the path and destination
-		this.path = dest.getPosition().subtract(origin.getPosition());
+		this.displacement = dest.getPosition().subtract(origin.getPosition());
 		this.destination = dest;
-
-		// log message
-		System.out.format("send ship on path x%.1f,y%.1f\n", path.getX(), path.getY());
 
 		for (List<Ship> l : ships.values())
 		{
@@ -124,29 +138,25 @@ public class Fleet extends ShipGroup
 	 * 
 	 * @param defender
 	 * @param defenderBonus
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
 	 */
 	public void attack(ShipGroup defender, double defenderBonus) throws Exception
 	{
-		Set<Class<? extends Ship>> allTypes = new HashSet<>(ships.keySet());
+		Set<ShipType> allTypes = new HashSet<>(ships.keySet());
 		allTypes.addAll(defender.ships.keySet());
-		List<Class<? extends Ship>> allTypesList = new ArrayList<>(allTypes);
+		List<ShipType> allTypesList = new ArrayList<>(allTypes);
 		int tn = allTypesList.size();
-		
+
 		double iniHpA = getTotalHealth();
 		double iniHpB = defender.getTotalHealth();
-		
-		int dmgA = -getTotalDamage();
-		int dmgB = (int) (-defender.getTotalDamage() * defenderBonus);
-		double avgDmgA = dmgA / defender.ships.keySet().size();
-		double avgDmgB =  dmgB / ships.keySet().size();
-		
+		double avgDmgA = -getTotalDamage() / defender.ships.keySet().size();
+		double avgDmgB = -defender.getTotalDamage() / ships.keySet().size() * defenderBonus;
+
 		// damage, strength map and individual ship health
 		PointerDoubleMatrix d_p = new PointerDoubleMatrix(1, tn);
 		PointerDoubleMatrix m_p = new PointerDoubleMatrix(tn, tn);
 		PointerDoubleMatrix h_p = new PointerDoubleMatrix(tn, tn);
-		
+		PointerDoubleMatrix u_p = new PointerDoubleMatrix(tn, 1, 1d);
+
 		// matrix for damages
 		PointerDoubleMatrix d_a = new PointerDoubleMatrix(1, tn);
 		PointerDoubleMatrix d_b = new PointerDoubleMatrix(1, tn);
@@ -154,17 +164,17 @@ public class Fleet extends ShipGroup
 		// matrix for healths		
 		PointerDoubleMatrix h_a = new PointerDoubleMatrix(1, tn);
 		PointerDoubleMatrix h_b = new PointerDoubleMatrix(1, tn);
-		
+
 		for (int i = 0; i < tn; i++)
 		{
-			Class<? extends Ship> t = allTypesList.get(i);
-			Ship s = t.newInstance();
+			ShipType t = allTypesList.get(i);
+			Ship s = t.getInstance();
 
 			h_a.set(0, i, getCount(t) * s.health);
 			h_b.set(0, i, defender.getCount(t) * s.health);
 			d_p.set(0, i, -s.getStrength()._2);
 			h_p.set(i, i, 1 / s.maxHealth);
-			
+
 			if (defender.ships.containsKey(t))
 			{
 				d_a.set(0, i, avgDmgA);
@@ -191,37 +201,45 @@ public class Fleet extends ShipGroup
 		}
 
 		PointerDoubleMatrix check = new PointerDoubleMatrix(1, tn, 0d);
-		while (!h_a.equals(check) || !h_b.equals(check))
+		while (!h_a.equals(check) && !h_b.equals(check))
 		{
+			double newHpA = h_a.dot(u_p);
+			double newHpB = h_b.dot(u_p);
 
-			double newHpA = 0, newHpB = 0;
+			h_a = h_a.add(d_b.mul(newHpB / iniHpB).add(d_p.mul(h_b).mul(h_p).mul(m_p)));
+			h_b = h_b.add(d_a.mul(newHpA / iniHpA).add(d_p.mul(h_a).mul(h_p).mul(m_p)));
+
 			for (int i = 0; i < tn; i++)
 			{
 				if (h_a.get(0, i).v < 1) h_a.set(0, i, 0d);
 				if (h_b.get(0, i).v < 1) h_b.set(0, i, 0d);
+			}
+		}
 
-				newHpA += h_a.get(0, i).v;
-				newHpB += h_b.get(0, i).v;
+		defender.removeAll();
+		removeAll();
+
+		for (int i = 0; i < tn; i++)
+		{
+			ShipType t = allTypesList.get(i);
+			Ship s = t.getInstance();
+
+			if (h_a.get(0, i).v > 0)
+			{
+				add(t, (int) Math.ceil(h_a.get(0, i).v / s.health));
 			}
 
-			
-			h_a = h_a.add(d_a.mul(newHpA / iniHpA).add(d_p.mul(h_b).mul(h_p).mul(m_p)));
-			h_b = h_b.add(d_b.mul(newHpB / iniHpB).add(d_p.mul(h_a).mul(h_p).mul(m_p)));
+			if (h_b.get(0, i).v > 0)
+			{
+				defender.add(t, (int) Math.ceil(h_b.get(0, i).v / s.health));
+			}
 		}
-		
-		
 
 	}
 
 	public void attack(Planet p) throws Exception
 	{
-		attack(p.getShipInventory(), ConfigurationManager.planetDefenderBonus);
+		attack(p.getShipInventory(), p.getDefenderBonus());
 	}
 
 }
-
-
-
-
-
-

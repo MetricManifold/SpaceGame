@@ -1,6 +1,7 @@
 package game.entities;
 
 import game.helpers.Tuple;
+import game.managers.ConfigManager.ShipType;
 
 public class Bomber extends Ship
 {
@@ -10,7 +11,8 @@ public class Bomber extends Ship
 		attack = 10;
 		armor = 1;
 		health = 50;
+		type = ShipType.BOMBER;
 		
-		strength = new Tuple<Class<? extends Ship>, Integer>(Destroyer.class, 5);
+		strength = new Tuple<ShipType, Integer>(ShipType.DESTROYER, 5);
 	}
 }
