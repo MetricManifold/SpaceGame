@@ -1,0 +1,235 @@
+.scene {
+	-fx-background-color: black;
+	-fx-padding: 2px;
+}
+
+/* PLANET GRID */
+
+.planet-grid {
+	-fx-background-repeat: no-repeat;
+	-fx-background-size: cover;
+	-fx-background-position: center;
+}
+
+.planet-grid1 {
+	-fx-background-image: url("background1.jpg");
+}
+
+.planet-grid2 {
+	-fx-background-image: url("background2.png");
+}
+
+.planet-grid3 {
+	-fx-background-image: url("background3.jpg");
+}
+
+.planet-grid4 {
+	-fx-background-image: url("background4.jpg");
+}
+
+
+/* PLANET BUTTONS */
+
+.space-button-origin {
+	-fx-border-insets: -3px;
+	-fx-border-style: dashed;
+	-fx-border-color: lightblue;
+}
+
+.space-button-destination {
+	-fx-border-insets: -3px;
+	-fx-border-style: dashed;
+	-fx-border-color: pink;
+}
+
+.space-button-illuminate {
+	-fx-effect: dropshadow(gaussian, lightblue, 16, 0.5, 0, 0);
+}
+
+.space-button:hover {
+	-fx-effect: dropshadow(gaussian, white, 6, 0.7, 0, 0);
+}
+
+.space-button {
+	-fx-border-width: 2px;
+	-fx-border-radius: 50%;
+
+	-fx-background-radius: 50%;
+	-fx-background-size: 85% 85%;
+	-fx-background-position: center;
+	-fx-background-repeat: no-repeat;
+}
+
+.planet-button1 {
+	-fx-background-image: url("planet1.png");
+	-fx-cursor: hand;
+}
+
+.planet-button2 {
+	-fx-background-image: url("planet2.png");
+	-fx-cursor: hand;
+}
+
+.planet-button3 {
+	-fx-background-image: url("planet3.png");
+	-fx-cursor: hand;
+}
+
+.planet-button4 {
+	-fx-background-image: url("planet4.png");
+	-fx-cursor: hand;
+}
+
+/* TURN BAR */
+
+.turn-bar {
+	-fx-background-color: #0c4422;
+	-fx-padding: 5;
+	-fx-alignment: center;
+}
+
+.player-label {
+	-fx-padding: 3px;
+	-fx-text-fill: white;
+	-fx-alignment: center;
+	-fx-font: 12px "Century Gothic";
+}
+
+.timer {
+	-fx-font: 16px "Consolas";
+	-fx-padding: 5;
+	-fx-alignment: center;
+}
+
+.tooltip-list:hover {
+	-fx-font-style: oblique;
+}
+
+.tooltip-list {
+	-fx-fill: lightgrey;
+	-fx-font-size: 12px;
+	-fx-alignment: left;
+}
+
+.tooltip-list-title {
+	-fx-fill: white;
+	-fx-font-size: 14px;
+	-fx-alignment: left;
+}
+
+.tooltip-list-production {
+	-fx-fill: white;
+	-fx-font-size: 12px;
+	-fx-alignment: right;
+}
+
+.turn-bar-entry {
+	-fx-text-fill: white;
+	-fx-min-width: 30px;
+	-fx-padding: 3px;
+	-fx-alignment: center;
+
+	-fx-background-radius: 0;
+
+	-fx-effect: innershadow(gaussian, black, 12, 0.2, 0, 0);
+	-fx-background-color: gray;
+
+	-fx-font: 12px "Century Gothic";
+}
+
+.turn-bar-button {
+	-fx-text-fill: white;
+	-fx-min-width: 80px;
+	-fx-padding: 4px;
+	-fx-alignment: center;
+
+	-fx-effect: innershadow(gaussian, black, 12, 0.2, 0, 0);
+	
+	-fx-background-color: #224f1e;
+	-fx-background-radius: 0 8 0 8;
+
+	-fx-font: 10px "Century Gothic";
+}
+
+.turn-bar-button:hover {
+	-fx-background-color: #10260e;
+	-fx-border: none;
+}
+
+.turn-bar-button:pressed {
+	-fx-background-insets: 0 1 1 0, 1 0 0 1, 1;
+	-fx-background-color: #557752;
+}
+
+
+/* PLAYER COLORS */
+
+.blue {
+	-fx-background-color: rgba(0, 0, 255, 0.75);
+	-fx-fill: rgb(0, 0, 255);
+}
+
+.red {
+	-fx-background-color: rgba(255, 0, 0, 0.75);
+	-fx-fill: rgb(255, 0, 0);
+}
+
+.orange {
+	-fx-background-color: rgba(255, 153, 0, 0.75);
+	-fx-fill: rgb(255, 153, 0);
+}
+
+.teal {
+	-fx-background-color: rgba(0, 153, 153, 0.75);
+	-fx-fill: rgb(0, 153, 153);
+}
+
+.purple {
+	-fx-background-color: rgba(153, 102, 255, 0.75);
+	-fx-fill: rgb(153, 102, 255);
+}
+
+.pink {
+	-fx-background-color: rgba(255, 153, 204, 0.75);
+	-fx-fill: rgb(255, 153, 204);
+}
+
+.gray {
+	-fx-background-color: rgba(102, 153, 153, 0.75);
+	-fx-fill: rgb(102, 153, 153);
+}
+
+.white {
+	-fx-background-color: rgba(255, 255, 255, 0.75);
+	-fx-fill: rgb(255, 255, 255);
+}
+
+.yellow {
+	-fx-background-color: rgba(255, 255, 0, 0.75);
+	-fx-fill: rgb(255, 255, 0);
+}
+
+.darkblue {
+	-fx-background-color: rgba(0, 51, 204, 0.75);
+	-fx-fill: rgb(0, 51, 204);
+}
+
+.green {
+	-fx-background-color: rgba(51, 204, 51, 0.75);
+	-fx-fill: rgb(51, 204, 51);
+}
+
+.lightgreen {
+	-fx-background-color: rgba(0, 255, 0, 0.75);
+	-fx-fill: rgb(0, 255, 0);
+}
+
+.lightblue {
+	-fx-background-color: rgba(0, 255, 255, 0.75);
+	-fx-fill: rgb(0, 255, 255);
+}
+
+.brown {
+	-fx-background-color: rgba(153, 102, 51, 0.75);
+	-fx-fill: rgb(153, 102, 51);
+}
