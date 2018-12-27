@@ -1,7 +1,6 @@
 package com.silber.ui;
 
 import javafx.animation.PauseTransition;
-import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.effect.DropShadow;
@@ -13,71 +12,50 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
-public class WindowManager extends Application
+public class WindowManager
 {
-	public static final String TITLE = "Starfare";
+	private static SetupManagerUI SM;
+	
+	// splash screen dimensions, conforming to given picture
+	private static final int SPLASH_WIDTH = 660;
+	private static final int SPLASH_HEIGHT = 360;
+	private static final int LOGO_WIDTH = SPLASH_WIDTH - 80;
+	
+	private static String splashStyle = "-fx-background-image: url(\"backgroundmain.jpg\"); -fx-background-size: cover;";
+	private static String splashImgFile = "starfarelogo.png";
+
+	// scenes for the splash and main screens
 	private static Scene scene;
+	private static Scene splash;
 
-	private SetupManagerUI SM;
+	// stage for the main screen
+	private static Stage primaryStage;
+	private static BorderPane mainPane;
 
-	private static final int SPLASH_WIDTH = 660, SPLASH_HEIGHT = 360, LOGO_WIDTH = SPLASH_WIDTH - 80;
-	private Stage primaryStage;
-	private BorderPane splashPane;
-	private BorderPane mainPane;
-
-	@Override
-	public void init()
-	{
-		ImageView splashImg = new ImageView(new Image("starfarelogo.png", LOGO_WIDTH, 0, true, true));
-		splashImg.maxWidth(LOGO_WIDTH);
-		splashImg.setEffect(new DropShadow());
-
-		splashPane = new BorderPane();
-		splashPane.setPrefHeight(SPLASH_HEIGHT);
-		splashPane.setPrefWidth(SPLASH_WIDTH);
-		splashPane.setCenter(splashImg);
-		splashPane.setStyle("-fx-background-image: url(\"backgroundmain.jpg\"); -fx-background-size: cover;");
-		splashPane.setEffect(new DropShadow());
-	}
-
-	@Override
-	public void start(final Stage initStage)
-	{
-		showSplash(initStage);
-
-		PauseTransition pause = new PauseTransition(Duration.seconds(1));
-		startGame();
-		
-		pause.setOnFinished(event -> {
-			initStage.hide();
-			primaryStage.show();
-		});
-		pause.play();
-	}
-
-	/**
-	 * show the splash screen on startup
-	 * 
-	 * @param initStage
-	 */
-	private void showSplash(Stage initStage)
-	{
-		Scene splash = new Scene(splashPane);
-		initStage.initStyle(StageStyle.UNDECORATED);
-		final Rectangle2D bounds = Screen.getPrimary().getBounds();
-
-		initStage.setTitle(TITLE);
-		initStage.setScene(splash);
-		initStage.setX(bounds.getMinX() + bounds.getWidth() / 2 - SPLASH_WIDTH / 2);
-		initStage.setY(bounds.getMinY() + bounds.getHeight() / 2 - SPLASH_HEIGHT / 2);
-		initStage.show();
-	}
+	// screen dimensions
+	final static Rectangle2D bounds = Screen.getPrimary().getBounds();
 
 	/**
 	 * begin the game
 	 */
-	private void startGame()
+	public static void startGame(Stage initStage, String title)
 	{
+		PauseTransition pause = new PauseTransition(Duration.seconds(1));
+		
+		/*
+		 * show the splash screen
+		 */
+		initStage.initStyle(StageStyle.UNDECORATED);
+		initStage.setTitle(title);
+		initStage.setScene(splash);
+		initStage.setX(bounds.getMinX() + bounds.getWidth() / 2 - SPLASH_WIDTH / 2);
+		initStage.setY(bounds.getMinY() + bounds.getHeight() / 2 - SPLASH_HEIGHT / 2);
+		initStage.show();
+
+		/*
+		 * start the game
+		 */
+
 		primaryStage = new Stage(StageStyle.DECORATED);
 		mainPane = new BorderPane();
 		SM = new SetupManagerUI(mainPane);
@@ -85,21 +63,48 @@ public class WindowManager extends Application
 		scene = new Scene(mainPane);
 		scene.getStylesheets().add("elements.css");
 		
-		primaryStage.setTitle(TITLE);
+		primaryStage.setTitle(title);
 		primaryStage.setScene(scene);
 
 		SM.setup();
 		System.out.println("game started");
+
+		// after the given pause time, start the game		
+		pause.setOnFinished(event -> {
+			initStage.hide();
+			primaryStage.show();
+		});
+		pause.play();
 	}
 
+
 	/**
-	 * Program entry point
+	 * show the splash screen on startup, static method called on application initialization
 	 * 
-	 * @param args
+	 * @param initStage
 	 */
-	public static void main(String[] args)
+	public static void showSplash(String title)
 	{
-		launch(args);
+		BorderPane splashPane;
+		ImageView splashImg;
+		
+		// set up the splash pane image
+		splashImg = new ImageView(
+			new Image(splashImgFile, LOGO_WIDTH, 0, true, true)
+			);
+
+		splashImg.maxWidth(LOGO_WIDTH);
+		splashImg.setEffect(new DropShadow());
+
+		// set up the splash pane itself and give it appropriate style
+		splashPane = new BorderPane();
+		splashPane.setPrefHeight(SPLASH_HEIGHT);
+		splashPane.setPrefWidth(SPLASH_WIDTH);
+		splashPane.setCenter(splashImg);
+		splashPane.setStyle(splashStyle);
+		splashPane.setEffect(new DropShadow());
+
+		splash = new Scene(splashPane);
 	}
 	
 	/**
