@@ -22,7 +22,7 @@ public class Main extends Application
 	@Override
 	public void init()
 	{
-		WindowManager.showSplash(TITLE);
+		WindowManager.setupSplash(TITLE);
 	}
 
 	/**

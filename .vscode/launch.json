@@ -6,9 +6,9 @@
     "configurations": [
         {
             "type": "java",
-            "name": "CodeLens (Launch) - WindowManager",
+            "name": "CodeLens (Launch) - Main",
             "request": "launch",
-            "mainClass": "com.silber.ui.WindowManager",
+            "mainClass": "com.silber.javagame.Main",
             "projectName": "javagame"
         },
         {
@@ -19,9 +19,9 @@
         },
         {
             "type": "java",
-            "name": "Debug (Launch)-App<javagame>",
+            "name": "Debug (Launch)-Main<javagame>",
             "request": "launch",
-            "mainClass": "com.silber.javagame.App",
+            "mainClass": "com.silber.javagame.Main",
             "projectName": "javagame"
         }
     ]

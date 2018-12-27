@@ -1,8 +1,7 @@
-package test.groups;
+package com.silber.groups;
 
-import game.groups.*;
-import game.managers.ConfigManager.ShipType;
-import game.players.Player;
+import com.silber.managers.ConfigManager.ShipType;
+import com.silber.players.Player;
 import junit.framework.TestCase;
 
 public class TestFleet extends TestCase

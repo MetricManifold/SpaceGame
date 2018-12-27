@@ -55,7 +55,6 @@ public class WindowManager
 		/*
 		 * start the game
 		 */
-
 		primaryStage = new Stage(StageStyle.DECORATED);
 		mainPane = new BorderPane();
 		SM = new SetupManagerUI(mainPane);
@@ -83,7 +82,7 @@ public class WindowManager
 	 * 
 	 * @param initStage
 	 */
-	public static void showSplash(String title)
+	public static void setupSplash(String title)
 	{
 		BorderPane splashPane;
 		ImageView splashImg;
