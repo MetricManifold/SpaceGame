@@ -1,10 +1,10 @@
-package game.managers;
+package com.silber.managers;
 
 import java.util.ArrayList;
-import game.groups.Fleet;
-import game.managers.PlayerManager.Controller;
-import game.players.Player;
-import game.tiles.Planet;
+import com.silber.groups.Fleet;
+import com.silber.managers.PlayerManager.Controller;
+import com.silber.players.Player;
+import com.silber.tiles.Planet;
 
 /**
  * Responsible for managing turns including updating planet production, fleets sent to other planets Also contains the graphical element

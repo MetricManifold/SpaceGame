@@ -1,4 +1,4 @@
-package game.managers;
+package com.silber.managers;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;

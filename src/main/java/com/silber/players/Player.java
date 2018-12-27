@@ -1,14 +1,14 @@
-package game.players;
+package com.silber.players;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import game.managers.PlanetManager;
-import game.managers.PlayerManager;
-import game.managers.TurnManager;
-import game.managers.PlayerManager.Controller;
-import game.tiles.Planet;
-import game.tiles.Space;
+import com.silber.managers.PlanetManager;
+import com.silber.managers.PlayerManager;
+import com.silber.managers.TurnManager;
+import com.silber.managers.PlayerManager.Controller;
+import com.silber.tiles.Planet;
+import com.silber.tiles.Space;
 
 public class Player
 {

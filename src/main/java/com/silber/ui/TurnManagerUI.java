@@ -1,14 +1,14 @@
-package game.ui;
+package com.silber.ui;
 
-import game.managers.*;
+import com.silber.managers.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import game.groups.ShipGroup;
-import game.groups.ShipInventory;
-import game.tiles.Planet;
+import com.silber.groups.ShipGroup;
+import com.silber.groups.ShipInventory;
+import com.silber.tiles.Planet;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;

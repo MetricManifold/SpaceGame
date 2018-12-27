@@ -1,4 +1,4 @@
-package game.managers;
+package com.silber.managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import game.entities.Bomber;
-import game.entities.Destroyer;
-import game.entities.Fighter;
-import game.entities.Ship;
-import game.players.Player;
+import com.silber.entities.Bomber;
+import com.silber.entities.Destroyer;
+import com.silber.entities.Fighter;
+import com.silber.entities.Ship;
+import com.silber.players.Player;
 
 public class ConfigManager
 {

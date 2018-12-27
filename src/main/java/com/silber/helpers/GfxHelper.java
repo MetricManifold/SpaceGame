@@ -1,4 +1,4 @@
-package game.helpers;
+package com.silber.helpers;
 
 import javafx.geometry.Point2D;
 import javafx.scene.shape.CubicCurve;

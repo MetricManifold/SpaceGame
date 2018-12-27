@@ -1,6 +1,6 @@
-package test.helpers;
+package com.silber.helpers;
 
-import game.helpers.PointerDoubleMatrix;
+import com.silber.helpers.PointerDoubleMatrix;
 import junit.framework.TestCase;
 
 public class TestPointerDoubleMatrix extends TestCase

@@ -1,4 +1,4 @@
-package game.groups;
+package com.silber.groups;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import game.entities.Ship;
-import game.helpers.AccumulateInteger;
-import game.helpers.Tuple;
-import game.managers.ConfigManager.ShipType;
+import com.silber.entities.Ship;
+import com.silber.helpers.AccumulateInteger;
+import com.silber.helpers.Tuple;
+import com.silber.managers.ConfigManager.ShipType;
 
 public abstract class ShipGroup
 {

@@ -1,4 +1,4 @@
-package game.helpers;
+package com.silber.helpers;
 
 public class PointerDoubleMatrix extends Matrix<Pointer<Double>>
 {

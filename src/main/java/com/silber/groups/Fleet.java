@@ -1,4 +1,4 @@
-package game.groups;
+package com.silber.groups;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,13 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import game.entities.Ship;
-import game.helpers.Displacement;
-import game.helpers.PointerDoubleMatrix;
-import game.managers.ConfigManager.ShipType;
-import game.managers.PlanetManager;
-import game.players.Player;
-import game.tiles.Planet;
+import com.silber.entities.Ship;
+import com.silber.helpers.Displacement;
+import com.silber.helpers.PointerDoubleMatrix;
+import com.silber.managers.ConfigManager.ShipType;
+import com.silber.managers.PlanetManager;
+import com.silber.players.Player;
+import com.silber.tiles.Planet;
 
 public class Fleet extends ShipGroup
 {

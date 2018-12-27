@@ -1,17 +1,17 @@
-package game.ui;
+package com.silber.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map.Entry;
 
-import game.managers.ConfigManager;
-import game.managers.MusicManager;
-import game.managers.PlayerManager;
-import game.managers.PlayerManager.Controller;
-import game.managers.SetupManager;
-import game.managers.ConfigManager.ShipType;
-import game.players.Player;
-import game.tiles.Planet;
+import com.silber.managers.ConfigManager;
+import com.silber.managers.MusicManager;
+import com.silber.managers.PlayerManager;
+import com.silber.managers.PlayerManager.Controller;
+import com.silber.managers.SetupManager;
+import com.silber.managers.ConfigManager.ShipType;
+import com.silber.players.Player;
+import com.silber.tiles.Planet;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;

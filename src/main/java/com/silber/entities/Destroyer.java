@@ -1,6 +1,6 @@
-package game.entities;
+package com.silber.entities;
 
-import game.managers.ConfigManager.ShipType;
+import com.silber.managers.ConfigManager.ShipType;
 
 public class Destroyer extends Ship
 {

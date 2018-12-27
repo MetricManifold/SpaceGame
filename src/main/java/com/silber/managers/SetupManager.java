@@ -1,4 +1,4 @@
-package game.managers;
+package com.silber.managers;
 
 public class SetupManager
 {

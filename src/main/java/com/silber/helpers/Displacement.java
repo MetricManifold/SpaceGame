@@ -1,6 +1,6 @@
-package game.helpers;
+package com.silber.helpers;
 
-import game.ui.PlanetManagerUI;
+import com.silber.ui.PlanetManagerUI;
 
 public class Displacement
 {

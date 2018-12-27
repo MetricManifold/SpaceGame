@@ -1,7 +1,7 @@
-package game.entities;
+package com.silber.entities;
 
-import game.helpers.Tuple;
-import game.managers.ConfigManager.ShipType;
+import com.silber.helpers.Tuple;
+import com.silber.managers.ConfigManager.ShipType;
 
 public abstract class Ship
 {

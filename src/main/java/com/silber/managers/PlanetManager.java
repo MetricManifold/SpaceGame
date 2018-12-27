@@ -1,4 +1,4 @@
-package game.managers;
+package com.silber.managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 
-import game.managers.PlayerManager.Controller;
-import game.players.Player;
-import game.tiles.Planet;
-import game.tiles.Space;
+import com.silber.managers.PlayerManager.Controller;
+import com.silber.players.Player;
+import com.silber.tiles.Planet;
+import com.silber.tiles.Space;
 
 public class PlanetManager
 {

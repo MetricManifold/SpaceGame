@@ -1,8 +1,8 @@
-package game.groups;
+package com.silber.groups;
 
 import java.util.List;
-import game.entities.Ship;
-import game.managers.ConfigManager.ShipType;
+import com.silber.entities.Ship;
+import com.silber.managers.ConfigManager.ShipType;
 
 public class ShipInventory extends ShipGroup
 {

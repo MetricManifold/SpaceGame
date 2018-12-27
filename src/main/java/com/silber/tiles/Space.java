@@ -1,6 +1,6 @@
-package game.tiles;
+package com.silber.tiles;
 
-import game.helpers.Displacement;
+import com.silber.helpers.Displacement;
 import javafx.scene.control.Tooltip;
 
 public class Space

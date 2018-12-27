@@ -1,11 +1,11 @@
-package game.managers;
+package com.silber.managers;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import game.entities.Destroyer;
-import game.entities.Ship;
+import com.silber.entities.Destroyer;
+import com.silber.entities.Ship;
 
 public class ConfigurationManager
 {

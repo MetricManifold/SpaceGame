@@ -1,9 +1,9 @@
-package game.players;
+package com.silber.players;
 
-import game.managers.PlanetManager;
-import game.managers.PlayerManager;
-import game.managers.PlayerManager.Controller;
-import game.managers.TurnManager;
+import com.silber.managers.PlanetManager;
+import com.silber.managers.PlayerManager;
+import com.silber.managers.PlayerManager.Controller;
+import com.silber.managers.TurnManager;
 
 public class Neutral extends Player
 {

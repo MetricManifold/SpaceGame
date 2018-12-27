@@ -1,12 +1,12 @@
-package game.managers;
+package com.silber.managers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import game.groups.ShipGroup;
-import game.players.Neutral;
-import game.players.Player;
+import com.silber.groups.ShipGroup;
+import com.silber.players.Neutral;
+import com.silber.players.Player;
 
 /**
  * Responsible for managing player actions and updating the current player per turn

@@ -1,4 +1,4 @@
-package game.helpers;
+package com.silber.helpers;
 
 import java.lang.reflect.Array;
 

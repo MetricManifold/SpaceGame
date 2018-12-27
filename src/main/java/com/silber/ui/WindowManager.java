@@ -1,4 +1,4 @@
-package game.ui;
+package com.silber.ui;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Application;

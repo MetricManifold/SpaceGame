@@ -1,16 +1,16 @@
-package game.ui;
+package com.silber.ui;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import game.managers.*;
-import game.groups.Fleet;
-import game.helpers.Displacement;
-import game.helpers.GfxHelper;
-import game.players.Player;
-import game.tiles.Planet;
-import game.tiles.Space;
+import com.silber.managers.*;
+import com.silber.groups.Fleet;
+import com.silber.helpers.Displacement;
+import com.silber.helpers.GfxHelper;
+import com.silber.players.Player;
+import com.silber.tiles.Planet;
+import com.silber.tiles.Space;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;

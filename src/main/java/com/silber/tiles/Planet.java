@@ -1,15 +1,15 @@
-package game.tiles;
+package com.silber.tiles;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import game.groups.Fleet;
-import game.groups.ShipInventory;
-import game.helpers.Displacement;
-import game.managers.ConfigManager;
-import game.managers.ConfigManager.ShipType;
-import game.players.Player;
+import com.silber.groups.Fleet;
+import com.silber.groups.ShipInventory;
+import com.silber.helpers.Displacement;
+import com.silber.managers.ConfigManager;
+import com.silber.managers.ConfigManager.ShipType;
+import com.silber.players.Player;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
